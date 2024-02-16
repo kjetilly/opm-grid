@@ -45,15 +45,16 @@
 #include "preprocess.h"
 #include "uniquepoints.h"
 
-#define MIN(i,j) (((i) < (j)) ? (i) : (j))
-#define MAX(i,j) (((i) > (j)) ? (i) : (j))
+#define MIN(i, j) (((i) < (j)) ? (i) : (j))
+#define MAX(i, j) (((i) > (j)) ? (i) : (j))
 
 /*-----------------------------------------------------------------
   Compare function passed to qsortx  */
-static int compare(const void *a, const void *b)
+static int
+compare(const void* a, const void* b)
 {
-    const double a0 = *(const double*) a;
-    const double b0 = *(const double*) b;
+    const double a0 = *(const double*)a;
+    const double b0 = *(const double*)b;
 
     /*                { -1, a < b
      * compare(a,b) = {  0, a = b
@@ -63,41 +64,44 @@ static int compare(const void *a, const void *b)
 
 /*-----------------------------------------------------------------
   Creat sorted list of z-values in zcorn with actnum==1x */
-static int createSortedList(double *list, int n, int m,
-                            const double *z[], const int *a[])
+static int
+createSortedList(double* list, int n, int m, const double* z[], const int* a[])
 {
-    int i,j;
-    double *ptr = list;
-    for (i=0; i<n; ++i){
-        for (j=0; j<m; ++j){
-            if (a[j][i/2])  *ptr++ = z[j][i];
+    int i, j;
+    double* ptr = list;
+    for (i = 0; i < n; ++i) {
+        for (j = 0; j < m; ++j) {
+            if (a[j][i / 2])
+                *ptr++ = z[j][i];
             /* else        fprintf(stderr, "skipping point in inactive cell\n"); */
         }
     }
 
-    qsort(list, ptr-list, sizeof(double), compare);
-    return ptr-list;
+    qsort(list, ptr - list, sizeof(double), compare);
+    return ptr - list;
 }
 
 
 /*-----------------------------------------------------------------
   Remove points less than <tolerance> apart in <list> of increasing
   doubles.  */
-static int uniquify(int n, double *list, double tolerance)
+static int
+uniquify(int n, double* list, double tolerance)
 {
-    int    i;
-    int    pos;
+    int i;
+    int pos;
     double val;
 
-    assert (!(tolerance < 0.0));
+    assert(!(tolerance < 0.0));
 
-    if (n<1) return 0;
+    if (n < 1)
+        return 0;
     pos = 0;
-    val = list[pos++];/* Keep first value */
+    val = list[pos++]; /* Keep first value */
 
-    for (i=1; i<n; ++i){
-        if (val + tolerance < list [i]){
-            val         = list[i];
+    for (i = 1; i < n; ++i) {
+        if (val + tolerance < list[i]) {
+            val = list[i];
             list[pos++] = val;
         }
     }
@@ -114,7 +118,7 @@ static int uniquify(int n, double *list, double tolerance)
       second-to-last point as it cannot be distinguished from "final"
       point.
     */
-    list[pos-1] = list[n-1];
+    list[pos - 1] = list[n - 1];
 
     return pos;
 }
@@ -122,14 +126,15 @@ static int uniquify(int n, double *list, double tolerance)
 
 /*-----------------------------------------------------------------
   Along single pillar: */
-static int assignPointNumbers(int    begin,
-                              int    end,
-                              const double *zlist,
-                              int    n,
-                              const double *zcorn,
-                              const int    *actnum,
-                              int    *plist,
-                              double tolerance)
+static int
+assignPointNumbers(int begin,
+                   int end,
+                   const double* zlist,
+                   int n,
+                   const double* zcorn,
+                   const int* actnum,
+                   int* plist,
+                   double tolerance)
 {
     /* n     - number of cells */
     /* zlist - list of len unique z-values */
@@ -139,29 +144,29 @@ static int assignPointNumbers(int    begin,
     /* All points should now be within tolerance of a listed point. */
 
 
-    const double *z = zcorn;
-    const int    *a = actnum;
-    int    *p = plist;
+    const double* z = zcorn;
+    const int* a = actnum;
+    int* p = plist;
 
     k = begin;
     *p++ = INT_MIN; /* Padding to ease processing of faults */
-    for (i=0; i<n; ++i){
+    for (i = 0; i < n; ++i) {
 
         /* Skip inactive cells */
-        if (!a[i/2]) {
-            p[0] = p[-1];  /* Inactive cells are collapsed leaving
-                            * void space.*/
+        if (!a[i / 2]) {
+            p[0] = p[-1]; /* Inactive cells are collapsed leaving
+                           * void space.*/
             ++p;
             continue;
         }
 
         /* Find next k such that zlist[k] < z[i] < zlist[k+1] */
-        while ((k < end) && (zlist[k] + tolerance < z[i])){
+        while ((k < end) && (zlist[k] + tolerance < z[i])) {
             k++;
         }
 
         /* assert (k < len && z[i] - zlist[k] <= tolerance) */
-        if ((k == end) || ( zlist[k] + tolerance < z[i])){
+        if ((k == end) || (zlist[k] + tolerance < z[i])) {
             fprintf(stderr, "Cannot associate  zcorn values with given list\n");
             fprintf(stderr, "of z-coordinates to given tolerance\n");
             return 0;
@@ -169,7 +174,7 @@ static int assignPointNumbers(int    begin,
 
         *p++ = k;
     }
-    *p++ = INT_MAX;/* Padding to ease processing of faults */
+    *p++ = INT_MAX; /* Padding to ease processing of faults */
 
 
     return 1;
@@ -178,23 +183,20 @@ static int assignPointNumbers(int    begin,
 
 /* ---------------------------------------------------------------------- */
 static void
-vector_positions(const int dims[3] ,
-                 const int i       ,
-                 const int j       ,
-                 size_t    start[4])
+vector_positions(const int dims[3], const int i, const int j, size_t start[4])
 /* ---------------------------------------------------------------------- */
 {
     size_t im, ip, jm, jp;
 
-    im = MAX(1,       i  ) - 1;
-    jm = MAX(1,       j  ) - 1;
-    ip = MIN(dims[0], i+1) - 1;
-    jp = MIN(dims[1], j+1) - 1;
+    im = MAX(1, i) - 1;
+    jm = MAX(1, j) - 1;
+    ip = MIN(dims[0], i + 1) - 1;
+    jp = MIN(dims[1], j + 1) - 1;
 
-    start[ 0 ] = dims[2] * (im + dims[0]*jm);
-    start[ 1 ] = dims[2] * (im + dims[0]*jp);
-    start[ 2 ] = dims[2] * (ip + dims[0]*jm);
-    start[ 3 ] = dims[2] * (ip + dims[0]*jp);
+    start[0] = dims[2] * (im + dims[0] * jm);
+    start[1] = dims[2] * (im + dims[0] * jp);
+    start[2] = dims[2] * (ip + dims[0] * jm);
+    start[3] = dims[2] * (ip + dims[0] * jp);
 }
 
 
@@ -203,8 +205,8 @@ vector_positions(const int dims[3] ,
   faster than j, and Cartesian dimensions <dims>, find pointers to the
   (i-1, j-1, 0), (i-1, j, 0), (i, j-1, 0) and (i, j, 0) elements of
   field.  */
-static void igetvectors(const int dims[3], int i, int j,
-                        const int *field, const int *v[])
+static void
+igetvectors(const int dims[3], int i, int j, const int* field, const int* v[])
 {
     size_t p, start[4];
 
@@ -221,8 +223,8 @@ static void igetvectors(const int dims[3], int i, int j,
   faster than j, and Cartesian dimensions <dims>, find pointers to the
   (i-1, j-1, 0), (i-1, j, 0), (i, j-1, 0) and (i, j, 0) elements of
   field.  */
-static void dgetvectors(const int dims[3], int i, int j,
-                        const double *field, const double *v[])
+static void
+dgetvectors(const int dims[3], int i, int j, const double* field, const double* v[])
 {
     size_t p, start[4];
 
@@ -238,7 +240,8 @@ static void dgetvectors(const int dims[3], int i, int j,
   Given a z coordinate, find x and y coordinates on line defined by
   coord.  Coord points to a vector of 6 doubles [x0,y0,z0,x1,y1,z1].
   */
-static void interpolate_pillar(const double *coord, double *pt)
+static void
+interpolate_pillar(const double* coord, double* pt)
 {
     double a;
 
@@ -249,15 +252,14 @@ static void interpolate_pillar(const double *coord, double *pt)
     } else {
 
         a = 0;
-
     }
 
 #if 0
     pt[0]       = coord[0] + a*(coord[3]-coord[0]);
     pt[1]       = coord[1] + a*(coord[4]-coord[1]);
 #else
-    pt[0]       = (1.0 - a)*coord[0] + a*coord[3];
-    pt[1]       = (1.0 - a)*coord[1] + a*coord[4];
+    pt[0] = (1.0 - a) * coord[0] + a * coord[3];
+    pt[1] = (1.0 - a) * coord[1] + a * coord[4];
 #endif
 }
 
@@ -265,70 +267,71 @@ static void interpolate_pillar(const double *coord, double *pt)
   Assign point numbers p such that "zlist(p)==zcorn".  Assume that
   coordinate number is arranged in a sequence such that the natural
   index is (k,i,j) */
-int finduniquepoints(const struct grdecl *g,
-                     /* return values: */
-                     int           *plist, /* list of point numbers on
-                                            * each pillar*/
-                     double tolerance,
-                     struct processed_grid *out)
+int
+finduniquepoints(const struct grdecl* g,
+                 /* return values: */
+                 int* plist, /* list of point numbers on
+                              * each pillar*/
+                 double tolerance,
+                 struct processed_grid* out)
 
 {
 
     const int nx = out->dimensions[0];
     const int ny = out->dimensions[1];
     const int nz = out->dimensions[2];
-    const int nc = g->dims[0]*g->dims[1]*g->dims[2];
+    const size_t nc = g->dims[0] * g->dims[1] * g->dims[2];
 
 
     /* zlist may need extra space temporarily due to simple boundary
      * treatement  */
-    int            npillarpoints = 8*(nx+1)*(ny+1)*nz;
-    int            npillars      = (nx+1)*(ny+1);
+    int npillarpoints = 8 * (nx + 1) * (ny + 1) * nz;
+    int npillars = (nx + 1) * (ny + 1);
 
-    double *zlist = malloc(npillarpoints*sizeof *zlist);
-    int     *zptr = malloc((npillars+1)*sizeof *zptr);
-
-
+    double* zlist = malloc(npillarpoints * sizeof *zlist);
+    int* zptr = malloc((npillars + 1) * sizeof *zptr);
 
 
-    int     i,j,k;
 
-    int     d1[3];
-    int     len    = 0;
-    double  *zout  = zlist;
-    int     pos    = 0;
-    double *pt;
-    const double *z[4];
-    const int *a[4];
-    int *p;
+
+    int i, j, k;
+
+    int d1[3];
+    int len = 0;
+    double* zout = zlist;
+    int pos = 0;
+    double* pt;
+    const double* z[4];
+    const int* a[4];
+    int* p;
     int pix, cix;
     int zix;
 
-    const double *coord = g->coord;
+    const double* coord = g->coord;
 
-    d1[0] = 2*g->dims[0];
-    d1[1] = 2*g->dims[1];
-    d1[2] = 2*g->dims[2];
+    d1[0] = 2 * g->dims[0];
+    d1[1] = 2 * g->dims[1];
+    d1[2] = 2 * g->dims[2];
 
-    out->node_coordinates = malloc (3*8*nc*sizeof(*out->node_coordinates));
+    out->node_coordinates = malloc(3 * 8 * (size_t)(nc) * sizeof(*out->node_coordinates));
 
     zptr[pos++] = zout - zlist;
 
-    pt    = out->node_coordinates;
+    pt = out->node_coordinates;
 
     /* Loop over pillars, find unique points on each pillar */
-    for (j=0; j < g->dims[1]+1; ++j){
-        for (i=0; i < g->dims[0]+1; ++i){
+    for (j = 0; j < g->dims[1] + 1; ++j) {
+        for (i = 0; i < g->dims[0] + 1; ++i) {
 
             /* Get positioned pointers for actnum and zcorn data */
-            igetvectors(g->dims,   i,   j, g->actnum, a);
-            dgetvectors(d1,      2*i, 2*j, g->zcorn,  z);
+            igetvectors(g->dims, i, j, g->actnum, a);
+            dgetvectors(d1, 2 * i, 2 * j, g->zcorn, z);
 
-            len = createSortedList(     zout, d1[2], 4, z, a);
-            len = uniquify        (len, zout, tolerance);
+            len = createSortedList(zout, d1[2], 4, z, a);
+            len = uniquify(len, zout, tolerance);
 
             /* Assign unique points */
-            for (k=0; k<len; ++k){
+            for (k = 0; k < len; ++k) {
                 pt[2] = zout[k];
                 interpolate_pillar(coord, pt);
                 pt += 3;
@@ -336,39 +339,37 @@ int finduniquepoints(const struct grdecl *g,
 
             /* Increment pointer to sparse table of unique zcorn
              * values */
-            zout        = zout + len;
+            zout = zout + len;
             zptr[pos++] = zout - zlist;
 
             coord += 6;
         }
     }
-    out->number_of_nodes_on_pillars = zptr[pos-1];
-    out->number_of_nodes            = zptr[pos-1];
+    out->number_of_nodes_on_pillars = zptr[pos - 1];
+    out->number_of_nodes = zptr[pos - 1];
 
     /* Loop over all vertical sets of zcorn values, assign point
      * numbers */
     p = plist;
-    for (j=0; j < 2*g->dims[1]; ++j){
-        for (i=0; i < 2*g->dims[0]; ++i){
+    for (j = 0; j < 2 * g->dims[1]; ++j) {
+        for (i = 0; i < 2 * g->dims[0]; ++i) {
 
             /* pillar index */
-            pix = (i+1)/2 + (g->dims[0]+1)*((j+1)/2);
+            pix = (i + 1) / 2 + (g->dims[0] + 1) * ((j + 1) / 2);
 
             /* cell column position */
-            cix = g->dims[2]*((i/2) + (j/2)*g->dims[0]);
+            cix = g->dims[2] * ((i / 2) + (j / 2) * g->dims[0]);
 
             /* zcorn column position */
-            zix = 2*g->dims[2]*(i+2*g->dims[0]*j);
+            zix = 2 * g->dims[2] * (i + 2 * g->dims[0] * j);
 
-            if (!assignPointNumbers(zptr[pix], zptr[pix+1], zlist,
-                                    2*g->dims[2],
-                                    g->zcorn  + zix, g->actnum + cix,
-                                    p, tolerance)){
+            if (!assignPointNumbers(
+                    zptr[pix], zptr[pix + 1], zlist, 2 * g->dims[2], g->zcorn + zix, g->actnum + cix, p, tolerance)) {
                 fprintf(stderr, "Something went wrong in assignPointNumbers");
                 return 0;
             }
 
-            p += 2 + 2*g->dims[2];
+            p += 2 + 2 * g->dims[2];
         }
     }
 
