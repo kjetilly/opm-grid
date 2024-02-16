@@ -109,6 +109,7 @@ list (APPEND TEST_SOURCE_FILES
   tests/test_repairzcorn.cpp
   tests/test_sparsetable.cpp
   tests/test_subgridpart.cpp
+  tests/test_int_overflow_cpgrid.cpp
 	)
 
 if(Boost_VERSION_STRING VERSION_GREATER 1.53)
