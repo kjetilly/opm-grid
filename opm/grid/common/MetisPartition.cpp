@@ -345,7 +345,16 @@ metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
         OPM_THROW(std::runtime_error, "Some other type of general error!");
     }
     
-    return cpgrid::createListsFromParts(cpgrid, wells, possibleFutureConnections, transmissibilities, partitionVector, allowDistributedWells, gridAndWells);
+    auto returnValue = cpgrid::createListsFromParts(cpgrid, wells, possibleFutureConnections, transmissibilities, partitionVector, allowDistributedWells, gridAndWells);
+    {
+        const auto numCells = cpgrid.numCells();
+        std::ofstream out("metis_partition.txt");
+        for (int i = 0; i < numCells; ++i) {
+            out << std::get<0>(returnValue)[i] << std::endl;
+        }
+    }
+
+    return returnValue;
 }
 
 } // namespace cpgrid
