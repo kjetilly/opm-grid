@@ -49,6 +49,7 @@ inline int getCpGridNumCells(void* cpGridPointer, int* err)
 {
     const Dune::CpGrid&  grid = *static_cast<const Dune::CpGrid*>(cpGridPointer);
     *err = ZOLTAN_OK;
+    
     return grid.numCells();
 }
 

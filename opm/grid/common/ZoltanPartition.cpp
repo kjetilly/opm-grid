@@ -25,6 +25,7 @@
 #include <opm/grid/utility/OpmWellType.hpp>
 #include <opm/grid/cpgrid/CpGridData.hpp>
 #include <opm/grid/cpgrid/Entity.hpp>
+#include <opm/input/eclipse/Schedule/Well/Well.hpp>
 #include <algorithm>
 #include <type_traits>
 #endif
@@ -363,6 +364,8 @@ zoltanGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                              &exportLocalGids,   /* Local IDs of the vertices I must send */
                              &exportProcs,    /* Process to which I send each of the vertices */
                              &exportToPart);  /* Partition to which each vertex will belong */
+    
+   
 
     auto importExportLists = makeImportAndExportLists(cpgrid,
                                      cc,
@@ -377,6 +380,13 @@ zoltanGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                                      exportProcs,
                                      importGlobalGids,
                                      allowDistributedWells);
+     {
+        const auto numCells = cpgrid.numCells();
+        std::ofstream out("zoltan_partition.txt");
+        for (int i = 0; i < numCells; ++i) {
+            out <<  iportExportLists.get<0>()[i] << std::endl;
+        }
+    }
     Zoltan_LB_Free_Part(&exportGlobalGids, &exportLocalGids, &exportProcs, &exportToPart);
     Zoltan_LB_Free_Part(&importGlobalGids, &importLocalGids, &importProcs, &importToPart);
     Zoltan_Destroy(&zz);

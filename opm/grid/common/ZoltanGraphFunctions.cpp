@@ -22,6 +22,7 @@
 #include <config.h>
 #endif
 #include <limits>
+#include <iostream>
 
 
 #if defined(HAVE_ZOLTAN) && defined(HAVE_MPI)
@@ -70,6 +71,7 @@ void getCpGridVertexList(void* cpGridPointer, int numGlobalIdEntries,
     {
         gids[idx]   = globalIdSet.id(*cell);
         lids[idx++] = localIdSet.id(*cell);
+        
     }
     *err = ZOLTAN_OK;
 }
@@ -109,6 +111,7 @@ void getCpGridNumEdgesList(void *cpGridPointer, int sizeGID, int sizeLID,
                            int *numEdges, int *err)
 {
     (void) globalID;
+    size_t numEdgesSum = 0;
     const Dune::CpGrid&  grid = *static_cast<const Dune::CpGrid*>(cpGridPointer);
     if ( sizeGID != 1 || sizeLID != 1 || numCells != grid.numCells() )
     {
@@ -118,9 +121,16 @@ void getCpGridNumEdgesList(void *cpGridPointer, int sizeGID, int sizeLID,
     for( int i = 0; i < numCells;  i++ )
     {
         numEdges[i] = getNumberOfEdgesForSpecificCell(grid, localID[i]);
+        numEdgesSum += numEdges[i];
     }
 
     *err = ZOLTAN_OK;
+}
+
+void createMetisGraph(const std::string_view& filename, const Dune::CpGrid& grid)
+{
+    std::ofstream metisGraphFile(filename.data());
+    metisGraphFile << grid.numCells() << " ";
 }
 
 int getNumberOfEdgesForSpecificCellForGridWithWells(const CombinedGridWellGraph& graph, int localCellId) {
@@ -160,9 +170,16 @@ void getCpGridWellsNumEdgesList(void *graphPointer, int sizeGID, int sizeLID,
         *err = ZOLTAN_FATAL;
         return;
     }
+
+    size_t totalEdges = 0;
     for( int i = 0; i < numCells;  i++ )
     {
         numEdges[i] = getNumberOfEdgesForSpecificCellForGridWithWells(graph, localID[i]);
+        totalEdges += numEdges[i];
+    }
+    {
+        std::ofstream metisGraphFile("metisgraph.txt", std::ios::app);
+        metisGraphFile << totalEdges/2 << std::endl;
     }
     *err = ZOLTAN_OK;
 }
@@ -192,7 +209,12 @@ void fillNBORGIDForSpecificCellAndIncrementNeighborCounter(const Dune::CpGrid& g
                 continue;
         }
         nborGID[neighborCounter++] = globalID[otherCell];
+
+        std::ofstream metisGraphFile("metisgraph.txt", std::ios::app);
+        metisGraphFile << globalID[otherCell] << " ";
     }
+    std::ofstream metisGraphFile("metisgraph.txt", std::ios::app);
+    metisGraphFile << std::endl;
 }
 
 void getCpGridEdgeList(void *cpGridPointer, int sizeGID, int sizeLID,
@@ -274,6 +296,8 @@ void fillNBORGIDAndWeightsForSpecificCellAndIncrementNeighborCounterForGridWithW
                 {
                     nborGID[neighborCounter] = globalID[otherCell];
                     ewgts[neighborCounter++] = graph.edgeWeight(face);
+                    std::ofstream metisGraphFile("metisgraph.txt", std::ios::app);
+                    metisGraphFile << globalID[otherCell] + 1<< " ";
                 }
                 continue;
             }
@@ -282,8 +306,12 @@ void fillNBORGIDAndWeightsForSpecificCellAndIncrementNeighborCounterForGridWithW
         {
             nborGID[neighborCounter] = globalID[otherCell];
             ewgts[neighborCounter++] = graph.edgeWeight(face);
+            std::ofstream metisGraphFile("metisgraph.txt", std::ios::app);
+            metisGraphFile << globalID[otherCell] + 1<< " ";
         }
     }
+    std::ofstream metisGraphFile("metisgraph.txt", std::ios::app);
+    metisGraphFile << std::endl;
 }
 
 void getCpGridWellsEdgeList(void *graphPointer, int sizeGID, int sizeLID,
@@ -383,6 +411,7 @@ void setCpGridZoltanGraphFunctions(Zoltan_Struct *zz, const Dune::CpGrid& grid,
     }
     else
     {
+        createMetisGraph("metisgraph.txt", grid);
         Zoltan_Set_Num_Obj_Fn(zz, getCpGridNumCells, gridPointer);
         Zoltan_Set_Obj_List_Fn(zz, getCpGridVertexList, gridPointer);
         Zoltan_Set_Num_Edges_Multi_Fn(zz, getCpGridNumEdgesList, gridPointer);
@@ -404,6 +433,7 @@ void setCpGridZoltanGraphFunctions(Zoltan_Struct *zz,
     }
     else
     {
+        createMetisGraph("metisgraph.txt", *gridPointer);
         CombinedGridWellGraph* graphPointer = const_cast<CombinedGridWellGraph*>(&graph);
         Zoltan_Set_Num_Obj_Fn(zz, getCpGridNumCells, gridPointer);
         Zoltan_Set_Obj_List_Fn(zz, getCpGridVertexList, gridPointer);
