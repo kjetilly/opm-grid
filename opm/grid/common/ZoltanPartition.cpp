@@ -380,11 +380,11 @@ zoltanGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                                      exportProcs,
                                      importGlobalGids,
                                      allowDistributedWells);
-     {
+    {
         const auto numCells = cpgrid.numCells();
         std::ofstream out("zoltan_partition.txt");
         for (int i = 0; i < numCells; ++i) {
-            out <<  iportExportLists.get<0>()[i] << std::endl;
+            out << std::get<0>(importExportLists)[i] << std::endl;
         }
     }
     Zoltan_LB_Free_Part(&exportGlobalGids, &exportLocalGids, &exportProcs, &exportToPart);
@@ -472,7 +472,7 @@ public:
         if (cc.rank() != root)
             importGlobalGids = importGlobalGidsVector.data();
 
-        return makeImportAndExportLists(cpgrid,
+        auto returnvalue =  makeImportAndExportLists(cpgrid,
                                         cc,
                                         wells,
                                         possibleFutureConnections,
@@ -485,6 +485,15 @@ public:
                                         exportToPart,
                                         importGlobalGids,
                                         allowDistributedWells);
+        {
+            const auto numCells = cpgrid.numCells();
+            std::ofstream out("zoltan_partition.txt");
+            for (int i = 0; i < numCells; ++i) {
+                out << std::get<0>(returnvalue)[i] << std::endl;
+            }
+        }
+        return returnvalue;
+        
     }
 
     ~ZoltanSerialPartitioner()
