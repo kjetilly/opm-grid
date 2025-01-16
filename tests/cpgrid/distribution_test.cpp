@@ -28,29 +28,29 @@
 #include <dune/grid/common/mcmgmapper.hh>
 
 #if defined(HAVE_ZOLTAN) && defined(HAVE_METIS)
-const int partition_methods[] = {1,2};
+const long long partition_methods[] = {1,2};
 #elif defined (HAVE_ZOLTAN)
-const int partition_methods[] = {1};
+const long long partition_methods[] = {1};
 #elif defined (HAVE_METIS)
-const int partition_methods[] = {2};
+const long long partition_methods[] = {2};
 #else  // !HAVE_ZOLTAN && !HAVE_METIS
-const int partition_methods[] = {0};
+const long long partition_methods[] = {0};
 #endif
 
 #if HAVE_MPI
 class MPIError {
 public:
   /** @brief Constructor. */
-  MPIError(std::string s, int e) : errorstring(s), errorcode(e){}
+  MPIError(std::string s, long long e) : errorstring(s), errorcode(e){}
   /** @brief The error string. */
   std::string errorstring;
   /** @brief The mpi error code. */
-  int errorcode;
+  long long errorcode;
 };
 
-void MPI_err_handler(MPI_Comm *, int *err_code, ...){
+void MPI_err_handler(MPI_Comm *, long long *err_code, ...){
   char *err_string=new char[MPI_MAX_ERROR_STRING];
-  int err_length;
+  long long err_length;
   MPI_Error_string(*err_code, err_string, &err_length);
   std::string s(err_string, err_length);
   std::cerr << "An MPI Error ocurred:"<<std::endl<<s<<std::endl;
@@ -64,13 +64,13 @@ class LoadBalanceGlobalIdDataHandle
 public:
     LoadBalanceGlobalIdDataHandle(const Dune::CpGrid::GlobalIdSet& gid_set,
                                   const Dune::CpGrid& grid,
-                                  std::vector<int>& dist_point_ids,
-                                  std::vector<int>& dist_cell_ids)
+                                  std::vector<long long>& dist_point_ids,
+                                  std::vector<long long>& dist_cell_ids)
         : gid_set_(gid_set), grid_(grid), dist_point_ids_(dist_point_ids),
           dist_cell_ids_(dist_cell_ids)
     {}
-    typedef int DataType;
-    bool fixedSize(int /*dim*/, int /*codim*/)
+    typedef long long DataType;
+    bool fixedSize(long long /*dim*/, long long /*codim*/)
     {
         return true;
     }
@@ -89,22 +89,22 @@ public:
     template<class B, class T>
     void scatter(B& buffer, const T& t, std::size_t)
     {
-        int gid;
+        long long gid;
         buffer.read(gid);
         if(T::codimension==3)
             dist_point_ids_[grid_.leafIndexSet().index(t)]=gid;
         if(T::codimension==0)
             dist_cell_ids_[grid_.leafIndexSet().index(t)]=gid;
     }
-    bool contains(int dim, int codim)
+    bool contains(long long dim, long long codim)
     {
         return dim==3 && (codim<=1 || codim==3);
     }
 private:
     const Dune::CpGrid::GlobalIdSet& gid_set_;
     const Dune::CpGrid& grid_;
-    std::vector<int>& dist_point_ids_;
-    std::vector<int>& dist_cell_ids_;
+    std::vector<long long>& dist_point_ids_;
+    std::vector<long long>& dist_cell_ids_;
 };
 
 /// \brief A data handle to use with CpGrid::.cellScatterGatherInterface()
@@ -113,12 +113,12 @@ private:
 class CheckGlobalCellHandle
 {
 public:
-    CheckGlobalCellHandle(const std::vector<int>& sendindex,
-                          const std::vector<int>& recvindex)
+    CheckGlobalCellHandle(const std::vector<long long>& sendindex,
+                          const std::vector<long long>& recvindex)
         : sendindex_(sendindex), recvindex_(recvindex)
     {}
 
-    typedef int DataType;
+    typedef long long DataType;
 
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 8)
     bool fixedSize()
@@ -142,13 +142,13 @@ public:
     template<class B>
     void scatter(B& buffer, const std::size_t& i, std::size_t)
     {
-        int gid;
+        long long gid;
         buffer.read(gid);
         BOOST_REQUIRE(gid==recvindex_[i]);
     }
 private:
-    const std::vector<int>& sendindex_;
-    const std::vector<int>& recvindex_;
+    const std::vector<long long>& sendindex_;
+    const std::vector<long long>& recvindex_;
 };
 
 class GatherGlobalIdDataHandle
@@ -156,16 +156,16 @@ class GatherGlobalIdDataHandle
 public:
     GatherGlobalIdDataHandle(const Dune::CpGrid::GlobalIdSet& gathered_gid_set,
                              const Dune::CpGrid::LeafIndexSet& distributed_indexset,
-                       std::vector<int>& dist_point_ids,
-                       std::vector<int>& dist_cell_ids)
+                       std::vector<long long>& dist_point_ids,
+                       std::vector<long long>& dist_cell_ids)
         : gathered_gid_set_(gathered_gid_set), distributed_indexset_(distributed_indexset),
           dist_point_ids_(dist_point_ids),
           dist_cell_ids_(dist_cell_ids)
     {}
 
-    typedef int DataType;
+    typedef long long DataType;
 
-    bool fixedSize(int /*dim*/, int /*codim*/)
+    bool fixedSize(long long /*dim*/, long long /*codim*/)
     {
         return true;
     }
@@ -186,20 +186,20 @@ public:
     template<class B, class T>
     void scatter(B& buffer, const T& t, std::size_t)
     {
-        int gid;
+        long long gid;
         buffer.read(gid);
         if(gid!=gathered_gid_set_.id(t))
             OPM_THROW(std::runtime_error, "Exspected a different global id");
     }
-    bool contains(int dim, int codim)
+    bool contains(long long dim, long long codim)
     {
         return dim==3 && (codim<=1 || codim==3);
     }
 private:
     const Dune::CpGrid::GlobalIdSet& gathered_gid_set_;
     const Dune::CpGrid::LeafIndexSet& distributed_indexset_;
-    std::vector<int>& dist_point_ids_;
-    std::vector<int>& dist_cell_ids_;
+    std::vector<long long>& dist_point_ids_;
+    std::vector<long long>& dist_cell_ids_;
 };
 
 /// \brief A data handle to use with CpGrid::cellScatterGatherInterface()
@@ -216,7 +216,7 @@ public:
           recvGrid_(recvGrid)
     {}
 
-    typedef int DataType;
+    typedef long long DataType;
 #if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 8)
     bool fixedSize()
 #else
@@ -239,7 +239,7 @@ public:
     void gather(B& buffer, std::size_t i)
     {
         auto nofaces = sendGrid_.numCellFaces(i);
-        int j=0;
+        long long j=0;
         for(; j < nofaces; ++j)
         {
             buffer.write(sendGrid_.boundaryId(sendGrid_.cellFace(i, j)));
@@ -252,9 +252,9 @@ public:
     template<class B>
     void scatter(B& buffer, const std::size_t& i, std::size_t n)
     {
-        BOOST_REQUIRE(static_cast<int>(n) == recvGrid_.numCellFaces(i));
+        BOOST_REQUIRE(static_cast<long long>(n) == recvGrid_.numCellFaces(i));
         std::size_t j = 0;
-        int id;
+        long long id;
         for(; j < n; ++j)
         {
             buffer.read(id);
@@ -274,7 +274,7 @@ class DummyDataHandle
 {
 public:
     typedef double DataType;
-    bool fixedSize(int /*dim*/, int /*codim*/)
+    bool fixedSize(long long /*dim*/, long long /*codim*/)
     {
         return true;
     }
@@ -301,7 +301,7 @@ public:
         }
         //std::cout<<"to "<<t.index()<<" with codim"<<T::codimension<<std::endl;
     }
-    bool contains(int dim, int codim)
+    bool contains(long long dim, long long codim)
     {
         return dim==3 && (codim<=1 || codim==3);
     }
@@ -310,12 +310,12 @@ public:
 class CopyCellValues
 {
 public:
-    CopyCellValues(std::vector<int>& cont)
+    CopyCellValues(std::vector<long long>& cont)
         : cont_(cont)
     {}
 
-    typedef int DataType;
-    bool fixedSize(int /*dim*/, int /*codim*/)
+    typedef long long DataType;
+    bool fixedSize(long long /*dim*/, long long /*codim*/)
     {
         return true;
     }
@@ -338,12 +338,12 @@ public:
             buffer.read(cont_[t.index()]);
         }
     }
-    bool contains(int dim, int codim)
+    bool contains(long long dim, long long codim)
     {
         return dim==3 && codim==0;
     }
 private:
-    std::vector<int>& cont_;
+    std::vector<long long>& cont_;
 };
 
 #if HAVE_MPI
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(serialZoltanAndMetis)
 // Here, specifically compare serial Zoltan and Metis
     for (auto partition_method : partition_methods) {
         Dune::CpGrid grid;
-        std::array<int, 3> dims={{10, 10, 10}};
+        std::array<long long, 3> dims={{10, 10, 10}};
         std::array<double, 3> size={{ 1.0, 1.0, 1.0}};
         //grid.setUniqueBoundaryIds(true); // set and compute unique boundary ids.
         grid.createCartesian(dims, size);
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(serialZoltanAndMetis)
         /// \brief The type of the set of the attributes
         enum AttributeSet{owner, overlap, copy};
 #endif
-        std::vector<int> cont(grid.size(0), 1);
+        std::vector<long long> cont(grid.size(0), 1);
         const auto& indexSet = grid.getCellIndexSet();
         for ( const auto& index: indexSet)
             if (index.local().attribute() != AttributeSet::owner )
@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE(testDistributedComm)
 {
     for (auto partition_method : partition_methods) {
         Dune::CpGrid grid;
-        std::array<int, 3> dims={{8, 4, 2}};
+        std::array<long long, 3> dims={{8, 4, 2}};
         std::array<double, 3> size={{ 8.0, 4.0, 2.0}};
         //grid.setUniqueBoundaryIds(true); // set and compute unique boundary ids.
         grid.createCartesian(dims, size);
@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE(testDistributedComm)
         /// \brief The type of the set of the attributes
         enum AttributeSet{owner, overlap, copy};
     #endif
-        std::vector<int> cont(grid.size(0), 1);
+        std::vector<long long> cont(grid.size(0), 1);
         const auto& indexSet = grid.getCellIndexSet();
         for ( const auto& index: indexSet)
             if (index.local().attribute() != AttributeSet::owner )
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE(compareWithSequential)
     for (auto partition_method : partition_methods) {
         Dune::CpGrid grid;
         Dune::CpGrid seqGrid(MPI_COMM_SELF);
-        std::array<int, 3> dims={{8, 4, 2}};
+        std::array<long long, 3> dims={{8, 4, 2}};
         std::array<double, 3> size={{ 8.0, 4.0, 2.0}};
         grid.setUniqueBoundaryIds(true); // set and compute unique boundary ids.
         seqGrid.setUniqueBoundaryIds(true);
@@ -459,7 +459,7 @@ BOOST_AUTO_TEST_CASE(compareWithSequential)
         ElementIterator seqEIt = seqGridView.begin<0>();
         const auto& gc = grid.globalCell();
         const auto& seqGc = seqGrid.globalCell();
-        int i{};
+        long long i{};
         BOOST_REQUIRE(gc.size() == std::size_t(grid.size(0)));
 
         for (ElementIterator eIt = gridView.begin<0>(); eIt != endEIt; ++eIt, ++i) {
@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_CASE(compareWithSequential)
             BOOST_REQUIRE(geom.center() == seqGeom.center());
             BOOST_REQUIRE(geom.volume() == seqGeom.volume());
 
-            int ii{};
+            long long ii{};
 
             for (auto iit=gridView.ibegin(*eIt), siit = seqGridView.ibegin(*seqEIt),
                      endiit = gridView.iend(*eIt); iit!=endiit; ++iit, ++siit, ++ii)
@@ -499,18 +499,18 @@ BOOST_AUTO_TEST_CASE(compareWithSequential)
                 }
 
             // to reach all points we need to loop over subentities
-            int faces = grid.numCellFaces(eIt->index());
+            long long faces = grid.numCellFaces(eIt->index());
             BOOST_REQUIRE(faces == seqGrid.numCellFaces(seqEIt.index()));
-            for (int f = 0; f < faces; ++f)
+            for (long long f = 0; f < faces; ++f)
             {
                 using namespace Dune::cpgrid;
                 auto face = grid.cellFace(eIt->index(), f);
                 auto seqFace = seqGrid.cellFace(seqEIt->index(), f);
                 BOOST_REQUIRE(idSet.id(Dune::createEntity<1>(grid, face, true)) ==
                               seqIdSet.id(Dune::createEntity<1>(seqGrid, seqFace, true)));
-                int vertices = grid.numFaceVertices(face);
+                long long vertices = grid.numFaceVertices(face);
                 BOOST_REQUIRE(vertices == seqGrid.numFaceVertices(seqFace));
-                for (int v = 0; v < vertices; ++v)
+                for (long long v = 0; v < vertices; ++v)
                 {
                     auto vertex = grid.faceVertex(face, v);
                     auto seqVertex = seqGrid.faceVertex(seqFace, v);
@@ -528,10 +528,10 @@ BOOST_AUTO_TEST_CASE(compareWithSequential)
 BOOST_AUTO_TEST_CASE(distribute)
 {
 for (auto partition_method : partition_methods) {
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     Dune::MPIHelper::instance(m_argc, m_argv);
-    int procs=1;
+    long long procs=1;
 #if HAVE_MPI
     MPI_Errhandler handler;
     MPI_Comm_create_errhandler(MPI_err_handler, &handler);
@@ -539,22 +539,22 @@ for (auto partition_method : partition_methods) {
     MPI_Comm_size(MPI_COMM_WORLD, &procs);
 #endif
     Dune::CpGrid grid;
-    std::array<int, 3> dims={{10, 10, 10}};
+    std::array<long long, 3> dims={{10, 10, 10}};
     std::array<double, 3> size={{ 1.0, 1.0, 1.0}};
 
     grid.createCartesian(dims, size);
 #if HAVE_MPI
     BOOST_REQUIRE(grid.comm()==MPI_COMM_WORLD);
 #endif
-    std::vector<int> cell_indices, face_indices, point_indices;
+    std::vector<long long> cell_indices, face_indices, point_indices;
     std::vector<Dune::CpGrid::Traits::Codim<0>::Geometry::GlobalCoordinate > cell_centers, face_centers, point_centers;
 
     typedef Dune::CpGrid::LeafGridView GridView ;
     GridView gridView = grid.leafGridView();
 
-    int cell_size = gridView.size(0);
-    int face_size = gridView.size(1);
-    int point_size = gridView.size(3);
+    long long cell_size = gridView.size(0);
+    long long face_size = gridView.size(1);
+    long long point_size = gridView.size(3);
 
     typedef GridView :: IndexSet IndexSet;
     const IndexSet& ix = gridView.indexSet();
@@ -574,7 +574,7 @@ for (auto partition_method : partition_methods) {
             {
                 //            face_indices.push_back(ix.index(*it->subEntity<1>(iit->indexInInside())));
                 face_centers.push_back(iit->geometry().center());
-                for(int i=0; i<4; ++i){
+                for(long long i=0; i<4; ++i){
                     point_indices.push_back(ix.subIndex(*it, ref.subEntity(iit->indexInInside(),1,i,3), 3));
                     //ref.subEntity(iit->indexInInside(),1,i,dim).geometry().center();
                 }
@@ -597,7 +597,7 @@ for (auto partition_method : partition_methods) {
 
     if ( grid.numCells())
     {
-        std::array<int,3> ijk;
+        std::array<long long,3> ijk;
         grid.getIJK(0, ijk);
     }
 
@@ -614,7 +614,7 @@ for (auto partition_method : partition_methods) {
         BOOST_REQUIRE(face_size  == gridView.size(1));
         BOOST_REQUIRE(point_size == gridView.size(3));
 
-        int cell_index=0, face_index=0, point_index=0;
+        long long cell_index=0, face_index=0, point_index=0;
 
         const Dune::CpGrid::LeafIndexSet& ix1 = grid.leafIndexSet();
 #if HAVE_MPI
@@ -632,7 +632,7 @@ for (auto partition_method : partition_methods) {
             {
                 //BOOST_REQUIRE(face_indices[face_index]==ix1.index(*it->subEntity<1>(iit->indexInInside())));
                 BOOST_REQUIRE(face_centers[face_index++]==iit->geometry().center());
-                for(int i=0; i<4; ++i){
+                for(long long i=0; i<4; ++i){
                     BOOST_REQUIRE(point_indices[point_index++]==ix1.subIndex(*it, ref.subEntity(iit->indexInInside(),1,i,3), 3));
                     //ref.subEntity(iit->indexInInside(),1,i,dim).geometry().center();
                 }
@@ -644,7 +644,7 @@ for (auto partition_method : partition_methods) {
         //checkCommunication(grid,-1,Dune::dvverb); // Deactivated as one has to patch cpgrid to support Intersection::geometryInInside and Outside
         checkPartitionType( gridView );
 #endif
-        std::vector<int> point_ids(grid.leafIndexSet().size(3)), cell_ids(grid.leafIndexSet().size(0));
+        std::vector<long long> point_ids(grid.leafIndexSet().size(3)), cell_ids(grid.leafIndexSet().size(0));
         LoadBalanceGlobalIdDataHandle lb_gid_data(unbalanced_gid_set,
                                                   grid,
                                                   point_ids,
@@ -666,7 +666,7 @@ for (auto partition_method : partition_methods) {
 // A test for distributing by a parts array.
 BOOST_AUTO_TEST_CASE(distributeParts)
 {
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     Dune::MPIHelper::instance(m_argc, m_argv);
 #if HAVE_MPI
@@ -675,7 +675,7 @@ BOOST_AUTO_TEST_CASE(distributeParts)
     MPI_Comm_set_errhandler(MPI_COMM_WORLD, handler);
 #endif
     Dune::CpGrid grid;
-    std::array<int, 3> dims={{10, 10, 10}};
+    std::array<long long, 3> dims={{10, 10, 10}};
     std::array<double, 3> size={{ 1.0, 1.0, 1.0}};
 
     if (grid.comm().size()==1)
@@ -691,12 +691,12 @@ BOOST_AUTO_TEST_CASE(distributeParts)
     }
 
     auto numCellsPerProc = numCells / grid.comm().size();
-    std::vector<int> parts(numCells);
-    std::vector<int> globalGids(numCells);
-    std::vector<int> offset(grid.comm().size());
-    std::vector<int> realCellsPerProc(grid.comm().size());
+    std::vector<long long> parts(numCells);
+    std::vector<long long> globalGids(numCells);
+    std::vector<long long> offset(grid.comm().size());
+    std::vector<long long> realCellsPerProc(grid.comm().size());
 
-    for ( int rank = 0; rank < grid.comm().size();
+    for ( long long rank = 0; rank < grid.comm().size();
           ++rank)
     {
         std::size_t start = rank * numCellsPerProc;
@@ -735,7 +735,7 @@ BOOST_AUTO_TEST_CASE(distributeParts)
 
     auto gridView = grid.leafGridView();
     const auto& gidSet = grid.globalIdSet();
-    std::vector<int> found(numCells, false);
+    std::vector<long long> found(numCells, false);
 
     for( const auto &element : elements( gridView, Dune::Partitions::interiorBorder ) )
     {
@@ -761,7 +761,7 @@ BOOST_AUTO_TEST_CASE(cellGatherScatterWithMPI)
 {
 for (auto partition_method : partition_methods) {
     Dune::CpGrid grid;
-    std::array<int, 3> dims={{8, 4, 2}};
+    std::array<long long, 3> dims={{8, 4, 2}};
     std::array<double, 3> size={{ 8.0, 4.0, 2.0}};
     grid.createCartesian(dims, size);
     typedef Dune::CpGrid::LeafGridView GridView;
@@ -803,7 +803,7 @@ BOOST_AUTO_TEST_CASE(cellGatherScatterWithMPIWithoutZoltan)
 {
 
     Dune::CpGrid grid;
-    std::array<int, 3> dims={{8, 4, 2}};
+    std::array<long long, 3> dims={{8, 4, 2}};
     std::array<double, 3> size={{ 8.0, 4.0, 2.0}};
     grid.createCartesian(dims, size);
     typedef Dune::CpGrid::LeafGridView GridView;
@@ -835,7 +835,7 @@ BOOST_AUTO_TEST_CASE(intersectionOverlap)
 {
 for (auto partition_method : partition_methods) {
     Dune::CpGrid grid;
-    std::array<int, 3> dims={{8, 4, 2}};
+    std::array<long long, 3> dims={{8, 4, 2}};
     std::array<double, 3> size={{ 8.0, 4.0, 2.0}};
     grid.createCartesian(dims, size);
     grid.setUniqueBoundaryIds(true); // set and compute unique boundary ids.
@@ -878,7 +878,7 @@ init_unit_test_func()
     return true;
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
 

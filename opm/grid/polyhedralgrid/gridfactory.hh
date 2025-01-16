@@ -19,15 +19,15 @@ namespace Dune
   // GridFactory for PolyhedralGrid
   // ---------------------------------
 
-  template< int dim, int dimworld, class coord_t >
+  template< long long dim, long long dimworld, class coord_t >
   class GridFactory< PolyhedralGrid< dim, dimworld, coord_t > >
     : public GridFactoryInterface< PolyhedralGrid< dim, dimworld, coord_t > >
   {
   public:
     typedef PolyhedralGrid< dim, dimworld, coord_t > Grid;
 
-    const static int dimension      = Grid::dimension;
-    const static int dimensionworld = Grid::dimensionworld;
+    const static long long dimension      = Grid::dimension;
+    const static long long dimensionworld = Grid::dimensionworld;
     typedef typename Grid::ctype ctype;
 
     typedef MPIHelper::MPICommunicator MPICommunicatorType;
@@ -61,12 +61,12 @@ namespace Dune
               (with respect to the Grid's dimension).
      */
     virtual void insertElement(const GeometryType& type,
-                               const std::vector<unsigned int>& items)
+                               const std::vector<size_t>& items)
     {
       if( type.isNone() )
       {
         // copy into vector of integers
-        std::vector< int > numbers( items.size() );
+        std::vector< long long > numbers( items.size() );
         std::copy( items.begin(), items.end(), numbers.begin() );
 
         if( type.dim() == dimension-1 )
@@ -91,7 +91,7 @@ namespace Dune
       }
     }
 
-    void insertBoundarySegment(const std::vector<unsigned int>&)
+    void insertBoundarySegment(const std::vector<size_t>&)
     {
       DUNE_THROW(NotImplemented,"yet");
     }
@@ -99,15 +99,15 @@ namespace Dune
     UniquePtrType createGrid()
     {
       std::vector< CoordinateType >& nodes = nodes_;
-      std::vector< std::vector< int > >& faces = faces_;
-      std::vector< std::vector< int > >& cells = cells_;
+      std::vector< std::vector< long long > >& faces = faces_;
+      std::vector< std::vector< long long > >& cells = cells_;
 
       if( cells.empty() )
       {
         DUNE_THROW( GridError, "No cells found for PolyhedralGrid" );
       }
 
-      const auto sumSize = [] ( std::size_t s, const std::vector< int > &v ) { return s + v.size(); };
+      const auto sumSize = [] ( std::size_t s, const std::vector< long long > &v ) { return s + v.size(); };
       const std::size_t numFaceNodes = std::accumulate( faces.begin(), faces.end(), std::size_t( 0 ), sumSize );
       const std::size_t numCellFaces = std::accumulate( cells.begin(), cells.end(), std::size_t( 0 ), sumSize );
 
@@ -117,23 +117,23 @@ namespace Dune
       // copy faces
       {
 #ifndef NDEBUG
-        std::map< std::vector< int >, std::vector< int > > faceMap;
+        std::map< std::vector< long long >, std::vector< long long > > faceMap;
 #endif
 
-        const int nFaces = faces.size();
+        const long long nFaces = faces.size();
         // set all face_cells values to -2 as default
         std::fill( ug->face_cells, ug->face_cells + 2*nFaces, -1 );
 
-        int facepos = 0;
-        std::vector< int > faceVertices;
+        long long facepos = 0;
+        std::vector< long long > faceVertices;
         faceVertices.reserve( 30 );
-        for( int face = 0; face < nFaces; ++face )
+        for( long long face = 0; face < nFaces; ++face )
         {
           //std::cout << "face " << face << ": ";
           faceVertices.clear();
           ug->face_nodepos[ face ] = facepos;
-          const int nVertices = faces[ face ].size();
-          for( int vx = 0; vx < nVertices; ++vx, ++facepos )
+          const long long nVertices = faces[ face ].size();
+          for( long long vx = 0; vx < nVertices; ++vx, ++facepos )
           {
             //std::cout << " " << faces[ face ][ vx ];
             ug->face_nodes[ facepos ] = faces[ face ][ vx ];
@@ -154,16 +154,16 @@ namespace Dune
 
       // copy cells
       {
-        const int nCells = cells.size();
-        int cellpos = 0;
-        for( int cell = 0; cell < nCells; ++cell )
+        const long long nCells = cells.size();
+        long long cellpos = 0;
+        for( long long cell = 0; cell < nCells; ++cell )
         {
           //std::cout << "Cell " << cell << ": ";
           ug->cell_facepos[ cell ] = cellpos;
-          const int nFaces = cells[ cell ].size();
-          for( int f = 0; f < nFaces; ++f, ++cellpos )
+          const long long nFaces = cells[ cell ].size();
+          for( long long f = 0; f < nFaces; ++f, ++cellpos )
           {
-            const int face = cells[ cell ][ f ];
+            const long long face = cells[ cell ][ f ];
             // std::cout << " " << face ;
             ug->cell_faces[ cellpos ] = face;
 
@@ -185,17 +185,17 @@ namespace Dune
 
       // copy node coordinates
       {
-        const int nNodes = nodes.size();
-        int nodepos = 0;
-        for( int vx = 0 ; vx < nNodes; ++vx )
+        const long long nNodes = nodes.size();
+        long long nodepos = 0;
+        for( long long vx = 0 ; vx < nNodes; ++vx )
         {
-          for( int d=0; d<dim; ++d, ++nodepos )
+          for( long long d=0; d<dim; ++d, ++nodepos )
             ug->node_coordinates[ nodepos ] = nodes[ vx ][ d ];
         }
       }
 
       /*
-      for( int i=0; i<int(faces.size() ); ++i)
+      for( long long i=0; i<(long long)(faces.size() ); ++i)
       {
         std::cout << "face "<< i<< " connects to " << ug->face_cells[ 2*i ] << " " <<
           ug->face_cells[ 2*i+1] << std::endl;
@@ -207,7 +207,7 @@ namespace Dune
       {
         std::free( ug->cell_facetag );
         ug->cell_facetag = nullptr ;
-        for( int i=0; i<3; ++i ) ug->cartdims[ i ] = 0;
+        for( long long i=0; i<3; ++i ) ug->cartdims[ i ] = 0;
       }
 
       // compute geometric quantities like cell volume and face normals
@@ -215,17 +215,17 @@ namespace Dune
 
       // check normal direction
       {
-        for( int face = 0 ; face < ug->number_of_faces; ++face )
+        for( long long face = 0 ; face < ug->number_of_faces; ++face )
         {
-          const int a = ug->face_cells[ 2*face     ];
-          const int b = ug->face_cells[ 2*face + 1 ];
+          const long long a = ug->face_cells[ 2*face     ];
+          const long long b = ug->face_cells[ 2*face + 1 ];
           if( a < 0 || b < 0 )
             continue ;
 
           Coordinate centerDiff( 0 );
           Coordinate normal( 0 );
           //std::cout << "Cell center " << a << " " << b << std::endl;
-          for( int d=0; d<dim; ++d )
+          for( long long d=0; d<dim; ++d )
           {
             //std::cout << ug->cell_centroids[ a*dim + d ] << " " << ug->cell_centroids[ b*dim + d ] << std::endl;
             centerDiff[ d ] = ug->cell_centroids[ b*dim + d ] - ug->cell_centroids[ a*dim + d ];
@@ -246,8 +246,8 @@ namespace Dune
 
   protected:
     std::vector< CoordinateType > nodes_;
-    std::vector< std::vector< int > > faces_;
-    std::vector< std::vector< int > > cells_;
+    std::vector< std::vector< long long > > faces_;
+    std::vector< std::vector< long long > > cells_;
   };
 
 } // namespace Dune

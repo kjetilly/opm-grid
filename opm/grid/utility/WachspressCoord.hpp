@@ -43,7 +43,7 @@ namespace Opm
         /// Count of vertices adjacent to a call.
         /// \param[in]  cell   A cell index.
         /// \return            Number of corners of cell.
-        int numCorners(const int cell) const;
+        long long numCorners(const long long cell) const;
 
         /// Compute generalized barycentric coordinates for some point x
         /// with respect to the vertices of a grid cell.
@@ -52,7 +52,7 @@ namespace Opm
         ///                    Must be array of length grid.dimensions.
         /// \param[out] xb     Coordinates of point in barycentric coordinates.
         ///                    Must be array of length numCorners(cell).
-        void cartToBary(const int cell,
+        void cartToBary(const long long cell,
                         const double* x,
                         double* xb) const;
 
@@ -60,8 +60,8 @@ namespace Opm
         // vertex is adjacent to the cell.
         struct CornerInfo
         {
-            int corner_id;         // Unique for each corner.
-            int vertex;            // Shared between corners belonging to different cells.
+            long long corner_id;         // Unique for each corner.
+            long long vertex;            // Shared between corners belonging to different cells.
             double volume;         // Defined as det(N) where N is the matrix of adjacent face normals.
         };
 
@@ -71,13 +71,13 @@ namespace Opm
 
         /// The class stores adjacent faces for each corner, made accessible for user convenience.
         /// \return            The vector of adjacent faces. Size = dim * #corners.
-        const std::vector<int>& adjacentFaces() const;
+        const std::vector<long long>& adjacentFaces() const;
 
     private:
         const UnstructuredGrid& grid_;
         SparseTable<CornerInfo> corner_info_;   // Corner info by cell.
-        std::vector<int> adj_faces_;    // Set of adjacent faces, by corner id. Contains dim face indices per corner.
-        SparseTable<int> nonadj_faces_; // Set of nonadjacent faces, by corner id.
+        std::vector<long long> adj_faces_;    // Set of adjacent faces, by corner id. Contains dim face indices per corner.
+        SparseTable<long long> nonadj_faces_; // Set of nonadjacent faces, by corner id.
     };
 
 } // namespace Opm

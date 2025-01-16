@@ -7,12 +7,12 @@
 
 namespace Dune
 {
-  template <int dim, int dimworld, typename coord_t> class PolyhedralGrid;
+  template <long long dim, long long dimworld, typename coord_t> class PolyhedralGrid;
 
   // PolyhedralGridIdSet
   // -------------------
 
-  template< int dim, int dimworld, typename coord_t >
+  template< long long dim, long long dimworld, typename coord_t >
   class PolyhedralGridIdSet
       : public IdSet< PolyhedralGrid< dim, dimworld, coord_t >, PolyhedralGridIdSet< dim, dimworld, coord_t >, std::size_t /*IdType=size_t*/ >
   {
@@ -29,17 +29,17 @@ namespace Dune
           globalCellPtr_( grid_.globalCellPtr() )
     {
       codimOffset_[ 0 ] = 0;
-      for( int i=1; i<=dim; ++i )
+      for( long long i=1; i<=dim; ++i )
       {
         codimOffset_[ i ] = codimOffset_[ i-1 ] + grid.size( i-1 );
       }
     }
 
     //! id meethod for entity and specific codim
-    template< int codim >
+    template< long long codim >
     IdType id ( const typename Traits::template Codim< codim >::Entity &entity ) const
     {
-      const int index = entity.seed().index();
+      const long long index = entity.seed().index();
       // in case
       if (codim == 0 && globalCellPtr_ )
         return IdType( globalCellPtr_[ index ] );
@@ -65,7 +65,7 @@ namespace Dune
 
     //! subId method for entities
     template< class Entity >
-    IdType subId ( const Entity &entity, int i, unsigned int codim ) const
+    IdType subId ( const Entity &entity, long long i, size_t codim ) const
     {
       if( codim == 0 )
         return id( entity );
@@ -84,7 +84,7 @@ namespace Dune
 
   protected:
     const Grid& grid_;
-    const int* globalCellPtr_;
+    const long long* globalCellPtr_;
     IdType codimOffset_[ dim+1 ];
   };
 

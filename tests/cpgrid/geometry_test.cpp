@@ -40,15 +40,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -131,17 +131,17 @@ BOOST_AUTO_TEST_CASE(cellgeom)
     Geometry::ctype v = 1.0;
     GC corners[8];
     GC cor;
-    for (int k = 0; k < 2; ++k) {
+    for (long long k = 0; k < 2; ++k) {
         cor[2] = k;
-        for (int j = 0; j < 2; ++j) {
+        for (long long j = 0; j < 2; ++j) {
             cor[1] = j;
-            for (int i = 0; i < 2; ++i) {
+            for (long long i = 0; i < 2; ++i) {
                 cor[0] = i;
                 corners[4*k + 2*j + i] = cor;
             }
         }
     }
-//     for (int i = 0; i < 8; ++i) {
+//     for (long long i = 0; i < 8; ++i) {
 //         std::cout << corners[i] << std::endl;
 //     }
     // call empty constructor initialze an object that we point to.
@@ -152,14 +152,14 @@ BOOST_AUTO_TEST_CASE(cellgeom)
         (*pg).push_back(cpgrid::Geometry<0, 3>(crn));
     }
 
-    int cor_idx[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    long long cor_idx[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     Geometry g(c, v, pg, cor_idx);
 
     // Verification of properties.
     BOOST_CHECK(g.type().isCube());
     BOOST_CHECK(!g.affine());
     BOOST_CHECK_EQUAL(g.corners(), 8);
-    for (int i = 0; i < 8; ++i) {
+    for (long long i = 0; i < 8; ++i) {
         BOOST_CHECK_EQUAL(g.corner(i), corners[i]);   // "corner(i)" returns 'pg[cor_idx_[i]].center()'
     }
     BOOST_CHECK_EQUAL(g.volume(), v);
@@ -168,15 +168,15 @@ BOOST_AUTO_TEST_CASE(cellgeom)
     // Verification of properties that depend on the mapping.'
     // Construction refined (local) corners.
     typedef Geometry::LocalCoordinate LC;
-    const int N = 5;  //  4 in each direction
-    const int num_pts = N*N*N;  // total amount of corners
+    const long long N = 5;  //  4 in each direction
+    const long long num_pts = N*N*N;  // total amount of corners
     LC testpts[num_pts] = { LC(0.0) };
     LC pt(0.0);
-    for (int k = 0; k < N; ++k) {
+    for (long long k = 0; k < N; ++k) {
         pt[2] = double(k)/double(N-1);
-        for (int j = 0; j < N; ++j) {
+        for (long long j = 0; j < N; ++j) {
             pt[1] = double(j)/double(N-1);
-            for (int i = 0; i < N; ++i) {
+            for (long long i = 0; i < N; ++i) {
                 pt[0] = double(i)/double(N-1);
                 testpts[k*N*N + j*N + i] = pt;
 //                 std::cout << pt << std::endl;
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(cellgeom)
     }
     Geometry::JacobianTransposed id(0.0);
     id[0][0] = id[1][1] = id[2][2] = 1.0;
-    for (int i = 0; i < num_pts; ++i) { // all refined corners
+    for (long long i = 0; i < num_pts; ++i) { // all refined corners
         BOOST_CHECK_EQUAL(g.global(testpts[i]), testpts[i]);
         BOOST_CHECK_EQUAL(g.local(g.global(testpts[i])), testpts[i]);
         BOOST_CHECK_EQUAL(g.integrationElement(testpts[i]), 1.0);   // 'MatrixHelperType::template sqrtDetAAT<3, 3>(testpts[i])'
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(cellgeom)
     BOOST_CHECK(g.type().isCube());
     BOOST_CHECK(!g.affine());
     BOOST_CHECK_EQUAL(g.corners(), 8);
-    for (int i = 0; i < 8; ++i) {
+    for (long long i = 0; i < 8; ++i) {
         BOOST_CHECK_EQUAL(g.corner(i), corners[i]);
     }
     BOOST_CHECK_EQUAL(g.volume(), v);
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(cellgeom)
 
     // Verification of properties that depend on the mapping.
     const double tolerance = 1e-14;
-    for (int i = 0; i < num_pts; ++i) {
+    for (long long i = 0; i < num_pts; ++i) {
         GC gl = g.global(testpts[i]);
         BOOST_CHECK_EQUAL(gl, Wedge::global(testpts[i]));
         BOOST_CHECK_EQUAL(g.integrationElement(testpts[i]), Wedge::integrationElement(testpts[i]));
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(cellgeom)
 
 
 #define CHECK_COORDINATES(c1, c2)                                        \
-    for (int c = 0; c < 3; c++) {                                        \
+    for (long long c = 0; c < 3; c++) {                                        \
         BOOST_TEST(c1[c] == c2[c], boost::test_tools::tolerance(1e-12)); \
     }
 
@@ -275,22 +275,22 @@ check_refined_grid(const cpgrid::Geometry<3, 3>& parent,
                    const cpgrid::EntityVariable<cpgrid::Geometry<3, 3>,0>& refined,
                    const cpgrid::EntityVariable<cpgrid::Geometry<2,3>,1>& refined_faces,
                    const cpgrid::EntityVariableBase<cpgrid::Geometry<0,3>>& refined_corners,
-                   const std::array<int, 3>& cells_per_dim)
+                   const std::array<long long, 3>& cells_per_dim)
 {
     // Check amount of refined faces.
-    int count_faces = (cells_per_dim[0]*cells_per_dim[1]*(cells_per_dim[2]+1)) // 'bottom/top faces'
+    long long count_faces = (cells_per_dim[0]*cells_per_dim[1]*(cells_per_dim[2]+1)) // 'bottom/top faces'
                     + (cells_per_dim[0]*(cells_per_dim[1]+1)*cells_per_dim[2]) // 'front/back faces'
                     + ((cells_per_dim[0]+1)*cells_per_dim[1]*cells_per_dim[2]);  // 'left/right faces'
     BOOST_CHECK_EQUAL(refined_faces.size(), count_faces);
     // Check amount of refined corners.
-    int count_corners = (cells_per_dim[0]+1)*(cells_per_dim[1]+1)*(cells_per_dim[2]+1);
+    long long count_corners = (cells_per_dim[0]+1)*(cells_per_dim[1]+1)*(cells_per_dim[2]+1);
     BOOST_CHECK_EQUAL(refined_corners.size(), count_corners);
 
 
     using Geometry = cpgrid::Geometry<3, 3>;
     using GlobalCoordinate = Geometry::GlobalCoordinate;
 
-    int count = cells_per_dim[0] * cells_per_dim[1] * cells_per_dim[2];
+    long long count = cells_per_dim[0] * cells_per_dim[1] * cells_per_dim[2];
     BOOST_CHECK_EQUAL(refined.size(), count);
 
 
@@ -318,10 +318,10 @@ check_refined_grid(const cpgrid::Geometry<3, 3>& parent,
     CHECK_COORDINATES(cell_corn7.corner(7), parent.corner(7));
 
     // Make sure the corners of neighboring cells overlap.
-    for (int k = 0; k < cells_per_dim[2]; k++) {
-        int slice = cells_per_dim[1] * cells_per_dim[0];
-        for (int j = 0; j < cells_per_dim[1]; j++) {
-            for (int i = 0; i < cells_per_dim[0]; i++) {
+    for (long long k = 0; k < cells_per_dim[2]; k++) {
+        long long slice = cells_per_dim[1] * cells_per_dim[0];
+        for (long long j = 0; j < cells_per_dim[1]; j++) {
+            for (long long i = 0; i < cells_per_dim[0]; i++) {
                 auto& r0 = refined.get(k * slice + cells_per_dim[0] * j + i);
                 if (i < cells_per_dim[0] - 1) {
                     auto& r1 = refined.get(k * slice + cells_per_dim[0] * j + i + 1);
@@ -351,8 +351,8 @@ check_refined_grid(const cpgrid::Geometry<3, 3>& parent,
     // Check the centers of the cells.
     for (auto r : refined) {
         GlobalCoordinate center = {0.0, 0.0, 0.0};
-        for (int h = 0; h < 8; h++) {
-            for (int c = 0; c < 3; c++) {
+        for (long long h = 0; h < 8; h++) {
+            for (long long c = 0; c < 3; c++) {
                 center[c] += r.corner(h)[c] / 8.0;
             }
         }
@@ -362,7 +362,7 @@ check_refined_grid(const cpgrid::Geometry<3, 3>& parent,
     // Check that the weighted mean of all centers equals the parent center
     GlobalCoordinate center = {0.0, 0.0, 0.0};
     for (auto r : refined) {
-        for (int c = 0; c < 3; c++) {
+        for (long long c = 0; c < 3; c++) {
             center[c] += r.center()[c] * r.volume()
                 / parent.volume();
         }
@@ -372,8 +372,8 @@ check_refined_grid(const cpgrid::Geometry<3, 3>& parent,
     // Check that mean of all corners equals the center of the parent.
     center = {0.0, 0.0, 0.0};
     for (auto r : refined) {
-        for (int h = 0; h < 8; h++) {
-            for (int c = 0; c < 3; c++) {
+        for (long long h = 0; h < 8; h++) {
+            for (long long c = 0; c < 3; c++) {
                 center[c] += r.corner(h)[c] / count / 8;
             }
         }
@@ -389,16 +389,16 @@ check_refined_grid(const cpgrid::Geometry<3, 3>& parent,
 }
 
 void refine_and_check(const cpgrid::Geometry<3, 3>& parent_geometry,
-                      const std::array<int, 3>& cells,
+                      const std::array<long long, 3>& cells,
                       bool is_simple = false)
 {
     using cpgrid::DefaultGeometryPolicy;
     CpGrid refined_grid;
     auto& child_view_data = *(refined_grid.currentData().back());
     cpgrid::OrientedEntityTable<0, 1>& cell_to_face = child_view_data.cell_to_face_;
-    Opm::SparseTable<int>& face_to_point = child_view_data.face_to_point_;
+    Opm::SparseTable<long long>& face_to_point = child_view_data.face_to_point_;
     DefaultGeometryPolicy& geometries = child_view_data.geometry_;
-    std::vector<std::array<int, 8>>& cell_to_point = child_view_data.cell_to_point_;
+    std::vector<std::array<long long, 8>>& cell_to_point = child_view_data.cell_to_point_;
     cpgrid::OrientedEntityTable<1,0>& face_to_cell = child_view_data.face_to_cell_;
     cpgrid::EntityVariable<enum face_tag, 1>& face_tags = child_view_data.face_tag_;
     cpgrid::SignedEntityVariable<Dune::FieldVector<double,3>, 1>& face_normals = child_view_data.face_normals_;
@@ -484,7 +484,7 @@ void refine_and_check(const cpgrid::Geometry<3, 3>& parent_geometry,
 
                         decltype(geom.corner(0)) sum_match{}, sum{};
 
-                        for(int cor = 0; cor < geom.corners(); ++cor)
+                        for(long long cor = 0; cor < geom.corners(); ++cor)
                         {
                             sum += geom.corner(cor);
                             sum_match += geom_match.corner(1);
@@ -525,7 +525,7 @@ BOOST_AUTO_TEST_CASE(refine_simple_cube)
         (*pg).push_back(cpgrid::Geometry<0, 3>(crn));
     }
 
-    int cor_idx[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    long long cor_idx[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     Geometry g(c, v, pg, cor_idx);
 
     refine_and_check(g, {1, 1, 1}, true);
@@ -555,8 +555,8 @@ BOOST_AUTO_TEST_CASE(refine_distorted_cube)
 
     // Calculate the centroid:
     GlobalCoordinate center = {0.0, 0.0, 0.0};
-    for (int h = 0; h < 8; h++) {
-        for (int c = 0; c < 3; c++) {
+    for (long long h = 0; h < 8; h++) {
+        for (long long c = 0; c < 3; c++) {
             center[c] += corners[h][c] / 8.0;
         }
     }
@@ -567,24 +567,24 @@ BOOST_AUTO_TEST_CASE(refine_distorted_cube)
         (*pg).push_back(cpgrid::Geometry<0, 3>(crn));
     }
 
-    int cor_idx[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    long long cor_idx[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     Geometry g(center, v, pg, cor_idx);
     refine_and_check(g, {1, 1, 1});
     refine_and_check(g, {2, 3, 4});
 
 }
 
-void refinePatch_and_check(const std::array<int,3>&,
-                           const std::array<int,3>&,
-                           const std::array<int,3>&)
+void refinePatch_and_check(const std::array<long long,3>&,
+                           const std::array<long long,3>&,
+                           const std::array<long long,3>&)
 {
     // Create a grid that is equivalent to the refinement
     Dune::CpGrid coarse_grid;
     std::array<double, 3> cell_sizes_new = {1.0, 1.0, 1.0};
-    std::array<int, 3> coarse_grid_dim = {4,3,3};
-    std::array<int, 3> cells_per_dim_patch = {2,2,2};
-    std::array<int, 3> start_ijk = {1,0,1};
-    std::array<int, 3> end_ijk = {3,2,3};  // then patch_dim = {3-1,2-0,3-1} ={2,2,2}
+    std::array<long long, 3> coarse_grid_dim = {4,3,3};
+    std::array<long long, 3> cells_per_dim_patch = {2,2,2};
+    std::array<long long, 3> start_ijk = {1,0,1};
+    std::array<long long, 3> end_ijk = {3,2,3};  // then patch_dim = {3-1,2-0,3-1} ={2,2,2}
     coarse_grid.createCartesian(coarse_grid_dim, cell_sizes_new);
     // Call refinePatch()
     coarse_grid.currentData().front()->refinePatch(cells_per_dim_patch, start_ijk, end_ijk);

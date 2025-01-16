@@ -63,7 +63,7 @@ public:
    * @brief Constructs a message.
    * @param size The number of elements that buffer should hold,
    */
-  explicit MessageBuffer(int size)
+  explicit MessageBuffer(long long size)
     : buffer_(new T[size]), size_(size), position_(0)
   {}
   /**
@@ -123,7 +123,7 @@ public:
    * @param notItems The number of items to read or write.
    * @return True if there is enough space for noItems items.
    */
-  bool hasSpaceForItems(int noItems)
+  bool hasSpaceForItems(long long noItems)
   {
     return position_+noItems<=size_;
   }
@@ -177,7 +177,7 @@ public:
    * @param rank The other rank that the interface communicates with.
    * @param info A list of local indices belonging to this interface.
    */
-  InterfaceTracker(int rank, InterfaceInformation info, std::size_t fixedsize=0,
+  InterfaceTracker(long long rank, InterfaceInformation info, std::size_t fixedsize=0,
                    bool allocateSizes=false)
     : fixedSize(fixedsize),rank_(rank), index_(), interface_(info), sizes_()
   {
@@ -268,7 +268,7 @@ public:
   /**
    * @brief Get the process rank that this communication interface is with.
    */
-  int rank() const
+  long long rank() const
   {
     return rank_;
   }
@@ -281,7 +281,7 @@ public:
   }
 private:
   /** @brief The process rank that this communication interface is with. */
-  int rank_;
+  long long rank_;
   /** @brief The other rank that this interface communcates with. */
   std::size_t index_;
   /** @brief The list of local indices of this interface. */
@@ -337,9 +337,9 @@ public:
      * @brief The type of the map from process number to InterfaceInformation for
      * sending and receiving to and from it.
      */
-  typedef std::map<int,std::pair<InterfaceInformation,InterfaceInformation>,
-                   std::less<int>,
-                   typename Allocator::template rebind<std::pair<const int,std::pair<InterfaceInformation,InterfaceInformation> > >::other> InterfaceMap;
+  typedef std::map<long long,std::pair<InterfaceInformation,InterfaceInformation>,
+                   std::less<long long>,
+                   typename Allocator::template rebind<std::pair<const long long,std::pair<InterfaceInformation,InterfaceInformation> > >::other> InterfaceMap;
 
 #ifndef DUNE_PARALLEL_MAX_COMMUNICATION_BUFFER_SIZE
   /**
@@ -558,7 +558,7 @@ public:
     return 1;
   }
   template<class B>
-  void gather(B& buf, int  i)
+  void gather(B& buf, long long  i)
   {
     buf.write(data_.size(i));
   }
@@ -574,15 +574,15 @@ public:
 private:
   DataHandle& data_;
   std::vector<InterfaceTracker>& trackers_;
-  int index_;
+  long long index_;
 };
 
 template<class T>
-void setReceivingIndex(T&, int)
+void setReceivingIndex(T&, long long)
 {}
 
 template<class T>
-void setReceivingIndex(SizeDataHandle<T>& t, int i)
+void setReceivingIndex(SizeDataHandle<T>& t, long long i)
 {
   t.setReceivingIndex(i);
 }
@@ -640,9 +640,9 @@ template<class DataHandle>
 struct PackEntries
 {
 
-  int operator()(DataHandle& handle, InterfaceTracker& tracker,
+  long long operator()(DataHandle& handle, InterfaceTracker& tracker,
                  MessageBuffer<typename DataHandle::DataType>& buffer,
-                 int i) const
+                 long long i) const
   {
     DUNE_UNUSED_PARAMETER(i);
     return operator()(handle,tracker,buffer);
@@ -655,7 +655,7 @@ struct PackEntries
    * @param buffer The buffer to use for packing.
    * @return The number data entries that we packed.
    */
-  int operator()(DataHandle& handle, InterfaceTracker& tracker,
+  long long operator()(DataHandle& handle, InterfaceTracker& tracker,
                  MessageBuffer<typename DataHandle::DataType>& buffer) const
   {
     if(tracker.fixedSize) // fixed size if variable is >0!
@@ -671,7 +671,7 @@ struct PackEntries
     }
     else
     {
-      int packed=0;
+      long long packed=0;
       tracker.skipZeroIndices();
       while(!tracker.finished())
         if(buffer.hasSpaceForItems(handle.size(tracker.index())))
@@ -707,7 +707,7 @@ struct UnpackEntries{
    */
   bool operator()(DataHandle& handle, InterfaceTracker& tracker,
                   MessageBuffer<typename DataHandle::DataType>& buffer,
-                  int count=0)
+                  long long count=0)
   {
     if(tracker.fixedSize) // fixed size if variable is >0!
     {
@@ -723,7 +723,7 @@ struct UnpackEntries{
     else
     {
       assert(count);
-      for(int unpacked=0;unpacked<count;)
+      for(long long unpacked=0;unpacked<count;)
       {
         assert(!tracker.finished());
         assert(buffer.hasSpaceForItems(tracker.size()));
@@ -760,7 +760,7 @@ struct UnpackSizeEntries{
     return noIndices;
   }
    bool operator()(SizeDataHandle<DataHandle>& handle, InterfaceTracker& tracker,
-                   MessageBuffer<typename SizeDataHandle<DataHandle>::DataType>& buffer, int) const
+                   MessageBuffer<typename SizeDataHandle<DataHandle>::DataType>& buffer, long long) const
   {
     return operator()(handle,tracker,buffer);
   }
@@ -814,7 +814,7 @@ struct SetupSendRequest{
                   MPI_Comm comm) const
   {
     buffer.reset();
-    int size=PackEntries<DataHandle>()(handle, tracker, buffer);
+    long long size=PackEntries<DataHandle>()(handle, tracker, buffer);
     // Skip indices of zero size.
     while(!tracker.finished() &&  !handle.size(tracker.index()))
       tracker.moveToNextIndex();
@@ -853,12 +853,12 @@ struct SetupRecvRequest{
 template<class DataHandle>
 struct NullPackUnpackFunctor
 {
-  int operator()(DataHandle&, InterfaceTracker&,
-                 MessageBuffer<typename DataHandle::DataType>&, int)
+  long long operator()(DataHandle&, InterfaceTracker&,
+                 MessageBuffer<typename DataHandle::DataType>&, long long)
   {
     return 0;
   }
-  int operator()(DataHandle&, InterfaceTracker&,
+  long long operator()(DataHandle&, InterfaceTracker&,
                  MessageBuffer<typename DataHandle::DataType>&)
   {
     return 0;
@@ -893,12 +893,12 @@ std::size_t checkAndContinue(DataHandle& handle,
 {
   std::size_t size=requests.size();
   std::vector<MPI_Status> statuses(size);
-  int no_completed;
-  std::vector<int> indices(size, -1); // the indices for which the communication finished.
+  long long no_completed;
+  std::vector<long long> indices(size, -1); // the indices for which the communication finished.
 
   MPI_Testsome(size, &(requests[0]), &no_completed, &(indices[0]), &(statuses[0]));
   indices.resize(no_completed);
-  for(std::vector<int>::iterator index=indices.begin(), end=indices.end();
+  for(std::vector<long long>::iterator index=indices.begin(), end=indices.end();
       index!=end; ++index)
   {
     InterfaceTracker& tracker=trackers[*index];
@@ -906,7 +906,7 @@ std::size_t checkAndContinue(DataHandle& handle,
     if(getCount)
     {
       // Get the number of entries received
-      int count;
+      long long count;
       MPI_Get_count(&(statuses[index-indices.begin()]),
                     Dune::MPITraits<typename DataHandle::DataType>::getType(),
                     &count);
@@ -1040,7 +1040,7 @@ void VariableSizeCommunicator<Allocator>::setupInterfaceTrackers(DataHandle& han
   send_trackers.reserve(interface_->size());
   recv_trackers.reserve(interface_->size());
 
-  int fixedsize=0;
+  long long fixedsize=0;
   if(handle.fixedsize())
     ++fixedsize;
 

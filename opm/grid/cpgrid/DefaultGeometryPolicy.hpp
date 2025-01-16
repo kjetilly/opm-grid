@@ -45,14 +45,14 @@ class CpGrid;
 
 namespace cpgrid
 {
-template<int mydim, int dim>
+template<long long mydim, long long dim>
 class Geometry;
 /// @brief
 /// @todo Doc me!
 class DefaultGeometryPolicy
 {
     friend class CpGridData;
-    template<int mydim, int dim>
+    template<long long mydim, long long dim>
     friend class Geometry;
     friend class ::Dune::CpGrid;
 public:
@@ -82,44 +82,44 @@ public:
     /// @tparam
     /// @param
     /// @return
-    template <int codim>
+    template <long long codim>
     const EntityVariable<cpgrid::Geometry<3 - codim, 3>, codim>& geomVector() const
     {
         static_assert(codim != 2, "");
-        return *geomVector(std::integral_constant<int,codim>());
+        return *geomVector(std::integral_constant<long long,codim>());
     }
 
     /// \brief Get cell geometry
-    std::shared_ptr<const EntityVariable<cpgrid::Geometry<3, 3>, 0>> geomVector(const std::integral_constant<int, 0>&) const
+    std::shared_ptr<const EntityVariable<cpgrid::Geometry<3, 3>, 0>> geomVector(const std::integral_constant<long long, 0>&) const
     {
         return cell_geom_ptr_;
     }
     /// \brief Get cell geometry
-    std::shared_ptr<EntityVariable<cpgrid::Geometry<3, 3>, 0>> geomVector(const std::integral_constant<int, 0>&)
+    std::shared_ptr<EntityVariable<cpgrid::Geometry<3, 3>, 0>> geomVector(const std::integral_constant<long long, 0>&)
     {
         return cell_geom_ptr_;
     }
     /// \brief Get face geometry
-    std::shared_ptr<const EntityVariable<cpgrid::Geometry<2, 3>, 1>> geomVector(const std::integral_constant<int, 1>&) const
+    std::shared_ptr<const EntityVariable<cpgrid::Geometry<2, 3>, 1>> geomVector(const std::integral_constant<long long, 1>&) const
     {
         return face_geom_ptr_;
     }
     /// \brief Get face geometry
-    std::shared_ptr<EntityVariable<cpgrid::Geometry<2, 3>, 1>> geomVector(const std::integral_constant<int, 1>&)
+    std::shared_ptr<EntityVariable<cpgrid::Geometry<2, 3>, 1>> geomVector(const std::integral_constant<long long, 1>&)
     {
         return face_geom_ptr_;
     }
 
     /// \brief Get point geometry
-    template<int codim>
-    std::shared_ptr<const EntityVariable<cpgrid::Geometry<0, 3>, 3>> geomVector(const std::integral_constant<int, codim>&) const
+    template<long long codim>
+    std::shared_ptr<const EntityVariable<cpgrid::Geometry<0, 3>, 3>> geomVector(const std::integral_constant<long long, codim>&) const
     {
         static_assert(codim==3, "Codim has to be 3");
         return point_geom_ptr_;
     }
     /// \brief Get point geometry
-    template<int codim>
-    std::shared_ptr<EntityVariable<cpgrid::Geometry<0, 3>, 3>> geomVector(const std::integral_constant<int, codim>&)
+    template<long long codim>
+    std::shared_ptr<EntityVariable<cpgrid::Geometry<0, 3>, 3>> geomVector(const std::integral_constant<long long, codim>&)
     {
         static_assert(codim==3, "Codim has to be 3");
         return point_geom_ptr_;

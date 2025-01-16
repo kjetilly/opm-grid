@@ -91,9 +91,9 @@ public:
 
     void write( const std::string& str)
     {
-        int size = str.size();
+        long long size = str.size();
         write(size);
-        for (int k = 0; k < size; ++k) {
+        for (long long k = 0; k < size; ++k) {
             write(str[k]);
         }
     }
@@ -111,18 +111,18 @@ public:
 
     void read( std::string& str) const
     {
-        int size = 0;
+        long long size = 0;
         read(size);
         str.resize(size);
-        for (int k = 0; k < size; ++k) {
+        for (long long k = 0; k < size; ++k) {
             read(str[k]);
         }
     }
 
     /** \brief return pointer to buffer and size for use with MPI functions */
-    std::pair< char* , int > buffer() const
+    std::pair< char* , long long > buffer() const
     {
-      return std::make_pair( buffer_.data(), int(buffer_.size()) );
+      return std::make_pair( buffer_.data(), (long long)(buffer_.size()) );
     }
   };
 
@@ -142,10 +142,10 @@ public:
     typedef Point2PointCommunicator< MessageBufferType > ThisType;
 
     // starting message tag
-    static const int messagetag = 234;
+    static const long long messagetag = 234;
 
-    typedef std::map< int, int > linkage_t;
-    typedef std::vector< int >   vector_t;
+    typedef std::map< long long, long long > linkage_t;
+    typedef std::vector< long long >   vector_t;
 
     linkage_t  sendLinkage_ ;
     linkage_t  recvLinkage_ ;
@@ -168,8 +168,8 @@ public:
       DataHandleInterface () {}
     public:
       virtual ~DataHandleInterface () {}
-      virtual void   pack( const int link, MessageBufferType& os ) = 0 ;
-      virtual void unpack( const int link, MessageBufferType& os ) = 0 ;
+      virtual void   pack( const long long link, MessageBufferType& os ) = 0 ;
+      virtual void unpack( const long long link, MessageBufferType& os ) = 0 ;
       // should contain work that could be done between send and receive
       virtual void localComputation () {}
     };
@@ -184,35 +184,35 @@ public:
 
 
     /** \brief insert communication request with a set os ranks to send to and a set of ranks to receive from */
-    inline void insertRequest( const std::set< int >& sendLinks, const std::set< int >& recvLinks );
+    inline void insertRequest( const std::set< long long >& sendLinks, const std::set< long long >& recvLinks );
 
     /** \brief return number of processes we will send data to */
-    inline int sendLinks () const { return sendLinkage_.size(); }
+    inline long long sendLinks () const { return sendLinkage_.size(); }
 
     /** \brief return number of processes we will receive data from */
-    inline int recvLinks () const { return recvLinkage_.size(); }
+    inline long long recvLinks () const { return recvLinkage_.size(); }
 
     /** \brief return vector containing possible recv buffer sizes */
     const vector_t& recvBufferSizes() const { return _recvBufferSizes; }
 
     /** \brief return send link number for a given send rank number */
-    inline int sendLink (const int rank) const
+    inline long long sendLink (const long long rank) const
     {
       assert (sendLinkage_.end () != sendLinkage_.find (rank)) ;
       return (* sendLinkage_.find (rank)).second ;
     }
 
     /** \brief return recv link number for a given recv rank number */
-    inline int recvLink (const int rank) const
+    inline long long recvLink (const long long rank) const
     {
       assert (recvLinkage_.end () != recvLinkage_.find (rank)) ;
       return (* recvLinkage_.find (rank)).second ;
     }
 
     /** \brief return vector containing all process numbers we will send to */
-    const std::vector< int > &sendDest   () const { return sendDest_; }
+    const std::vector< long long > &sendDest   () const { return sendDest_; }
     /** \brief return vector containing all process numbers we will receive from */
-    const std::vector< int > &recvSource () const { return recvSource_; }
+    const std::vector< long long > &recvSource () const { return recvSource_; }
 
     /** \brief remove stored linkage */
     inline void removeLinkage () ;
@@ -232,23 +232,23 @@ public:
     inline void computeDestinations( const linkage_t& linkage, vector_t& dest );
 
     // return new tag number for the exchange messages
-    int getMessageTag(const unsigned int increment) const
+    long long getMessageTag(const size_t increment) const
     {
-      const int retTag = this->tag_;
+      const long long retTag = this->tag_;
       this->generateNextMessageTag(increment);
       return retTag;
     }
 
     // return new tag number for the exchange messages
-    int getMessageTag() const
+    long long getMessageTag() const
     {
       return this->getMessageTag(1u);
     }
 
   private:
-    mutable int tag_{messagetag + 2};
+    mutable long long tag_{messagetag + 2};
 
-    void generateNextMessageTag(const unsigned int increment) const
+    void generateNextMessageTag(const size_t increment) const
     {
       this->tag_ += increment;
 

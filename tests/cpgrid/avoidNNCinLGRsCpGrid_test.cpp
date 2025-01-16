@@ -54,15 +54,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -70,9 +70,9 @@ struct Fixture
 
 void testCase(const std::string& deckString,
               const Opm::NNC& nnc,
-              const std::vector<std::array<int,3>>& cells_per_dim_vec,
-              const std::vector<std::array<int,3>>& startIJK_vec,
-              const std::vector<std::array<int,3>>& endIJK_vec,
+              const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+              const std::vector<std::array<long long,3>>& startIJK_vec,
+              const std::vector<std::array<long long,3>>& endIJK_vec,
               const std::vector<std::string>& lgr_name_vec,
               bool hasNNC)
 {
@@ -129,9 +129,9 @@ BOOST_AUTO_TEST_CASE(NNCatAnLgr)
 {
     Opm::NNC nnc;
     nnc.addNNC(2, 4, 1.0); // connect cell 2 (does not belong to any LGR) and cell 4 (belongs to LGR2)
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,1,1}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,1}, {1,1,5}};
     // LGR1 cell indices = {0,1}, LGR2 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testCase(deckString, nnc,  cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec, true);
@@ -142,9 +142,9 @@ BOOST_AUTO_TEST_CASE(NNCAtSeveralLgrs)
     Opm::NNC nnc;
     nnc.addNNC(0, 1, 1.0); // connect cell 0 and cell 1 (both belong to LGR1)
     nnc.addNNC(2, 4, 1.0); // connect cell 2 (belongs to LGR2) and cell 4 (belongs to LGR3)
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,1}, {1,1,3}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,1}, {1,1,3}, {1,1,5}};
     // LGR1 cell indices = {0}, LGR2 cell indices = {2}, LGR3 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
     testCase(deckString, nnc,  cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec, true);
@@ -154,9 +154,9 @@ BOOST_AUTO_TEST_CASE(LgrWithNNC_and_lgrsWithoutNNC)
 {
     Opm::NNC nnc;
     nnc.addNNC(0, 2, 1.0); // connect cell 0 and cell 2 (both belong to LGR1). LGR2 does not have NNCs.
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {4,4,4}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0},{0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,3}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {4,4,4}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0},{0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,3}, {1,1,5}};
     // LGR1 cell indices = {0,1,2}, LGR2 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testCase(deckString, nnc,  cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec, true);
@@ -166,9 +166,9 @@ BOOST_AUTO_TEST_CASE(NNCoutsideLgrs)
 {
     Opm::NNC nnc;
     nnc.addNNC(1, 3, 1.0); // connect cell 1 and cell 3 (both do NOT belong to any LGR)
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,1}, {1,1,3}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,1}, {1,1,3}, {1,1,5}};
     // LGR1 cell indices = {0}, LGR2 cell indices = {2}, LGR3 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
     testCase(deckString, nnc,  cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec, false);

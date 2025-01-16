@@ -18,20 +18,20 @@ namespace Dune
   // PolyhedralGridIndexSet
   // --------------
 
-  template< int dim, int dimworld, typename coord_t >
+  template< long long dim, long long dimworld, typename coord_t >
   class PolyhedralGridIndexSet
-      : public IndexSet< PolyhedralGrid< dim, dimworld, coord_t >, PolyhedralGridIndexSet< dim, dimworld, coord_t >, int >
+      : public IndexSet< PolyhedralGrid< dim, dimworld, coord_t >, PolyhedralGridIndexSet< dim, dimworld, coord_t >, long long >
   {
     typedef PolyhedralGrid<dim, dimworld, coord_t > GridType;
 
   protected:
     typedef PolyhedralGridIndexSet< dim, dimworld, coord_t > This;
-      typedef IndexSet< GridType, This, int > Base;
+      typedef IndexSet< GridType, This, long long > Base;
 
     typedef typename std::remove_const< GridType >::type::Traits Traits;
 
   public:
-    static const int dimension = Traits::dimension;
+    static const long long dimension = Traits::dimension;
 
     typedef typename Base::IndexType IndexType;
 
@@ -46,20 +46,20 @@ namespace Dune
       return index< Entity::codimension >( entity );
     }
 
-    template< int cd >
+    template< long long cd >
     IndexType index ( const typename Traits::template Codim< cd >::Entity &entity ) const
     {
       return entity.impl().index();
     }
 
-    template< int cd >
-    IndexType subIndex ( const typename Traits::template Codim< cd >::Entity &entity, int i, unsigned int codim ) const
+    template< long long cd >
+    IndexType subIndex ( const typename Traits::template Codim< cd >::Entity &entity, long long i, size_t codim ) const
     {
       return subIndex( entity, i, codim );
     }
 
     template< class Entity >
-    IndexType subIndex ( const Entity &entity, int i, unsigned int codim ) const
+    IndexType subIndex ( const Entity &entity, long long i, size_t codim ) const
     {
       if( codim == 0 )
         return index( entity );
@@ -81,7 +81,7 @@ namespace Dune
       return grid().size( type );
     }
 
-    int size ( int codim ) const
+    long long size ( long long codim ) const
     {
       return grid().size( codim );
     }
@@ -92,12 +92,12 @@ namespace Dune
         return index(entity) >= 0 && index(entity) < size(Entity::codimension);
     }
 
-    const std::vector< GeometryType > &geomTypes ( int codim ) const
+    const std::vector< GeometryType > &geomTypes ( long long codim ) const
     {
         return grid().geomTypes(codim);
     }
 
-    const std::vector< GeometryType >& types(int codim) const
+    const std::vector< GeometryType >& types(long long codim) const
     {
         return grid().geomTypes(codim);
     }

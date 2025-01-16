@@ -19,7 +19,7 @@ namespace Dune
    *
    *  \nosubgrouping
    */
-  template< int codim, int dim, class Grid >
+  template< long long codim, long long dim, class Grid >
   class PolyhedralGridEntityBasic
   {
   protected:
@@ -30,13 +30,13 @@ namespace Dune
      *  \{ */
 
     //! codimensioon of the entity
-    static const int codimension = codim;
+    static const long long codimension = codim;
     //! dimension of the grid
-    static const int dimension = Traits::dimension;
+    static const long long dimension = Traits::dimension;
     //! dimension of the entity
-    static const int mydimension = dimension - codimension;
+    static const long long mydimension = dimension - codimension;
     //! dimension of the world
-    static const int dimensionworld = Traits::dimensionworld;
+    static const long long dimensionworld = Traits::dimensionworld;
 
     /** \} */
 
@@ -101,7 +101,7 @@ namespace Dune
     }
 
     /** \brief obtain the level of this entity */
-    int level () const
+    long long level () const
     {
       return 0;
     }
@@ -147,7 +147,7 @@ namespace Dune
   // PolyhedralGridEntity
   // ------------
 
-  template< int codim, int dim, class Grid >
+  template< long long codim, long long dim, class Grid >
   class PolyhedralGridEntity : public PolyhedralGridEntityBasic< codim, dim, Grid >
   {
     typedef PolyhedralGridEntityBasic< codim, dim, Grid > Base ;
@@ -176,7 +176,7 @@ namespace Dune
     : Base( data_param, seed )
     {}
 
-    unsigned int subEntities( const unsigned int cd ) const
+    size_t subEntities( const size_t cd ) const
     {
       if( cd == Base :: codimension )
         return 1;
@@ -184,9 +184,9 @@ namespace Dune
         return data()->subEntities( seed_, cd );
     }
 
-    template< int cd >
+    template< long long cd >
     typename Grid::template Codim< cd >::EntityPointer
-    subEntity ( int i ) const
+    subEntity ( long long i ) const
     {
       typedef typename Traits::template Codim< cd >::EntityPointerImpl EntityPointerImpl;
       typedef typename Traits::template Codim< cd >::EntityImpl        EntityImpl;
@@ -202,7 +202,7 @@ namespace Dune
    *
    *  \nosubgrouping
    */
-  template< int dim, class Grid >
+  template< long long dim, class Grid >
   class PolyhedralGridEntity< 0, dim, Grid > : public PolyhedralGridEntityBasic< 0, dim, Grid >
   {
     typedef PolyhedralGridEntityBasic< 0, dim, Grid > Base ;
@@ -271,7 +271,7 @@ namespace Dune
     This& dereference()
     { return *this; }
 
-    unsigned int subEntities( const unsigned int codim ) const
+    size_t subEntities( const size_t codim ) const
     {
       if( codim == 0 )
         return 1;
@@ -279,15 +279,15 @@ namespace Dune
         return data()->subEntities( seed_, codim );
     }
 
-    template< int codim >
-    int count () const
+    template< long long codim >
+    long long count () const
     {
       return subEntities( codim );
     }
 
-    template< int codim >
+    template< long long codim >
     typename Grid::template Codim< codim >::EntityPointer
-    subEntity ( int i ) const
+    subEntity ( long long i ) const
     {
       typedef typename Traits::template Codim< codim >::EntityPointerImpl EntityPointerImpl;
       typedef typename Traits::template Codim< codim >::EntityImpl        EntityImpl;
@@ -339,12 +339,12 @@ namespace Dune
       return LocalGeometry( LocalGeometryImpl( data() ) );
     }
 
-    HierarchicIterator hbegin ( int maxLevel ) const
+    HierarchicIterator hbegin ( long long maxLevel ) const
     {
       return hend( maxLevel );
     }
 
-    HierarchicIterator hend ( int ) const
+    HierarchicIterator hend ( long long ) const
     {
       typedef typename Traits :: HierarchicIteratorImpl HierarchicIteratorImpl ;
       return HierarchicIterator( HierarchicIteratorImpl( data(), false ) );

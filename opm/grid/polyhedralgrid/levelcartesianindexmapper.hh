@@ -40,7 +40,7 @@
 
 namespace Dune
 {
-template<int dim, int dimworld, typename coord_t>
+template<long long dim, long long dimworld, typename coord_t>
 class PolyhedralGrid;
 
 }
@@ -56,42 +56,42 @@ namespace Opm
 // grid types, like CpGrid) to integrate smoothly within the existing conventions.
 //
 // Specialization for PolyhedralGrid
-template<int dim, int dimworld, typename coord_t>
+template<long long dim, long long dimworld, typename coord_t>
 class LevelCartesianIndexMapper<Dune::PolyhedralGrid< dim, dimworld, coord_t >>
 {
     using Grid = Dune::PolyhedralGrid< dim, dimworld, coord_t >;
 public:
-    static constexpr int dimension = 3 ;
+    static constexpr long long dimension = 3 ;
 
     explicit LevelCartesianIndexMapper(const Dune::CartesianIndexMapper<Grid>& cartesian_index_mapper)
         : cartesianIndexMapper_{std::make_unique<Dune::CartesianIndexMapper<Grid>>(cartesian_index_mapper)}
     {}
 
-    const std::array<int,3>& cartesianDimensions(int level) const
+    const std::array<long long,3>& cartesianDimensions(long long level) const
     {
         throwIfLevelPositive(level);
         return cartesianIndexMapper_->logicalCartesianSize();
     }
 
-    int cartesianSize(int level) const
+    long long cartesianSize(long long level) const
     {
         throwIfLevelPositive(level);
         return cartesianIndexMapper_->cartesianSize();
     }
 
-    int compressedSize(int level) const
+    long long compressedSize(long long level) const
     {
         throwIfLevelPositive(level);
         return cartesianIndexMapper_->compressedSize();
     }
 
-    int cartesianIndex( const int compressedElementIndex, const int level) const
+    long long cartesianIndex( const long long compressedElementIndex, const long long level) const
     {
         throwIfLevelPositive(level);
         return cartesianIndexMapper_->cartesianIndex(compressedElementIndex);
     }
 
-    void cartesianCoordinate(const int compressedElementIndex, std::array<int,dimension>& coords, int level) const
+    void cartesianCoordinate(const long long compressedElementIndex, std::array<long long,dimension>& coords, long long level) const
     {
         throwIfLevelPositive(level);
         cartesianIndexMapper_->cartesianCoordinate(compressedElementIndex, coords);
@@ -100,7 +100,7 @@ public:
 private:
     std::unique_ptr<Dune::CartesianIndexMapper<Grid>> cartesianIndexMapper_;
 
-    void throwIfLevelPositive(int level) const
+    void throwIfLevelPositive(long long level) const
     {
         if (level) {
             throw std::invalid_argument("Invalid level.\n");

@@ -22,17 +22,17 @@ namespace Dune
   // Internal Forward Declarations
   // -----------------------------
 
-  template< int dim, int dimworld, typename coord_t, PartitionIteratorType defaultpitype >
+  template< long long dim, long long dimworld, typename coord_t, PartitionIteratorType defaultpitype >
   class PolyhedralGridView;
 
-  template< int dim, int dimworld, typename coord_t, PartitionIteratorType ptype >
+  template< long long dim, long long dimworld, typename coord_t, PartitionIteratorType ptype >
   struct PolyhedralGridViewTraits;
 
 
   // PolyhedralGridView
   // ------------------
 
-  template< int dim, int dimworld, typename coord_t, PartitionIteratorType defaultpitype >
+  template< long long dim, long long dimworld, typename coord_t, PartitionIteratorType defaultpitype >
   class PolyhedralGridView
   {
     typedef PolyhedralGridView< dim, dimworld, coord_t, defaultpitype > This;
@@ -47,7 +47,7 @@ namespace Dune
 
     using Communication = typename Traits::Communication;
     using CollectiveCommunication = Communication; // deprecated
-    template< int codim >
+    template< long long codim >
     struct Codim
     : public Traits::template Codim< codim >
     {};
@@ -55,7 +55,7 @@ namespace Dune
     static const bool conforming = Traits :: conforming;
     static const PartitionIteratorType pitype = Traits :: pitype;
 
-    PolyhedralGridView ( const Grid &grid, const int level = 0 )
+    PolyhedralGridView ( const Grid &grid, const long long level = 0 )
     : grid_( &grid )
     {
       (void)level;
@@ -74,36 +74,36 @@ namespace Dune
 
     bool isConforming() const { return bool(conforming); }
 
-    int size ( int codim ) const
+    long long size ( long long codim ) const
     {
       return grid().size( codim );
     }
 
-    int size ( const GeometryType &type ) const
+    long long size ( const GeometryType &type ) const
     {
       return grid().size( type );
     }
 
-    template< int codim >
+    template< long long codim >
     typename Codim< codim >::Iterator begin () const
     {
       return begin< codim, defaultpitype >();
     }
 
-    template< int codim, PartitionIteratorType pit >
+    template< long long codim, PartitionIteratorType pit >
     typename Codim< codim >::template Partition< pit >::Iterator begin () const
     {
       typedef typename Traits::template Codim< codim >::template Partition< pit >::IteratorImpl Impl;
       return Impl( grid().extraData(), true );
     }
 
-    template< int codim >
+    template< long long codim >
     typename Codim< codim >::Iterator end () const
     {
       return end< codim, defaultpitype >();
     }
 
-    template< int codim, PartitionIteratorType pit >
+    template< long long codim, PartitionIteratorType pit >
     typename Codim< codim >::template Partition< pit >::Iterator end () const
     {
       typedef typename Traits::template Codim< codim >::template Partition< pit >::IteratorImpl Impl;
@@ -127,12 +127,12 @@ namespace Dune
       return grid().comm();
     }
 
-    int overlapSize ( int codim ) const
+    long long overlapSize ( long long codim ) const
     {
       return grid().overlapSize( codim );
     }
 
-    int ghostSize ( int codim ) const
+    long long ghostSize ( long long codim ) const
     {
       return grid().ghostSize( codim );
     }
@@ -151,7 +151,7 @@ namespace Dune
   // PolyhedralGridViewTraits
   // ------------------------
 
-  template< int dim, int dimworld, typename coord_t, PartitionIteratorType ptype >
+  template< long long dim, long long dimworld, typename coord_t, PartitionIteratorType ptype >
   struct PolyhedralGridViewTraits
   {
     typedef PolyhedralGrid< dim, dimworld, coord_t > Grid;
@@ -169,7 +169,7 @@ namespace Dune
     using Communication = typename Grid::Communication;
     using CollectiveCommunication = Communication;
 
-    template< int codim >
+    template< long long codim >
     struct Codim
     {
       typedef typename Grid::Traits::template Codim< codim >::Entity Entity;

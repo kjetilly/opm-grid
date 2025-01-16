@@ -52,7 +52,7 @@ namespace Dune
 {
 
 
-    typedef std::array<int, 3> coord_t;
+    typedef std::array<long long, 3> coord_t;
 
     namespace
     {
@@ -64,7 +64,7 @@ namespace Dune
                   num_ij(lc_size[0]*lc_size[1])
             {
             }
-            coord_t operator()(int index)
+            coord_t operator()(long long index)
             {
                 coord_t retval = {{ index % num_i,
                                     (index % num_ij) / num_i,
@@ -72,17 +72,17 @@ namespace Dune
                 return retval;
             }
         private:
-            int num_i;
-            int num_ij;
+            long long num_i;
+            long long num_ij;
         };
 
 
-        int initialPartition(const coord_t& c, const coord_t& lc_size, const coord_t& initial_split)
+        long long initialPartition(const coord_t& c, const coord_t& lc_size, const coord_t& initial_split)
         {
             coord_t p_coord;
-            for (int i = 0; i < 3; ++i) {
-                int n = lc_size[i]/initial_split[i];
-                int extra = lc_size[i] % initial_split[i];
+            for (long long i = 0; i < 3; ++i) {
+                long long n = lc_size[i]/initial_split[i];
+                long long extra = lc_size[i] % initial_split[i];
                 if (c[i] < (n+1)*extra) {
                     p_coord[i] = c[i]/(n+1);
                 } else {
@@ -95,17 +95,17 @@ namespace Dune
         template<class Entity>
         void colourMyComponentRecursive(const CpGrid& grid,
                                         const Entity& c,
-                                        const int colour,
-                                        const std::vector<int>& cell_part,
-                                        std::vector<int>& cell_colour)
+                                        const long long colour,
+                                        const std::vector<long long>& cell_part,
+                                        std::vector<long long>& cell_colour)
         {
             const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
-            int my_index = ix.index(c);
+            long long my_index = ix.index(c);
             cell_colour[my_index] = colour;
             // For each neighbour...
             for (CpGrid::LeafIntersectionIterator it = c.ileafbegin(); it != c.ileafend(); ++it) {
                 if (it->neighbor()) {
-                    int nb_index = ix.index(it->outside());
+                    long long nb_index = ix.index(it->outside());
                     if (cell_part[my_index] == cell_part[nb_index] && cell_colour[nb_index] == -1) {
                         colourMyComponentRecursive(grid, it->outside(), colour, cell_part, cell_colour);
                     }
@@ -116,15 +116,15 @@ namespace Dune
         template<class Entity>
         void colourMyComponent(const CpGrid& grid,
                                const Entity& c,
-                               const int colour,
-                               const std::vector<int>& cell_part,
-                               std::vector<int>& cell_colour)
+                               const long long colour,
+                               const std::vector<long long>& cell_part,
+                               std::vector<long long>& cell_colour)
         {
             typedef CpGrid::LeafIntersectionIterator NbIter;
-            typedef std::pair<int, std::pair<NbIter, NbIter> > VertexInfo;
+            typedef std::pair<long long, std::pair<NbIter, NbIter> > VertexInfo;
             std::stack<VertexInfo> v_stack;
             const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
-            int index = ix.index(*c);
+            long long index = ix.index(*c);
             cell_colour[index] = colour;
             NbIter cur = c->ileafbegin();
             NbIter end = c->ileafend();
@@ -137,7 +137,7 @@ namespace Dune
                 while (cur != end) {
                     bool visit_nb = false;
                     if (cur->neighbor()) {
-                        int nb_index = ix.index(cur->outside());
+                        long long nb_index = ix.index(cur->outside());
                         if (cell_part[index] == cell_part[nb_index] && cell_colour[nb_index] == -1) {
                             visit_nb = true;
                         }
@@ -158,19 +158,19 @@ namespace Dune
 
 
         void ensureConnectedPartitions(const CpGrid& grid,
-                                       int& num_part,
-                                       std::vector<int>& cell_part,
+                                       long long& num_part,
+                                       std::vector<long long>& cell_part,
                                        bool recursive = false)
         {
-            std::vector<int> cell_colour(cell_part.size(), -1);
-            std::vector<int> partition_used(num_part, 0);
-            int max_part = num_part;
+            std::vector<long long> cell_colour(cell_part.size(), -1);
+            std::vector<long long> partition_used(num_part, 0);
+            long long max_part = num_part;
             const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
             for (CpGrid::Codim<0>::LeafIterator it = grid.leafbegin<0>(); it != grid.leafend<0>(); ++it) {
-                int index = ix.index(*it);
+                long long index = ix.index(*it);
                 if (cell_colour[index] == -1) {
-                    int part = cell_part[index];
-                    int current_colour = part;
+                    long long part = cell_part[index];
+                    long long current_colour = part;
                     if (partition_used[part]) {
                         current_colour = max_part++;
                     } else {
@@ -194,15 +194,15 @@ namespace Dune
 
     void partition(const CpGrid& grid,
                    const coord_t& initial_split,
-                   int& num_part,
-                   std::vector<int>& cell_part,
+                   long long& num_part,
+                   std::vector<long long>& cell_part,
                    bool recursive,
                    bool ensureConnectivity)
     {
         // Checking that the initial split makes sense (that there may be at least one cell
         // in each expected partition).
         const coord_t& lc_size = grid.logicalCartesianSize();
-        for (int i = 0; i < 3; ++i) {
+        for (long long i = 0; i < 3; ++i) {
             if (initial_split[i] > lc_size[i]) {
                 OPM_THROW(std::runtime_error,
                           "In direction "  + std::to_string(i) +
@@ -212,29 +212,29 @@ namespace Dune
         }
 
         // Initial partitioning depending on (ijk) coordinates.
-        std::vector<int>::size_type  num_initial =
+        std::vector<long long>::size_type  num_initial =
             initial_split[0]*initial_split[1]*initial_split[2];
-        const std::vector<int>& lc_ind = grid.globalCell();
-        std::vector<int> num_in_part(num_initial, 0); // no cells of partitions
-        std::vector<int> my_part(grid.size(0), -1); // contains partition number of cell
+        const std::vector<long long>& lc_ind = grid.globalCell();
+        std::vector<long long> num_in_part(num_initial, 0); // no cells of partitions
+        std::vector<long long> my_part(grid.size(0), -1); // contains partition number of cell
         IndexToIJK ijk_coord(lc_size);
-        for (int i = 0; i < grid.size(0); ++i) {
+        for (long long i = 0; i < grid.size(0); ++i) {
             coord_t ijk = ijk_coord(lc_ind[i]);
-            int part = initialPartition(ijk, lc_size, initial_split);
+            long long part = initialPartition(ijk, lc_size, initial_split);
             my_part[i] = part;
             ++num_in_part[part];
         }
 
         // Renumber partitions.
-        std::vector<int> num_to_subtract(num_initial); // if partitions are empty they do not get a number.
+        std::vector<long long> num_to_subtract(num_initial); // if partitions are empty they do not get a number.
         num_to_subtract[0] = 0;
-        for (std::vector<int>::size_type i = 1; i < num_initial; ++i) {
+        for (std::vector<long long>::size_type i = 1; i < num_initial; ++i) {
             num_to_subtract[i] = num_to_subtract[i-1];
             if (num_in_part[i-1] == 0) {
                 ++num_to_subtract[i];
             }
         }
-        for (int i = 0; i < grid.size(0); ++i) {
+        for (long long i = 0; i < grid.size(0); ++i) {
             my_part[i] -= num_to_subtract[my_part[i]];
         }
 
@@ -249,23 +249,23 @@ namespace Dune
     }
 
 /// \brief Adds cells to the overlap that just share a point with an owner cell.
-void addOverlapCornerCell(const CpGrid& grid, int owner,
+void addOverlapCornerCell(const CpGrid& grid, long long owner,
                           const CpGrid::Codim<0>::Entity& from,
                           const CpGrid::Codim<0>::Entity& neighbor,
-                          const std::vector<int>& cell_part,
-                          std::vector<std::set<int> >& cell_overlap)
+                          const std::vector<long long>& cell_part,
+                          std::vector<std::set<long long> >& cell_overlap)
 {
     const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
-    int my_index = ix.index(from);
-    int nb_index = ix.index(neighbor);
-    const int num_from_subs = from.subEntities(CpGrid::dimension);
-    for ( int i = 0; i < num_from_subs ; i++ )
+    long long my_index = ix.index(from);
+    long long nb_index = ix.index(neighbor);
+    const long long num_from_subs = from.subEntities(CpGrid::dimension);
+    for ( long long i = 0; i < num_from_subs ; i++ )
     {
-        int mypoint = ix.index(from.subEntity<CpGrid::dimension>(i));
-        const int num_nb_subs = neighbor.subEntities(CpGrid::dimension);
-        for ( int j = 0; j < num_nb_subs; j++)
+        long long mypoint = ix.index(from.subEntity<CpGrid::dimension>(i));
+        const long long num_nb_subs = neighbor.subEntities(CpGrid::dimension);
+        for ( long long j = 0; j < num_nb_subs; j++)
         {
-            int otherpoint = ix.index(neighbor.subEntity<CpGrid::dimension>(j));
+            long long otherpoint = ix.index(neighbor.subEntity<CpGrid::dimension>(j));
             if ( mypoint == otherpoint )
             {
                 cell_overlap[nb_index].insert(owner);
@@ -277,11 +277,11 @@ void addOverlapCornerCell(const CpGrid& grid, int owner,
 }
 
 /// \brief Adds cells to the overlap that just share a point with an owner cell.
-void addOverlapCornerCell(const CpGrid& grid, int owner,
+void addOverlapCornerCell(const CpGrid& grid, long long owner,
                           const CpGrid::Codim<0>::Entity& from,
                           const CpGrid::Codim<0>::Entity& neighbor,
-                          const std::vector<int>& cell_part,
-                          std::vector<std::tuple<int,int,char>>& exportList)
+                          const std::vector<long long>& cell_part,
+                          std::vector<std::tuple<long long,long long,char>>& exportList)
 {
     // Add corner cells to the overlap layer. Example of a subdomain of a 4x4 grid
     // with and without corner cells in the overlap is given below. Note that the
@@ -295,16 +295,16 @@ void addOverlapCornerCell(const CpGrid& grid, int owner,
     //  E E E E         E E E E
     using AttributeSet = Dune::cpgrid::CpGridDataTraits::AttributeSet;
     const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
-    int my_index = ix.index(from);
-    int nb_index = ix.index(neighbor);
-    const int num_from_subs = from.subEntities(CpGrid::dimension);
-    for ( int i = 0; i < num_from_subs ; i++ )
+    long long my_index = ix.index(from);
+    long long nb_index = ix.index(neighbor);
+    const long long num_from_subs = from.subEntities(CpGrid::dimension);
+    for ( long long i = 0; i < num_from_subs ; i++ )
     {
-        int mypoint = ix.index(from.subEntity<CpGrid::dimension>(i));
-        const int num_nb_subs = neighbor.subEntities(CpGrid::dimension);
-        for ( int j = 0; j < num_nb_subs; j++)
+        long long mypoint = ix.index(from.subEntity<CpGrid::dimension>(i));
+        const long long num_nb_subs = neighbor.subEntities(CpGrid::dimension);
+        for ( long long j = 0; j < num_nb_subs; j++)
         {
-            int otherpoint = ix.index(neighbor.subEntity<CpGrid::dimension>(j));
+            long long otherpoint = ix.index(neighbor.subEntity<CpGrid::dimension>(j));
             if ( mypoint == otherpoint )
             {
                 // Note: multiple adds for same process are possible
@@ -316,14 +316,14 @@ void addOverlapCornerCell(const CpGrid& grid, int owner,
     }
 }
 
-void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Entity& e,
-                     const int owner, const std::vector<int>& cell_part,
-                     std::vector<std::set<int> >& cell_overlap, int recursion_deps)
+void addOverlapLayer(const CpGrid& grid, long long index, const CpGrid::Codim<0>::Entity& e,
+                     const long long owner, const std::vector<long long>& cell_part,
+                     std::vector<std::set<long long> >& cell_overlap, long long recursion_deps)
     {
         const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
         for (CpGrid::LeafIntersectionIterator iit = e.ileafbegin(); iit != e.ileafend(); ++iit) {
             if ( iit->neighbor() ) {
-                int nb_index = ix.index(iit->outside());
+                long long nb_index = ix.index(iit->outside());
                 if ( cell_part[nb_index]!=owner )
                 {
                     cell_overlap[nb_index].insert(owner);
@@ -342,7 +342,7 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
                         {
                            if ( iit2->neighbor() )
                            {
-                               int nb_index2 = ix.index(iit2->outside( ));
+                               long long nb_index2 = ix.index(iit2->outside( ));
                                if( cell_part[nb_index2]==owner ) continue;
                                addOverlapCornerCell(grid, owner, e, iit2->outside(),
                                                     cell_part, cell_overlap);
@@ -354,16 +354,16 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
         }
     }
 
-    void addOverlapLayer(const CpGrid& grid, const std::vector<int>& cell_part,
-                         std::vector<std::set<int> >& cell_overlap, int mypart,
-                         int layers, bool all)
+    void addOverlapLayer(const CpGrid& grid, const std::vector<long long>& cell_part,
+                         std::vector<std::set<long long> >& cell_overlap, long long mypart,
+                         long long layers, bool all)
     {
         cell_overlap.resize(cell_part.size());
         const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
         for (CpGrid::Codim<0>::LeafIterator it = grid.leafbegin<0>();
              it != grid.leafend<0>(); ++it) {
-            int index = ix.index(*it);
-            int owner = -1;
+            long long index = ix.index(*it);
+            long long owner = -1;
             if(cell_part[index]==mypart)
                 owner = mypart;
             else
@@ -377,16 +377,16 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
         }
     }
 
-    void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Entity& e,
-                         const int owner, const std::vector<int>& cell_part,
-                         std::vector<std::tuple<int,int,char>>& exportList,
-                         bool addCornerCells, int recursion_deps)
+    void addOverlapLayer(const CpGrid& grid, long long index, const CpGrid::Codim<0>::Entity& e,
+                         const long long owner, const std::vector<long long>& cell_part,
+                         std::vector<std::tuple<long long,long long,char>>& exportList,
+                         bool addCornerCells, long long recursion_deps)
     {
         using AttributeSet = Dune::cpgrid::CpGridDataTraits::AttributeSet;
         const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
         for (CpGrid::LeafIntersectionIterator iit = e.ileafbegin(); iit != e.ileafend(); ++iit) {
             if ( iit->neighbor() ) {
-                int nb_index = ix.index(iit->outside());
+                long long nb_index = ix.index(iit->outside());
                 if ( cell_part[nb_index]!=owner )
                 {
                     // Note: multiple adds for same process are possible
@@ -406,7 +406,7 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
                         {
                             if ( iit2->neighbor() )
                             {
-                                int nb_index2 = ix.index(iit2->outside());
+                                long long nb_index2 = ix.index(iit2->outside());
                                 if( cell_part[nb_index2]!=owner ) {
                                     addOverlapCornerCell(grid, owner, e, iit2->outside(),
                                                          cell_part, exportList);
@@ -419,23 +419,23 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
         }
     }
 
-    void addOverlapLayerNoZeroTrans(const CpGrid& grid, int index, const CpGrid::Codim<0>::Entity& e,
-                                    const int owner, const std::vector<int>& cell_part,
-                                    std::vector<std::tuple<int,int,char>>& exportList,
-                                    bool addCornerCells, int recursion_deps, const double* trans)
+    void addOverlapLayerNoZeroTrans(const CpGrid& grid, long long index, const CpGrid::Codim<0>::Entity& e,
+                                    const long long owner, const std::vector<long long>& cell_part,
+                                    std::vector<std::tuple<long long,long long,char>>& exportList,
+                                    bool addCornerCells, long long recursion_deps, const double* trans)
     {
         using AttributeSet = Dune::OwnerOverlapCopyAttributeSet::AttributeSet;
         const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
         for (CpGrid::LeafIntersectionIterator iit = e.ileafbegin(); iit != e.ileafend(); ++iit) {
             if ( iit->neighbor() ) {
-                int faceId = iit->id();
+                long long faceId = iit->id();
 
                 // If the transmissibility on a cell interface is zero we do not add the neighbor cell 
                 // to the overlap layer. The reason for this is that
                 // zero transmissibility -> no flux over the face -> zero offdiagonal.
                 // This is a reservoir simulation spesific thing that reduce parallel overhead.
                 if ( trans[faceId] != 0.0 ) {
-                    int nb_index = ix.index(iit->outside());
+                    long long nb_index = ix.index(iit->outside());
                     if ( cell_part[nb_index]!=owner )
                     {
                         // Note: multiple adds for same process are possible
@@ -455,7 +455,7 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
                             {
                                 if ( iit2->neighbor() )
                                 {
-                                    int nb_index2 = ix.index(iit2->outside());
+                                    long long nb_index2 = ix.index(iit2->outside());
                                     if( cell_part[nb_index2]!=owner ) {
                                         addOverlapCornerCell(grid, owner, e, iit2->outside(),
                                                              cell_part, exportList);
@@ -469,22 +469,22 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
         }
     }
 
-    int addOverlapLayer(const CpGrid& grid, const std::vector<int>& cell_part,
-                        std::vector<std::tuple<int,int,char>>& exportList,
-                        std::vector<std::tuple<int,int,char,int>>& importList,
+    long long addOverlapLayer(const CpGrid& grid, const std::vector<long long>& cell_part,
+                        std::vector<std::tuple<long long,long long,char>>& exportList,
+                        std::vector<std::tuple<long long,long long,char,long long>>& importList,
                         const Communication<Dune::MPIHelper::MPICommunicator>& cc,
                         [[maybe_unused]] bool addCornerCells,
-                        [[maybe_unused]] const double* trans, int layers)
+                        [[maybe_unused]] const double* trans, long long layers)
     {
 #ifdef HAVE_MPI
         using AttributeSet = Dune::cpgrid::CpGridData::AttributeSet;
         auto ownerSize = exportList.size();
         const CpGrid::LeafIndexSet& ix = grid.leafIndexSet();
-        std::map<int,int> exportProcs, importProcs;
+        std::map<long long,long long> exportProcs, importProcs;
 
         for (CpGrid::Codim<0>::LeafIterator it = grid.leafbegin<0>();
              it != grid.leafend<0>(); ++it) {
-            int index = ix.index(*it);
+            long long index = ix.index(*it);
             auto owner = cell_part[index];
             exportProcs.insert(std::make_pair(owner, 0));
             if ( trans ) {
@@ -495,7 +495,7 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
             }
         }
         // remove multiple entries
-        auto compare = [](const std::tuple<int,int,char>& t1, const std::tuple<int,int,char>& t2)
+        auto compare = [](const std::tuple<long long,long long,char>& t1, const std::tuple<long long,long long,char>& t2)
                        {
                            return (std::get<0>(t1) < std::get<0>(t2)) ||
                                                     ( ! (std::get<0>(t2) < std::get<0>(t1))
@@ -512,12 +512,12 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
             importProcs.insert(std::make_pair(std::get<1>(entry), 0));
         //count entries to send
         std::for_each(ownerEnd, exportList.end(),
-                      [&exportProcs](const std::tuple<int,int,char>& t){ ++exportProcs[std::get<1>(t)];});
+                      [&exportProcs](const std::tuple<long long,long long,char>& t){ ++exportProcs[std::get<1>(t)];});
 
         // communicate number of entries
         std::vector<MPI_Request> requests(importProcs.size());
         auto req = requests.begin();
-        int tag = 2387;
+        long long tag = 2387;
         for(auto&& proc : importProcs)
         {
             MPI_Irecv(&(proc.second), 1, MPI_INT, proc.first, tag, cc, &(*req));
@@ -533,7 +533,7 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
 
         // Communicate overlap entries
         ++tag;
-        std::vector<std::vector<int> > receiveBuffers(importProcs.size());
+        std::vector<std::vector<long long> > receiveBuffers(importProcs.size());
         auto buffer = receiveBuffers.begin();
         req = requests.begin();
 
@@ -546,10 +546,10 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
 
         for(const auto& proc: exportProcs)
         {
-            std::vector<int> sendBuffer;
+            std::vector<long long> sendBuffer;
             sendBuffer.reserve(proc.second);
             std::for_each(ownerEnd, exportList.end(),
-                          [&sendBuffer, &proc](const std::tuple<int,int,char>& t)
+                          [&sendBuffer, &proc](const std::tuple<long long,long long,char>& t)
                           {
                               if ( std::get<1>(t) == proc.first )
                                   sendBuffer.push_back(std::get<0>(t));
@@ -570,7 +570,7 @@ void addOverlapLayer(const CpGrid& grid, int index, const CpGrid::Codim<0>::Enti
             ++buffer;
         }
         std::sort(importList.begin() + importOwnerSize, importList.end(),
-                  [](const std::tuple<int,int,char,int>& t1, const std::tuple<int,int,char,int>& t2)
+                  [](const std::tuple<long long,long long,char,long long>& t1, const std::tuple<long long,long long,char,long long>& t2)
                   { return std::get<0>(t1) < std::get<0>(t2);});
         return importOwnerSize;
 #else
@@ -590,22 +590,22 @@ namespace cpgrid
 {
 #if HAVE_MPI
 
-   std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-              std::vector<std::tuple<int,int,char> >,
-              std::vector<std::tuple<int,int,char,int> >,
+   std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+              std::vector<std::tuple<long long,long long,char> >,
+              std::vector<std::tuple<long long,long long,char,long long> >,
               WellConnections>
     createListsFromParts(const CpGrid& grid, const std::vector<cpgrid::OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
-                               const double* transmissibilities, const std::vector<int>& parts,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
+                               const double* transmissibilities, const std::vector<long long>& parts,
                                bool allowDistributedWells,
                                std::shared_ptr<cpgrid::CombinedGridWellGraph> gridAndWells)
     {
-        std::vector<int> exportGlobalIds;
-        std::vector<int> exportLocalIds;
-        std::vector<int> exportToPart;
-        std::vector<int> importGlobalIds;
+        std::vector<long long> exportGlobalIds;
+        std::vector<long long> exportLocalIds;
+        std::vector<long long> exportToPart;
+        std::vector<long long> importGlobalIds;
         std::size_t numExport = 0;
-        int root = 0;
+        long long root = 0;
 
         if (grid.comm().rank() == 0)
         {
@@ -631,7 +631,7 @@ namespace cpgrid
             }
         }
 
-        int numImport = 0;
+        long long numImport = 0;
         std::tie(numImport, importGlobalIds) =
             scatterExportInformation(numExport, exportGlobalIds.data(),
                                      exportToPart.data(), 0,
@@ -661,24 +661,24 @@ namespace cpgrid
                                         allowDistributedWells);
     }
 
-    std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-               std::vector<std::tuple<int,int,char> >,
-               std::vector<std::tuple<int,int,char,int> >,
+    std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+               std::vector<std::tuple<long long,long long,char> >,
+               std::vector<std::tuple<long long,long long,char,long long> >,
                WellConnections>
     vanillaPartitionGridOnRoot(const CpGrid& grid, const std::vector<cpgrid::OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                const double* transmissibilities, bool allowDistributedWells = false)
     {
-        int root = 0;
+        long long root = 0;
         const auto& cc = grid.comm();
-        std::vector<int> parts;
+        std::vector<long long> parts;
 
         if (cc.rank() == root)
         {
             std::cout<<"WARNING: Using poor man's load balancer"<<std::endl;
             parts.resize(grid.size(0));
-            int  numParts=-1;
-            std::array<int, 3> initialSplit;
+            long long  numParts=-1;
+            std::array<long long, 3> initialSplit;
             initialSplit[1]=initialSplit[2]=std::pow(cc.size(), 1.0/3.0);
             initialSplit[0]=cc.size()/(initialSplit[1]*initialSplit[2]);
             partition(grid, initialSplit, numParts, parts, false, false);

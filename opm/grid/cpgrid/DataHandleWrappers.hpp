@@ -71,7 +71,7 @@ struct FaceViaCellHandleWrapper
         : handle_(handle), c2fGather_(c2fGather), c2f_(c2f)
     {}
 
-    bool fixedSize(int, int)
+    bool fixedSize(long long, long long)
     {
         return false; // as the faces per cell differ
     }
@@ -153,7 +153,7 @@ template<class Handle>
 struct PointViaCellHandleWrapper : public PointViaCellWarner
 {
     using DataType = typename Handle::DataType;
-    using C2PTable = std::vector< std::array<int,8> >;
+    using C2PTable = std::vector< std::array<long long,8> >;
 
     /// \brief Constructs the data handle
     ///
@@ -165,7 +165,7 @@ struct PointViaCellHandleWrapper : public PointViaCellWarner
                              const C2PTable& c2p)
         : handle_(handle), c2pGather_(c2pGather), c2p_(c2p)
     {}
-    bool fixedSize(int i, int j)
+    bool fixedSize(long long i, long long j)
     {
         if( ! handle_.fixedSize(i, j))
         {

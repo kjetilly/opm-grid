@@ -55,10 +55,10 @@ namespace Dune
         template <class Point, template <class> class Vector>
         Point average(const Vector<Point>& points)
         {
-            int num_points = points.size();
+            long long num_points = points.size();
             assert(num_points > 0);
             Point pt = points[0];
-            for (int i = 1; i < num_points; ++i) {
+            for (long long i = 1; i < num_points; ++i) {
                 pt += points[i];
             }
             pt /= double(num_points);
@@ -75,8 +75,8 @@ namespace Dune
                            const Point& centroid)
         {
             double tot_area = 0.0;
-            int num_points = points.size();
-            for (int i = 0; i < num_points; ++i) {
+            long long num_points = points.size();
+            for (long long i = 0; i < num_points; ++i) {
                 Point tri[3] = { centroid, points[i], points[(i+1)%num_points] };
                 tot_area += area(tri);
             }
@@ -95,8 +95,8 @@ namespace Dune
         {
             double tot_area = 0.0;
             Point tot_centroid(0.0);
-            int num_points = points.size();
-            for (int i = 0; i < num_points; ++i) {
+            long long num_points = points.size();
+            for (long long i = 0; i < num_points; ++i) {
                 Point tri[3] = { inpoint, points[i], points[(i+1)%num_points] };
                 double tri_area = area(tri);
                 Point tri_w_mid = (tri[0] + tri[1] + tri[2]);
@@ -126,8 +126,8 @@ namespace Dune
                             const Point& centroid)
         {
             Point tot_normal(0.0);
-            int num_points = points.size();
-            for (int i = 0; i < num_points; ++i) {
+            long long num_points = points.size();
+            for (long long i = 0; i < num_points; ++i) {
                 Point tri[3] = { centroid, points[i], points[(i+1)%num_points] };
                 Point d0 = tri[1] - tri[0];
                 Point d1 = tri[2] - tri[0];
@@ -155,8 +155,8 @@ namespace Dune
                                  const Point& cell_centroid)
         {
             double tot_volume = 0.0;
-            int num_points = points.size();
-            for (int i = 0; i < num_points; ++i) {
+            long long num_points = points.size();
+            for (long long i = 0; i < num_points; ++i) {
                 Point tet[4] = { cell_centroid, face_centroid, points[i], points[(i+1)%num_points] };
                 double small_volume = std::fabs(simplex_volume(tet));
                 assert(small_volume >= 0);
@@ -179,13 +179,13 @@ namespace Dune
         {
             Point centroid(0.0);
             double tot_volume = 0.0;
-            int num_points = points.size();
-            for (int i = 0; i < num_points; ++i) {
+            long long num_points = points.size();
+            for (long long i = 0; i < num_points; ++i) {
                 Point tet[4] = { cell_centroid, face_centroid, points[i], points[(i+1)%num_points] };
                 double small_volume = std::fabs(simplex_volume(tet));
                 assert(small_volume >= 0);
                 Point small_centroid = tet[0];
-                for(int j = 1; j < 4; ++j){
+                for(long long j = 1; j < 4; ++j){
                     small_centroid += tet[j];
                 }
                 small_centroid *= small_volume/4.0;

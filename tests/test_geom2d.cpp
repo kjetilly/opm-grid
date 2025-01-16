@@ -68,7 +68,7 @@ struct BackspaceGrid {
       };
       copy(nodes, nodes+sizeof(nodes)/sizeof(nodes[0]), g->node_coordinates);
       /* edges */
-      int edges[] = {
+      long long edges[] = {
          0, 1,          /* edge 0 */
          1, 2,          /* edge 1 */
          2, 3,          /* edge 2 */
@@ -78,12 +78,12 @@ struct BackspaceGrid {
       };
       copy(edges, edges+sizeof(edges)/sizeof(edges[0]), g->face_nodes);
       /* starting index in map for each edge */
-      int edge_pos[] = {
+      long long edge_pos[] = {
          0, 2, 4, 6, 8, 10, 12,
       };
       copy(edge_pos, edge_pos+sizeof(edge_pos)/sizeof(edge_pos[0]), g->face_nodepos);
       /* topology, clock-wise ordering */
-      int neighbours[] = {
+      long long neighbours[] = {
          -1, 0,   /* edge 0, between boundary and cell 0 */
          -1, 1,   /* edge 1, between boundary and cell 1 */
          -1, 1,   /* edge 2, between boundary and cell 1 */
@@ -93,13 +93,13 @@ struct BackspaceGrid {
       };
       copy(neighbours, neighbours+sizeof(neighbours)/sizeof(neighbours[0]), g->face_cells);
       /* cells */
-      int cells[] = {
+      long long cells[] = {
          0, 5, 4,    /* cell 0, clockwise */
          1, 2, 3, 5, /* cell 1, clockwise */
       };
       copy(cells, cells+sizeof(cells)/sizeof(cells[0]), g->cell_faces);
       /* starting index in map for each cell */
-      int cell_pos[] = {
+      long long cell_pos[] = {
          0, 3, 7,
       };
       copy(cell_pos, cell_pos+sizeof(cell_pos)/sizeof(cell_pos[0]), g->cell_facepos);
@@ -127,9 +127,9 @@ BOOST_AUTO_TEST_CASE(edgeMidpoints)
    };
    BOOST_REQUIRE (sizeof(midpoints)/sizeof(midpoints[0]) ==
                   g->number_of_faces * g->dimensions);
-   for (int edge = 0; edge < g->number_of_faces; ++edge)
+   for (long long edge = 0; edge < g->number_of_faces; ++edge)
    {
-      for (int dim = 0; dim < g->dimensions; ++dim)
+      for (long long dim = 0; dim < g->dimensions; ++dim)
       {
          BOOST_REQUIRE_CLOSE (g->face_centroids[edge*g->dimensions+dim],
                midpoints[edge*g->dimensions+dim], 0.001);
@@ -150,9 +150,9 @@ BOOST_AUTO_TEST_CASE(edgeNormals)
    };
    BOOST_REQUIRE (sizeof(normals)/sizeof(normals[0]) ==
                   g->number_of_faces * g->dimensions);
-   for (int edge = 0; edge < g->number_of_faces; ++edge)
+   for (long long edge = 0; edge < g->number_of_faces; ++edge)
    {
-      for (int dim = 0; dim < g->dimensions; ++dim)
+      for (long long dim = 0; dim < g->dimensions; ++dim)
       {
          BOOST_REQUIRE_CLOSE (g->face_normals[edge*g->dimensions+dim],
                normals[edge*g->dimensions+dim], 0.001);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(edgeLengths)
       2.,         /* edge 5 */
    };
    BOOST_REQUIRE (sizeof(lengths)/sizeof(lengths[0]) == g->number_of_faces);
-   for (int edge = 0; edge < g->number_of_faces; ++edge)
+   for (long long edge = 0; edge < g->number_of_faces; ++edge)
    {
       BOOST_REQUIRE_CLOSE (g->face_areas[edge], lengths[edge], 0.001);
    }
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE(cellAreas)
       1., 2.,
    };
    BOOST_REQUIRE (sizeof(areas)/sizeof(areas[0]) == g->number_of_cells);
-   for (int cell = 0; cell < g->number_of_cells; ++cell)
+   for (long long cell = 0; cell < g->number_of_cells; ++cell)
    {
       BOOST_REQUIRE_CLOSE (g->cell_volumes[cell], areas[cell], 0.001);
    }
@@ -197,9 +197,9 @@ BOOST_AUTO_TEST_CASE(cellCenters)
    };
    BOOST_REQUIRE (sizeof(cellCenters_var)/sizeof(cellCenters_var[0]) ==
                   g->number_of_cells * g->dimensions);
-   for (int cell = 0; cell < g->number_of_cells; ++cell)
+   for (long long cell = 0; cell < g->number_of_cells; ++cell)
    {
-      for (int dim = 0; dim < g->dimensions; ++dim)
+      for (long long dim = 0; dim < g->dimensions; ++dim)
       {
          BOOST_REQUIRE_CLOSE (g->cell_centroids[cell*g->dimensions+dim],
                cellCenters_var[cell*g->dimensions+dim], 0.001);

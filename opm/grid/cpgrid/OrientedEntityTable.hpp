@@ -50,7 +50,7 @@ namespace Dune
 
         /// @brief A class used as a row type for  OrientedEntityTable.
         /// @tparam codim_to Codimension.
-        template <int codim_to>
+        template <long long codim_to>
         class OrientedEntityRange : private Opm::SparseTable< EntityRep<codim_to> >::row_type
         {
         public:
@@ -70,14 +70,14 @@ namespace Dune
                 : R(r), orientation_(orientation)
             {
             }
-            int size () const { return R::size(); }
+            long long size () const { return R::size(); }
             using R::empty;
             using R::begin;
             using R::end;
             /// @brief Random access operator.
             /// @param subindex Column index.
             /// @return Entity representation.
-            ToType operator[](int subindex) const
+            ToType operator[](long long subindex) const
             {
                 ToType erep = *(this->begin() + subindex);
                 return orientation_ ? erep : erep.opposite();
@@ -89,7 +89,7 @@ namespace Dune
 
         /// @brief A class used as a row type for  OrientedEntityTable.
         /// @tparam codim_to Codimension.
-        template <int codim_to>
+        template <long long codim_to>
         class MutableOrientedEntityRange : private Opm::SparseTable< EntityRep<codim_to> >::mutable_row_type
         {
         public:
@@ -109,14 +109,14 @@ namespace Dune
                 : R(r), orientation_(orientation)
             {
             }
-            int size () const { return R::size(); }
+            long long size () const { return R::size(); }
             using R::empty;
             using R::begin;
             using R::end;
             /// @brief Random access operator.
             /// @param subindex Column index.
             /// @return Entity representation.
-            ToType operator[](int subindex) const
+            ToType operator[](long long subindex) const
             {
                 ToType erep = R::operator[](subindex);
                 return orientation_ ? erep : erep.opposite();
@@ -134,7 +134,7 @@ namespace Dune
         /// straight Opm::SparseTable would do.
         /// @tparam codim_from Codimension of domain of relation mapping
         /// @tparam codim_to Codimension of range of relation mapping
-        template <int codim_from, int codim_to>
+        template <long long codim_from, long long codim_to>
         class OrientedEntityTable : private Opm::SparseTable< EntityRep<codim_to> >
         {
             friend class CpGridData;
@@ -154,7 +154,7 @@ namespace Dune
             /// data and a sequence of row size data.
             ///
             /// These table data are in the same format as the underlying
-            /// Opm::SparseTable<int> constructor with the same signature.
+            /// Opm::SparseTable<long long> constructor with the same signature.
             /// @tparam DataIter Iterator to table data.
             /// @tparam IntegerIter Iterator to  the row length data.
             /// @param data_beg The start of the table data.
@@ -179,7 +179,7 @@ namespace Dune
             /// returns the number of neighbours of codimension codim_to.
             /// @param e Entity representation.
             /// @return the number of neighbours of codimension codim_to.
-            int rowSize(const FromType& e) const
+            long long rowSize(const FromType& e) const
             {
                 return super_t::rowSize(e.index());
             }
@@ -241,11 +241,11 @@ namespace Dune
             */
             void printSparseRelationMatrix(std::ostream& os) const
             {
-                for (int i = 0; i < size(); ++i) {
+                for (long long i = 0; i < size(); ++i) {
                     const FromType from_ent(i, true);
                     const row_type r = operator[](from_ent);
-                    const int rsize = r.size();
-                    for (int j = 0; j < rsize; ++j) {
+                    const long long rsize = r.size();
+                    for (long long j = 0; j < rsize; ++j) {
                         os << i << ' ' << r[j].index() << ' ' << (r[j].orientation() ? 1 : -1) << '\n';
                     }
                 }
@@ -271,14 +271,14 @@ namespace Dune
             */
             void printRelationMatrix(std::ostream& os) const
             {
-                int columns = numberOfColumns();
-                for (int i = 0; i < size(); ++i) {
+                long long columns = numberOfColumns();
+                for (long long i = 0; i < size(); ++i) {
                     FromType from_ent(i, true);
                     row_type r  = operator[](from_ent);
-                    int cur_col = 0;
-                    int next_ent = 0;
+                    long long cur_col = 0;
+                    long long next_ent = 0;
                     ToType to_ent = r[next_ent];
-                    int next_print = to_ent.index();
+                    long long next_print = to_ent.index();
                     while (cur_col < columns) {
                         if (cur_col == next_print) {
                             if (to_ent.orientation()) {
@@ -312,44 +312,44 @@ namespace Dune
             {
                 // Find the maximum index used. This will give (one less than) the size
                 // of the table to be created.
-                int maxind = -1;
-                for (int i = 0; i < size(); ++i) {
+                long long maxind = -1;
+                for (long long i = 0; i < size(); ++i) {
                     EntityRep<codim_from> from_ent(i, true);
                     row_type r = operator[](from_ent);
-                    for (int j = 0; j < r.size(); ++j) {
+                    for (long long j = 0; j < r.size(); ++j) {
                         EntityRep<codim_to> to_ent = r[j];
-                        int ind = to_ent.index();
+                        long long ind = to_ent.index();
                         maxind = std::max(ind, maxind);
                     }
                 }
                 // Build the new_sizes vector and compute datacount.
-                std::vector<int> new_sizes(maxind + 1);
-                int datacount = 0;
-                for (int i = 0; i < size(); ++i) {
+                std::vector<long long> new_sizes(maxind + 1);
+                long long datacount = 0;
+                for (long long i = 0; i < size(); ++i) {
                     EntityRep<codim_from> from_ent(i, true);
                     row_type r = operator[](from_ent);
                     datacount += r.size();
-                    for (int j = 0; j < r.size(); ++j) {
+                    for (long long j = 0; j < r.size(); ++j) {
                         EntityRep<codim_to> to_ent = r[j];
-                        int ind = to_ent.index();
+                        long long ind = to_ent.index();
                         ++new_sizes[ind];
                     }
                 }
                 // Compute the cumulative sizes.
-                std::vector<int> cumul_sizes(new_sizes.size() + 1);
+                std::vector<long long> cumul_sizes(new_sizes.size() + 1);
                 cumul_sizes[0] = 0;
                 std::partial_sum(new_sizes.begin(), new_sizes.end(), cumul_sizes.begin() + 1);
                 // Using the cumulative sizes array as indices, we populate new_data.
                 // Note that cumul_sizes[ind] is not kept constant, but incremented so that
                 // it always gives the correct index for new data corresponding to index ind.
                 std::vector<EntityRep<codim_from> > new_data(datacount);
-                for (int i = 0; i < size(); ++i) {
+                for (long long i = 0; i < size(); ++i) {
                     EntityRep<codim_from> from_ent(i, true);
                     row_type r = operator[](from_ent);
-                    for (int j = 0; j < r.size(); ++j) {
+                    for (long long j = 0; j < r.size(); ++j) {
                         EntityRep<codim_to> to_ent(r[j]);
-                        int ind = to_ent.index();
-                        int data_ind = cumul_sizes[ind];
+                        long long ind = to_ent.index();
+                        long long data_ind = cumul_sizes[ind];
                         new_data[data_ind] = to_ent.orientation() ? from_ent : from_ent.opposite();
                         ++cumul_sizes[ind];
                     }
@@ -361,13 +361,13 @@ namespace Dune
             }
 
         private:
-            int numberOfColumns() const
+            long long numberOfColumns() const
             {
-                int maxind = 0;
-                for (int i = 0; i < size(); ++i) {
+                long long maxind = 0;
+                for (long long i = 0; i < size(); ++i) {
                     FromType from_ent(i, true);
                     row_type r  = operator[](from_ent);
-                    for (int j = 0; j < r.size(); ++j) {
+                    for (long long j = 0; j < r.size(); ++j) {
                         maxind = std::max(maxind, r[j].index());
                     }
                 }

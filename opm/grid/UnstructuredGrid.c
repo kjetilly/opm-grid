@@ -177,7 +177,7 @@ allocate_grid(size_t ndims     ,
 static void
 input_error(FILE *fp, const char * const err)
 {
-    int save_errno = errno;
+    long long save_errno = errno;
 
     if (ferror(fp)) {
         fprintf(stderr, "%s: %s\n", err, strerror(save_errno));
@@ -192,11 +192,11 @@ input_error(FILE *fp, const char * const err)
 
 
 static struct UnstructuredGrid *
-allocate_grid_from_file(FILE *fp, int *has_tag, int *has_indexmap)
+allocate_grid_from_file(FILE *fp, long long *has_tag, long long *has_indexmap)
 {
     struct UnstructuredGrid *G;
 
-    int           save_errno;
+    long long           save_errno;
     unsigned long tmp;
     size_t        dimens[GRID_NMETA], i;
 
@@ -231,10 +231,10 @@ allocate_grid_from_file(FILE *fp, int *has_tag, int *has_indexmap)
                     /* Allocation failure checked elsewhere. */
                 }
 
-                G->number_of_cells = (int) dimens[GRID_NCELLS];
-                G->number_of_faces = (int) dimens[GRID_NFACES];
-                G->number_of_nodes = (int) dimens[GRID_NNODES];
-                G->dimensions      = (int) dimens[GRID_NDIMS];
+                G->number_of_cells = (long long) dimens[GRID_NCELLS];
+                G->number_of_faces = (long long) dimens[GRID_NFACES];
+                G->number_of_nodes = (long long) dimens[GRID_NNODES];
+                G->dimensions      = (long long) dimens[GRID_NDIMS];
 
                 i = 0;
                 while ((i < dimens[GRID_NDIMS]) &&
@@ -273,10 +273,10 @@ allocate_grid_from_file(FILE *fp, int *has_tag, int *has_indexmap)
 }
 
 
-static int
+static long long
 read_grid_nodes(FILE *fp, struct UnstructuredGrid *G)
 {
-    int    save_errno;
+    long long    save_errno;
     size_t i, n;
 
     save_errno = errno;
@@ -300,10 +300,10 @@ read_grid_nodes(FILE *fp, struct UnstructuredGrid *G)
 }
 
 
-static int
+static long long
 read_grid_faces(FILE *fp, struct UnstructuredGrid *G)
 {
-    int    save_errno, ok;
+    long long    save_errno, ok;
     size_t nf, nfn, i;
 
     save_errno = errno;
@@ -404,11 +404,11 @@ read_grid_faces(FILE *fp, struct UnstructuredGrid *G)
 }
 
 
-static int
-read_grid_cells(FILE *fp, int has_tag, int has_indexmap,
+static long long
+read_grid_cells(FILE *fp, long long has_tag, long long has_indexmap,
                 struct UnstructuredGrid *G)
 {
-    int    save_errno, ok;
+    long long    save_errno, ok;
     size_t nc, ncf, i;
 
     save_errno = errno;
@@ -465,7 +465,7 @@ read_grid_cells(FILE *fp, int has_tag, int has_indexmap,
                 }
             }
             else {
-                int discard;
+                long long discard;
 
                 while ((i < nc) && (fscanf(fp, " %d", & discard) == 1)) {
                     i += 1;
@@ -526,8 +526,8 @@ read_grid(const char *fname)
     struct UnstructuredGrid *G;
     FILE                    *fp;
 
-    int save_errno;
-    int has_tag, has_indexmap, ok;
+    long long save_errno;
+    long long has_tag, has_indexmap, ok;
 
     save_errno = errno;
 

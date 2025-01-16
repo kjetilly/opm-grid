@@ -44,7 +44,7 @@
 BOOST_AUTO_TEST_CASE(SimpleGraph)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{2,2,2};
+    std::array<long long,3> dims{2,2,2};
     std::array<double,3> size{2.,2.,2.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
@@ -68,14 +68,14 @@ BOOST_AUTO_TEST_CASE(SimpleGraph)
 BOOST_AUTO_TEST_CASE(SimpleGraphWithVertexContraction)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{2,2,2};
+    std::array<long long,3> dims{2,2,2};
     std::array<double,3> size{2.,2.,2.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    auto edgeL = gog.edgeList(3); // std::map<int,float>(gID,edgeWeight)
+    auto edgeL = gog.edgeList(3); // std::map<long long,float>(gID,edgeWeight)
     BOOST_REQUIRE(edgeL[1]==1);
     BOOST_REQUIRE_THROW(edgeL.at(0),std::out_of_range);
     gog.contractVertices(0,1);
@@ -112,15 +112,15 @@ BOOST_AUTO_TEST_CASE(SimpleGraphWithVertexContraction)
 BOOST_AUTO_TEST_CASE(WrapperForZoltan)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{5,4,3};
+    std::array<long long,3> dims{5,4,3};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    int err;
-    int nVer = getGraphOfGridNumVertices(&gog,&err);
+    long long err;
+    long long nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 60);
 
@@ -130,11 +130,11 @@ BOOST_AUTO_TEST_CASE(WrapperForZoltan)
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(objWeights[18]==1); // all weights are 1 at this point
 
-    std::vector<int> numEdges(nVer);
+    std::vector<long long> numEdges(nVer);
     getGraphOfGridNumEdges(&gog, 1, 1, nVer, gIDs.data(), nullptr, numEdges.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
-    int nEdges=0;
-    for (int i=0; i<nVer; ++i)
+    long long nEdges=0;
+    for (long long i=0; i<nVer; ++i)
     {
         switch (gIDs[i])
         {
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(WrapperForZoltan)
     BOOST_REQUIRE(nEdges==266);
 
     std::vector<uint> nborGIDs(nEdges);
-    std::vector<int> nborProc(nEdges);
+    std::vector<long long> nborProc(nEdges);
     std::vector<float> edgeWeights(nEdges);
     getGraphOfGridEdgeList(&gog, 1, 1, nVer, gIDs.data(), nullptr, numEdges.data(), nborGIDs.data(), nborProc.data(), 1, edgeWeights.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
@@ -163,21 +163,21 @@ BOOST_AUTO_TEST_CASE(WrapperForZoltan)
 BOOST_AUTO_TEST_CASE(GraphWithWell)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{5,4,3};
+    std::array<long long,3> dims{5,4,3};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    std::unordered_map<std::string, std::set<int>> wells{
+    std::unordered_map<std::string, std::set<long long>> wells{
         {"shape L on the front face", {5,10,15,35,55} },
         {"lying 8 on the right face", {20,1,41,22,3,43,24} },
         {"disconnected vertices", {58,12} } };
     addFutureConnectionWells(gog,wells);
     BOOST_REQUIRE(gog.getWells().size()==3);
-    int err;
-    int nVer = getGraphOfGridNumVertices(&gog,&err);
+    long long err;
+    long long nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 49);
 
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(GraphWithWell)
     std::vector<float> objWeights(nVer);
     getGraphOfGridVerticesList(&gog, 1, 1, gIDs.data(), nullptr, 1, objWeights.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
-    for (int i=0; i<nVer; ++i)
+    for (long long i=0; i<nVer; ++i)
     {
         switch (gIDs[i])
         {
@@ -200,17 +200,17 @@ BOOST_AUTO_TEST_CASE(GraphWithWell)
 BOOST_AUTO_TEST_CASE(IntersectingWells)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{5,4,3};
+    std::array<long long,3> dims{5,4,3};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    std::array<std::set<int>,3> wells{std::set<int>{0,1,2,3,4},
-                                      std::set<int>{52,32,12},
-                                      std::set<int>{59,48,37}};
-                        // later add  std::set<int>{37,38,39,34},
+    std::array<std::set<long long>,3> wells{std::set<long long>{0,1,2,3,4},
+                                      std::set<long long>{52,32,12},
+                                      std::set<long long>{59,48,37}};
+                        // later add  std::set<long long>{37,38,39,34},
                         //                         {2,8} and {2,38}
     for (const auto& w : wells)
     {
@@ -218,29 +218,29 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
     }
     BOOST_REQUIRE(gog.getWells().size()==3);
 
-    int err;
-    int nVer = getGraphOfGridNumVertices(&gog,&err);
+    long long err;
+    long long nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 52);
 
-    gog.addWell(std::set<int>{37,38,39,34}); // intersects with previous
+    gog.addWell(std::set<long long>{37,38,39,34}); // intersects with previous
     BOOST_REQUIRE(gog.getWells().size()==3);
     nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 49);
 
-    gog.addWell(std::set<int>{2,8});
+    gog.addWell(std::set<long long>{2,8});
     nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 48);
 
-    gog.addWell(std::set<int>{2,38}); // joins two wells
+    gog.addWell(std::set<long long>{2,38}); // joins two wells
     BOOST_REQUIRE(gog.getWells().size()==2);
     nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 47);
 
-    gog.addWell(std::set<int>{8,38});
+    gog.addWell(std::set<long long>{8,38});
     nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 47);
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
     getGraphOfGridVerticesList(&gog, 1, 1, gIDs.data(), nullptr, 1, objWeights.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
 
-    for (int i=0; i<nVer; ++i)
+    for (long long i=0; i<nVer; ++i)
     {
         switch (gIDs[i])
         {
@@ -260,8 +260,8 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
         }
     }
 
-    int nOut = 3;
-    std::vector<int> numEdges(nOut);
+    long long nOut = 3;
+    std::vector<long long> numEdges(nOut);
     std::vector<uint> gID{12,0,54};
     getGraphOfGridNumEdges(&gog, 1, 1, nOut, gID.data(), nullptr, numEdges.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
@@ -269,16 +269,16 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
     BOOST_REQUIRE(numEdges[1]==26);
     BOOST_REQUIRE(numEdges[2]==3);
 
-    int nEdges = 41;
+    long long nEdges = 41;
     std::vector<uint> nborGIDs(nEdges);
-    std::vector<int> nborProc(nEdges);
+    std::vector<long long> nborProc(nEdges);
     std::vector<float> edgeWeights(nEdges);
     getGraphOfGridEdgeList(&gog, 1, 1, nOut, gID.data(), nullptr, numEdges.data(), nborGIDs.data(), nborProc.data(), 1, edgeWeights.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
 
     // neighbors of the well with cells 12, 32, 52
-    int checked = 0;
-    for (int i=0; i<12; ++i)
+    long long checked = 0;
+    for (long long i=0; i<12; ++i)
     {
         BOOST_REQUIRE(edgeWeights[i]==1);
         switch (nborGIDs[i])
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
 
     // neighbors of the well with cells 0,1,2,3,4,8,34,37,38,39,48,59
     checked=0;
-    for (int i=12; i<38; ++i)
+    for (long long i=12; i<38; ++i)
     {
         switch (nborGIDs[i])
         {
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
     checked=0;
 
     // neighbors of the cell with global ID 54
-    for (int i=38; i<41; ++i)
+    for (long long i=38; i<41; ++i)
     {
         switch (nborGIDs[i])
         {
@@ -326,8 +326,8 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
 
     const auto& wellList = gog.getWells();
     BOOST_REQUIRE(wellList.size()==2);
-    std::set<int> well1{12,32,52};
-    std::set<int> well2{0,1,2,3,4,8,34,37,38,39,48,59};
+    std::set<long long> well1{12,32,52};
+    std::set<long long> well2{0,1,2,3,4,8,34,37,38,39,48,59};
     if (wellList.begin()->size()==3)
     {
         BOOST_REQUIRE( *wellList.begin()==well1 );
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(IntersectingWells)
 BOOST_AUTO_TEST_CASE(WellWithBuffers)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{5,1,1};
+    std::array<long long,3> dims{5,1,1};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
@@ -353,7 +353,7 @@ BOOST_AUTO_TEST_CASE(WellWithBuffers)
 
     gog.addNeighboringCellsToWells(); // adding buffer to zero wells does nothing
     BOOST_REQUIRE(gog.size()==5);
-    std::set<int> well{0,1};
+    std::set<long long> well{0,1};
     gog.addWell(well);
 
     // buffers of negative or zero size are ignored
@@ -371,59 +371,59 @@ BOOST_AUTO_TEST_CASE(WellWithBuffers)
 BOOST_AUTO_TEST_CASE(NeighboringWellsWithBuffers)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{6,1,1};
+    std::array<long long,3> dims{6,1,1};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    std::set<int> well0{0,1};
-    std::set<int> well1{2,3};
+    std::set<long long> well0{0,1};
+    std::set<long long> well1{2,3};
     gog.addWell(well0);
     gog.addWell(well1);
     BOOST_REQUIRE(gog.size()==4);
     gog.addNeighboringCellsToWells();
     BOOST_REQUIRE(gog.size()==2);
     BOOST_REQUIRE(gog.getWells().size()==1);
-    BOOST_REQUIRE(*gog.getWells().begin()==(std::set<int>{0,1,2,3,4}));
+    BOOST_REQUIRE(*gog.getWells().begin()==(std::set<long long>{0,1,2,3,4}));
 }
 
 BOOST_AUTO_TEST_CASE(WellsWithIntersectingBuffers)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{6,1,1};
+    std::array<long long,3> dims{6,1,1};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    std::set<int> well0{0,1};
-    std::set<int> well1{3,4};
+    std::set<long long> well0{0,1};
+    std::set<long long> well1{3,4};
     gog.addWell(well0);
     gog.addWell(well1);
     BOOST_REQUIRE(gog.size()==4);
     gog.addNeighboringCellsToWells();
     BOOST_REQUIRE(gog.size()==1);
     BOOST_REQUIRE(gog.getWells().size()==1);
-    BOOST_REQUIRE(*gog.getWells().begin()==(std::set<int>{0,1,2,3,4,5}));
+    BOOST_REQUIRE(*gog.getWells().begin()==(std::set<long long>{0,1,2,3,4,5}));
 }
 
 BOOST_AUTO_TEST_CASE(WellsWithIntersectingBuffers2)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{6,4,1};
+    std::array<long long,3> dims{6,4,1};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
     if (grid.size(0)==0)
         return;
 
-    std::set<int> well0{0,1};
-    std::set<int> well1{5,11};
-    std::set<int> well2{3,8,9,14};
-    std::set<int> well3{18,22};
+    std::set<long long> well0{0,1};
+    std::set<long long> well1{5,11};
+    std::set<long long> well2{3,8,9,14};
+    std::set<long long> well3{18,22};
     gog.addWell(well0);
     gog.addWell(well1);
     gog.addWell(well2);
@@ -437,11 +437,11 @@ BOOST_AUTO_TEST_CASE(WellsWithIntersectingBuffers2)
     {
         if (*w.begin()==0)
         {
-            BOOST_REQUIRE(w==(std::set<int>{0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,20}));
+            BOOST_REQUIRE(w==(std::set<long long>{0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,20}));
         }
         else
         {
-            BOOST_REQUIRE(w==(std::set<int>{12,16,18,19,21,22,23}));
+            BOOST_REQUIRE(w==(std::set<long long>{12,16,18,19,21,22,23}));
         }
     }
     // adding one layer contracts everything into one vertex, another layer does nothing
@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_CASE(WellsWithIntersectingBuffers2)
 
 namespace {
     // create Wells, we only use well name and cell locations
-    auto createConnection (int i, int j, int k)
+    auto createConnection (long long i, long long j, long long k)
     {
         return Opm::Connection(i,j,k,0, 0,Opm::Connection::State::OPEN,
                                    Opm::Connection::Direction::Z,
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(addWellConnections)
 {
     // create a grid
     Dune::CpGrid grid;
-    std::array<int,3> dims{2,2,2};
+    std::array<long long,3> dims{2,2,2};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
@@ -502,20 +502,20 @@ BOOST_AUTO_TEST_CASE(addWellConnections)
     wells.push_back(createWell("third")); // intersects with second
     wells[2].updateConnections(wellCon,true);
 
-    Dune::cpgrid::WellConnections wellConnections(wells,std::unordered_map<std::string, std::set<int>>(),gog.getGrid());
+    Dune::cpgrid::WellConnections wellConnections(wells,std::unordered_map<std::string, std::set<long long>>(),gog.getGrid());
     BOOST_REQUIRE(wellConnections.size()==3);
-    BOOST_REQUIRE(wellConnections[0]==(std::set<int>{0,2,6}));
+    BOOST_REQUIRE(wellConnections[0]==(std::set<long long>{0,2,6}));
     BOOST_REQUIRE(wellConnections[1].size()==2);
-    BOOST_REQUIRE(wellConnections[1]==(std::set<int>{3,4}));
+    BOOST_REQUIRE(wellConnections[1]==(std::set<long long>{3,4}));
     BOOST_REQUIRE(wellConnections[2].size()==2);
-    BOOST_REQUIRE(wellConnections[2]==(std::set<int>{4,5}));
+    BOOST_REQUIRE(wellConnections[2]==(std::set<long long>{4,5}));
 
     Opm::addWellConnections(gog,wellConnections,true);
     BOOST_REQUIRE(gog.size()==4);
     BOOST_REQUIRE(gog.getWells().size()==2); // second and third got merged (in gog)
 
-    int err;
-    int nVer = getGraphOfGridNumVertices(&gog,&err);
+    long long err;
+    long long nVer = getGraphOfGridNumVertices(&gog,&err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(nVer == 4);
     std::vector<uint> gIDs(nVer);
@@ -524,19 +524,19 @@ BOOST_AUTO_TEST_CASE(addWellConnections)
     BOOST_REQUIRE(err==ZOLTAN_OK);
     std::sort(gIDs.begin(),gIDs.end());
     BOOST_REQUIRE(gIDs[0]==0 && gIDs[1]==1 && gIDs[2]==3 && gIDs[3]==7);
-    std::vector<int> numEdges(nVer);
+    std::vector<long long> numEdges(nVer);
     getGraphOfGridNumEdges(&gog, 1, 1, nVer, gIDs.data(), nullptr, numEdges.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
     BOOST_REQUIRE(numEdges[0]==3 && numEdges[1]==2 && numEdges[2]==3 && numEdges[3]==2);
-    int nEdges = 10; // sum of numEdges[i]
+    long long nEdges = 10; // sum of numEdges[i]
     std::vector<uint> nborGIDs(nEdges);
-    std::vector<int> nborProc(nEdges);
+    std::vector<long long> nborProc(nEdges);
     std::vector<float> edgeWeights(nEdges);
     getGraphOfGridEdgeList(&gog, 1, 1, nVer, gIDs.data(), nullptr, numEdges.data(), nborGIDs.data(), nborProc.data(), 1, edgeWeights.data(), &err);
     BOOST_REQUIRE(err==ZOLTAN_OK);
 
     // check all edgeWeights. Note that nborGIDs are not sorted
-    for (int i=0; i<3; ++i)
+    for (long long i=0; i<3; ++i)
     {
         switch (nborGIDs[i])
         {
@@ -546,7 +546,7 @@ BOOST_AUTO_TEST_CASE(addWellConnections)
             default: throw("GraphOfGrid was constructed badly.");
         }
     }
-    for (int i=3; i<5; ++i)
+    for (long long i=3; i<5; ++i)
     {
         switch (nborGIDs[i])
         {
@@ -555,7 +555,7 @@ BOOST_AUTO_TEST_CASE(addWellConnections)
             default: throw("GraphOfGrid was constructed badly.");
         }
     }
-    for (int i=5; i<8; ++i)
+    for (long long i=5; i<8; ++i)
     {
         switch (nborGIDs[i])
         {
@@ -565,7 +565,7 @@ BOOST_AUTO_TEST_CASE(addWellConnections)
             default: throw("GraphOfGrid was constructed badly.");
         }
     }
-    for (int i=8; i<10; ++i)
+    for (long long i=8; i<10; ++i)
     {
         switch (nborGIDs[i])
         {
@@ -582,7 +582,7 @@ BOOST_AUTO_TEST_CASE(gIDtoRankCorrection)
 {
     // create a grid with wells
     Dune::CpGrid grid;
-    std::array<int,3> dims{2,3,2};
+    std::array<long long,3> dims{2,3,2};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     Opm::GraphOfGrid gog(grid);
@@ -590,21 +590,21 @@ BOOST_AUTO_TEST_CASE(gIDtoRankCorrection)
         return;
 
     // well needs at least 2 cells for vertex contraction
-    gog.addWell(std::set<int>{});
-    gog.addWell(std::set<int>{1});
+    gog.addWell(std::set<long long>{});
+    gog.addWell(std::set<long long>{1});
     BOOST_REQUIRE(gog.getWells().size()==0);
 
-    gog.addWell(std::set<int>{0,1,2});
-    gog.addWell(std::set<int>{5,8,11});
+    gog.addWell(std::set<long long>{0,1,2});
+    gog.addWell(std::set<long long>{5,8,11});
     const auto& wells = gog.getWells();
     BOOST_REQUIRE(wells.size()==2);
 
-    std::vector<int>gIDtoRank(12,1);
+    std::vector<long long>gIDtoRank(12,1);
     gIDtoRank[0]=0; // well {0,1,2}
     gIDtoRank[8]=2; // inside well {5,8,11}, to be rewritten unless skipped
     extendGIDtoRank(gog,gIDtoRank,1); // skip wells on rank 1
     BOOST_CHECK(gIDtoRank[8]==2);
-    for (int i=0; i<12; ++i)
+    for (long long i=0; i<12; ++i)
     {
         if (i<3)
             BOOST_CHECK(gIDtoRank[i]==0);
@@ -621,7 +621,7 @@ BOOST_AUTO_TEST_CASE(test_getWellRanks)
 {
     // create a grid with wells
     Dune::CpGrid grid;
-    std::array<int,3> dims{1,2,4};
+    std::array<long long,3> dims{1,2,4};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     if (grid.size(0)==0)
@@ -643,9 +643,9 @@ BOOST_AUTO_TEST_CASE(test_getWellRanks)
 
     wells.push_back(createWell("third"));
 
-    std::vector<int> gIDtoRank{4,4,1,4,3,3,2,2};
-    std::unordered_map<std::string, std::set<int>> futureConnections;
-    futureConnections.emplace("third",std::set<int>{6,7});
+    std::vector<long long> gIDtoRank{4,4,1,4,3,3,2,2};
+    std::unordered_map<std::string, std::set<long long>> futureConnections;
+    futureConnections.emplace("third",std::set<long long>{6,7});
     Dune::cpgrid::WellConnections wellConnections(wells,futureConnections,grid);
     auto wellRanks = Opm::getWellRanks(gIDtoRank,wellConnections);
     BOOST_REQUIRE(wellRanks.size()==3);
@@ -660,7 +660,7 @@ init_unit_test_func()
     return true;
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     boost::unit_test::unit_test_main(&init_unit_test_func,

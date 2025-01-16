@@ -37,21 +37,21 @@ namespace UgGridHelpers
 
 /// \brief Allows viewing a sparse table consisting out of C-array
 ///
-/// This class can be used to convert two int array (like they are
+/// This class can be used to convert two long long array (like they are
 /// in UnstructuredGrid for representing the cell to faces mapping
 /// as a sparse table object.
 class SparseTableView
 {
 public:
     /// \brief The type of the roww.
-    using row_type = iterator_range_pod<int>;
+    using row_type = iterator_range_pod<long long>;
 
     /// \brief Creates a sparse table view
     /// \param data The array with data of the table.
     /// \param offset The offsets of the rows. Row i starts
     ///               at offset[i] and ends a offset[i+1]
     /// \param size   The number of entries/rows of the table
-    SparseTableView(int* data, unsigned *offset, std::size_t size_arg)
+    SparseTableView(long long* data, unsigned *offset, std::size_t size_arg)
         : data_(data), offset_(offset), size_(size_arg)
     {}
 
@@ -80,7 +80,7 @@ public:
 
 private:
     /// \brief The array with data of the table.
-    const int* data_;
+    const long long* data_;
     /// \brief offset The offsets of the rows.
     ///
     /// Row i starts at offset[i] and ends a offset[i+1]
@@ -90,32 +90,32 @@ private:
 };
 
 /// \brief Get the number of cells of a grid.
-int numCells(const UnstructuredGrid& grid);
+long long numCells(const UnstructuredGrid& grid);
 
 /// \brief Get the number of faces of a grid.
-int numFaces(const UnstructuredGrid& grid);
+long long numFaces(const UnstructuredGrid& grid);
 
 /// \brief Get the dimensions of a grid
-int dimensions(const UnstructuredGrid& grid);
+long long dimensions(const UnstructuredGrid& grid);
 
 /// \brief Get the number of faces, where each face counts as many times as there are adjacent faces
-int numCellFaces(const UnstructuredGrid& grid);
+long long numCellFaces(const UnstructuredGrid& grid);
 
 /// \brief Get the cartesion dimension of the underlying structured grid.
-const int* cartDims(const UnstructuredGrid& grid);
+const long long* cartDims(const UnstructuredGrid& grid);
 
 /// \brief Get the local to global index mapping.
 ///
 /// The global index is the index of the active cell
 /// in the underlying structured grid.
-const int* globalCell(const UnstructuredGrid& grid);
+const long long* globalCell(const UnstructuredGrid& grid);
 
 #if HAVE_ECL_INPUT
 /// \brief Create Eclipse style ACTNUM array.
 ///
 /// Create a vector with global cartesian number of elements,
 /// the value is 0 for inactive cells and one for active cells.
-std::vector<int> createACTNUM(const UnstructuredGrid& grid);
+std::vector<long long> createACTNUM(const UnstructuredGrid& grid);
 #endif
 
 
@@ -147,14 +147,14 @@ beginCellCentroids(const UnstructuredGrid& grid);
 /// \brief Get vertical position of cell center ("zcorn" average.)
 /// \brief grid The grid.
 /// \brief cell_index The index of the specific cell.
-double cellCenterDepth(const UnstructuredGrid& grid, int cell_index);
+double cellCenterDepth(const UnstructuredGrid& grid, long long cell_index);
 
 /// \brief Get a coordinate of a specific face center.
 /// \brief calculated as the raw average of the cell corners
 /// \param grid The grid.
 /// \param cell_index The index of the specific cell.
 /// \param face_tag The logical cartesian index of the face
-Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell_index, int face_tag);
+Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, long long cell_index, long long face_tag);
 
 /// \brief Get a area weighted normal vector of a specific face.
 /// \brief calculated without introducing a center point
@@ -162,27 +162,27 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
 /// \brief values closer to Ecl.
 /// \param grid The grid.
 /// \param face_index The index of the specific face.
-Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int face_index);
+Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, long long face_index);
 
 
 /// \brief Get a coordinate of a specific cell centroid.
 /// \brief grid The grid.
 /// \brief cell_index The index of the specific cell.
 /// \breif coordinate The coordinate index.
-double cellCentroidCoordinate(const UnstructuredGrid& grid, int cell_index,
-                                 int coordinate);
+double cellCentroidCoordinate(const UnstructuredGrid& grid, long long cell_index,
+                                 long long coordinate);
 
 
 /// \brief Get the centroid of a cell.
 /// \param grid The grid whose cell centroid we query.
 /// \param cell_index The index of the corresponding cell.
-const double* cellCentroid(const UnstructuredGrid& grid, int cell_index);
+const double* cellCentroid(const UnstructuredGrid& grid, long long cell_index);
 
 
 /// \brief Get the volume of a cell.
 /// \param grid The grid the cell belongs to.
 /// \param cell_index The index of the cell.
-double cellVolume(const UnstructuredGrid& grid, int cell_index);
+double cellVolume(const UnstructuredGrid& grid, long long cell_index);
 
 /// \brief The mapping of the grid type to type of the iterator over
 /// the cell volumes.
@@ -259,17 +259,17 @@ beginFaceCentroids(const UnstructuredGrid& grid);
 /// \param grid The grid.
 /// \param face_index The index of the specific face.
 FaceCentroidTraits<UnstructuredGrid>::ValueType
-faceCentroid(const UnstructuredGrid& grid, int face_index);
+faceCentroid(const UnstructuredGrid& grid, long long face_index);
 
 /// \brief Get the normal of a face.
 /// \param grid The grid that the face is part of.
 /// \param face_index The index of the face in the grid.
-const double* faceNormal(const UnstructuredGrid& grid, int face_index);
+const double* faceNormal(const UnstructuredGrid& grid, long long face_index);
 
 /// \brief Get the area of a face
 /// \param grid The grid that the face is part of.
 /// \param face_index The index of the face in the grid.
-double faceArea(const UnstructuredGrid& grid, int face_index);
+double faceArea(const UnstructuredGrid& grid, long long face_index);
 
 /// \brief Maps the grid type to the associated type of the cell to faces mapping.
 ///
@@ -312,7 +312,7 @@ face2Vertices(const UnstructuredGrid& grid);
 /// \brief Get the coordinates of a vertex of the grid.
 /// \param grid The grid the vertex is part of.
 /// \param index The index identifying the vertex.
-const double* vertexCoordinates(const UnstructuredGrid& grid, int index);
+const double* vertexCoordinates(const UnstructuredGrid& grid, long long index);
 
 class FaceCellsProxy
 {
@@ -320,12 +320,12 @@ public:
     FaceCellsProxy(const UnstructuredGrid& grid)
     : face_cells_(grid.face_cells)
     {}
-    int operator()(int face_index, int local_index) const
+    long long operator()(long long face_index, long long local_index) const
     {
         return face_cells_[2*face_index+local_index];
     }
 private:
-    const int* face_cells_;
+    const long long* face_cells_;
 };
 
 /// \brief Traits of the face to attached cell mappping of a grid.
@@ -351,7 +351,7 @@ FaceCellTraits<UnstructuredGrid>::Type faceCells(const UnstructuredGrid& grid);
 /// \param i The nzumber of rows to increment
 /// \param dim The number of columns of the matrix.
 template<class T>
-T* increment(T* cc, int i, int dim)
+T* increment(T* cc, long long i, long long dim)
 {
     return cc+(i*dim);
 }
@@ -360,7 +360,7 @@ T* increment(T* cc, int i, int dim)
 /// \param cc The iterator.
 /// \param i The nzumber of rows to increment
 template<class T>
-T increment(const T& t, int i, int)
+T increment(const T& t, long long i, long long)
 {
     return t+i;
 }
@@ -370,7 +370,7 @@ T increment(const T& t, int i, int)
 /// \param i The index of the coordinate.
 /// \tparam T The type of the coordinate of the centroid.
 template<class T>
-double getCoordinate(T* cc, int i)
+double getCoordinate(T* cc, long long i)
 {
     return cc[i];
 }
@@ -381,7 +381,7 @@ double getCoordinate(T* cc, int i)
 /// \tparam T The type of the iterator representing the centroid.
 /// Its value_type has to provide an operator[] to access the coordinates.
 template<class T>
-double getCoordinate(T t, int i)
+double getCoordinate(T t, long long i)
 {
     return (*t)[i];
 }

@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 template<class G, class V>
-void vtkout (const G& grid, const V& c, const char* name, int k, double time=0.0, int rank=0)
+void vtkout (const G& grid, const V& c, const char* name, long long k, double time=0.0, long long rank=0)
 {
   Dune::VTKWriter<typename G::LeafGridView> vtkwriter(grid.leafGridView());
   char fname[128];

@@ -52,13 +52,13 @@
 
 namespace Dune
 {
-    template<typename K, int n>
+    template<typename K, long long n>
     FieldVector<K,n>
     operator- (const FieldVector<K,n>& v)
     {
         // Assume 'K' supports a single parameter constructor.  The
         // assumption holds for all standard C++ built-in arithmetic
-        // types such as 'int', 'float', and 'complex<double>'.
+        // types such as 'long long', 'float', and 'complex<double>'.
         //
         return FieldVector<K,n>(K(0)) - v;
     }
@@ -91,10 +91,10 @@ namespace Dune
         /// If entityrep_ is negative, the orientation is negative, and the index
         /// is given by ~entityrep_ (we cannot use -entityrep_, since 0 is a valid index).
         /// We may consider changing this representation to using something like a
-        /// std::pair<int, bool> instead.
+        /// std::pair<long long, bool> instead.
         /// @tparam codim Codimension
 
-        template <int codim>
+        template <long long codim>
         class EntityRep
         {
         public:
@@ -108,7 +108,7 @@ namespace Dune
             /// @brief Constructor taking an entity index and an orientation.
             /// @param index_arg Entity index
             /// @param orientation_arg True if the entity's orientation is positive.
-            EntityRep(int index_arg, bool orientation_arg)
+            EntityRep(long long index_arg, bool orientation_arg)
                 : entityrep_(orientation_arg ? index_arg : ~index_arg)
             {
                 assert(index_arg >= 0);
@@ -116,20 +116,20 @@ namespace Dune
             /// @brief Set entity value.
             /// @param index Entity index
             /// @param orientation True if the entity's orientation is positive.
-            void setValue(int index_arg, bool orientation_arg)
+            void setValue(long long index_arg, bool orientation_arg)
             {
                 assert(index_arg >= 0);
                 entityrep_ = orientation_arg ? index_arg : ~index_arg;
             }
             /// @brief The (positive) index of an entity. Not a Dune interface method.
             /// @return the (positive) index of an entity.
-            int index() const
+            long long index() const
             {
                 return entityrep_ < 0 ? ~entityrep_ : entityrep_;
             }
 
             /// @brief The signed index that also tells us the orientation
-            int signedIndex() const
+            long long signedIndex() const
             {
                 return entityrep_;
             }
@@ -166,8 +166,8 @@ namespace Dune
             /// @return true if \b this element is less than the \b other.
             bool operator<(const EntityRep& other) const
             {
-                int i1 = index();
-                int i2 = other.index();
+                long long i1 = index();
+                long long i2 = other.index();
                 if (i1 < i2) return true;
                 if (orientation() && !other.orientation()) return true;
                 return false;
@@ -199,13 +199,13 @@ namespace Dune
             /// need to be modified if we change the representation, then we should remove
             /// this constructor.
             /// @param erep Entity representation.
-            explicit EntityRep(int erep)
+            explicit EntityRep(long long erep)
                 : entityrep_(erep)
             {
             }
 
             // Interior representation is documented in class main comment.
-            int entityrep_;
+            long long entityrep_;
         };
 
 
@@ -240,12 +240,12 @@ namespace Dune
             {
             }
 
-            const T& get(int i) const
+            const T& get(long long i) const
             {
                 return V::operator[](i);
             }
 
-            T& get(int i)
+            T& get(long long i)
             {
                 return V::operator[](i);
             }
@@ -267,7 +267,7 @@ namespace Dune
         /// @tparam T A value type for the variable,
         ///           such as double for pressure etc.
         /// @tparam codim Codimension.
-        template <typename T, int codim>
+        template <typename T, long long codim>
         class EntityVariable : public EntityVariableBase<T>
         {
         public:
@@ -302,7 +302,7 @@ namespace Dune
         /// @tparam T A value type for the variable,
         ///           such as double for pressure etc.
         /// @tparam codim Codimension.
-        template <typename T, int codim>
+        template <typename T, long long codim>
         class SignedEntityVariable : public EntityVariableBase<T>
         {
         public:

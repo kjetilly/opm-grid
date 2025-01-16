@@ -35,17 +35,17 @@
 class MPIError {
 public:
   /** @brief Constructor. */
-  MPIError(std::string s, int e) : errorstring(s), errorcode(e){}
+  MPIError(std::string s, long long e) : errorstring(s), errorcode(e){}
   /** @brief The error string. */
   std::string errorstring;
   /** @brief The mpi error code. */
-  int errorcode;
+  long long errorcode;
 };
 
 #ifdef HAVE_MPI
-void MPI_err_handler(MPI_Comm *, int *err_code, ...){
+void MPI_err_handler(MPI_Comm *, long long *err_code, ...){
     std::vector<char> err_string(MPI_MAX_ERROR_STRING);
-  int err_length;
+  long long err_length;
   MPI_Error_string(*err_code, err_string.data(), &err_length);
   std::string s(err_string.data(), err_length);
   std::cerr << "An MPI Error ocurred:"<<std::endl<<s<<std::endl;
@@ -58,7 +58,7 @@ struct MPIFixture
     MPIFixture()
     {
 #if HAVE_MPI
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     helper = &Dune::MPIHelper::instance(m_argc, m_argv);
 #ifdef MPI_2
@@ -85,11 +85,11 @@ struct MPIFixture
 BOOST_GLOBAL_FIXTURE(MPIFixture);
 
 template<class T, class C>
-std::tuple<std::vector<T>, std::vector<T>, std::vector<int>, std::vector<int>>
+std::tuple<std::vector<T>, std::vector<T>, std::vector<long long>, std::vector<long long>>
 createParallelData(const C& comm, T)
 {
-    std::vector<int> sizes(comm.size());
-    std::vector<int> displ(comm.size()+1);
+    std::vector<long long> sizes(comm.size());
+    std::vector<long long> displ(comm.size()+1);
     std::vector<T> allVals;
     
     if (comm.rank() == 0)
@@ -97,7 +97,7 @@ createParallelData(const C& comm, T)
         // Initialize with random numbers.
         std::random_device rndDevice;
         std::mt19937 mersenneEngine {rndDevice()};  // Generates random integers
-        std::uniform_int_distribution<int> dist {1, 10};
+        std::uniform_int_distribution<long long> dist {1, 10};
         
         auto gen = [&dist, &mersenneEngine](){
                        return dist(mersenneEngine);
@@ -128,7 +128,7 @@ createParallelData(const C& comm, T)
 
 template<class T>
 void checkGlobalData(const std::vector<T>& data, const std::vector<T>& expected,
-                     const std::vector<int> displ, const std::vector<int> expectedDispl){
+                     const std::vector<long long> displ, const std::vector<long long> expectedDispl){
     using std::begin;
     using std::end;
     BOOST_CHECK_EQUAL_COLLECTIONS(begin(data), end(data), begin(expected), end(expected));
@@ -138,9 +138,9 @@ void checkGlobalData(const std::vector<T>& data, const std::vector<T>& expected,
 template<class C>
 void testAllGatherv(const C& comm)
 {
-    //std::vector<int> sizes(comm.size());
-    std::vector<int> expectedDispl(comm.size()+1);
-    std::vector<int> displ;
+    //std::vector<long long> sizes(comm.size());
+    std::vector<long long> expectedDispl(comm.size()+1);
+    std::vector<long long> displ;
     std::vector<double> expectedAllVals;
     std::vector<double> allVals;
     std::vector<double> myVals;
@@ -150,16 +150,16 @@ void testAllGatherv(const C& comm)
     std::tie(allVals, displ) = Opm::allGatherv(myVals, comm);
     checkGlobalData(allVals, expectedAllVals, displ, expectedDispl);
     // test with a pair
-    std::pair<std::vector<double>, std::vector<int>> out;
+    std::pair<std::vector<double>, std::vector<long long>> out;
     out = Opm::allGatherv(myVals, comm);
 }
 
 template<class C>
 void testGatherv(const C& comm)
 {
-    //std::vector<int> sizes(comm.size());
-    std::vector<int> expectedDispl(comm.size()+1);
-    std::vector<int> displ;
+    //std::vector<long long> sizes(comm.size());
+    std::vector<long long> expectedDispl(comm.size()+1);
+    std::vector<long long> displ;
     std::vector<double> expectedAllVals;
     std::vector<double> allVals;
     std::vector<double> myVals;
@@ -174,7 +174,7 @@ void testGatherv(const C& comm)
     }
     checkGlobalData(allVals, expectedAllVals, displ, expectedDispl);
     // test with a pair
-    std::pair<std::vector<double>, std::vector<int>> out;
+    std::pair<std::vector<double>, std::vector<long long>> out;
     out = Opm::gatherv(myVals, comm, 0);
 }
 

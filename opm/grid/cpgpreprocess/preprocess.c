@@ -50,26 +50,26 @@
 #define MAX(i,j) ((i)>(j) ? (i) : (j))
 
 static void
-compute_cell_index(const int dims[3], int i, int j, int *neighbors, int len);
+compute_cell_index(const long long dims[3], long long i, long long j, long long *neighbors, long long len);
 
-static int
-checkmemory(int nz, struct processed_grid *out, int **intersections);
+static long long
+checkmemory(long long nz, struct processed_grid *out, long long **intersections);
 
 static void
-process_vertical_faces(int direction,
-                       int **intersections,
-                       int *plist, int *work,
+process_vertical_faces(long long direction,
+                       long long **intersections,
+                       long long *plist, long long *work,
                        struct processed_grid *out);
 
 static void
-process_horizontal_faces(int **intersections,
-                         int *plist,
-                         const int* is_aquifer_cell,
+process_horizontal_faces(long long **intersections,
+                         long long *plist,
+                         const long long* is_aquifer_cell,
                          struct processed_grid *out,
-                         int pinchActive);
+                         long long pinchActive);
 
-static int
-linearindex(const int dims[3], int i, int j, int k)
+static long long
+linearindex(const long long dims[3], long long i, long long j, long long k)
 {
     assert (0 <= i);
     assert (0 <= j);
@@ -87,9 +87,9 @@ linearindex(const int dims[3], int i, int j, int k)
   direct vertical neighbor in a cartesian grid with dimension
   dims.
  */
-static int
-vertical_cart_neighbors(const int dims[3], int c1, int c2){
-    int k1, k2;
+static long long
+vertical_cart_neighbors(const long long dims[3], long long c1, long long c2){
+    long long k1, k2;
     k1 = c1 / dims[0] / dims[1];
     k2 = c2 / dims[0] / dims[1];
     return (k1 - k2) == 1 || (k2 - k1) == 1;
@@ -101,12 +101,12 @@ vertical_cart_neighbors(const int dims[3], int c1, int c2){
   (i-1, j-1, 0), (i-1, j, 0), (i, j-1, 0) and (i, j, 0) elements of
   field.  */
 static void
-igetvectors(int dims[3], int i, int j, int *field, int *v[])
+igetvectors(long long dims[3], long long i, long long j, long long *field, long long *v[])
 {
-    int im = MAX(1,       i  ) - 1;
-    int ip = MIN(dims[0], i+1) - 1;
-    int jm = MAX(1,       j  ) - 1;
-    int jp = MIN(dims[1], j+1) - 1;
+    long long im = MAX(1,       i  ) - 1;
+    long long ip = MIN(dims[0], i+1) - 1;
+    long long jm = MAX(1,       j  ) - 1;
+    long long jp = MIN(dims[1], j+1) - 1;
 
     v[0] = field + dims[2]*(im + dims[0]* jm);
     v[1] = field + dims[2]*(im + dims[0]* jp);
@@ -127,10 +127,10 @@ igetvectors(int dims[3], int i, int j, int *field, int *v[])
 
 */
 static void
-compute_cell_index(const int dims[3], int i, int j,
-                   int *neighbors, int len)
+compute_cell_index(const long long dims[3], long long i, long long j,
+                   long long *neighbors, long long len)
 {
-    int k;
+    long long k;
 
     if (((i < 0) || (i >= dims[0])) || /* 'i' outside [0, dims[0]) */
         ((j < 0) || (j >= dims[1]))) { /* 'j' outside [0, dims[1]) */
@@ -151,11 +151,11 @@ compute_cell_index(const int dims[3], int i, int j,
 
 /*-----------------------------------------------------------------
   Ensure there's sufficient memory */
-static int
-checkmemory(int nz, struct processed_grid *out, int **intersections)
+static long long
+checkmemory(long long nz, struct processed_grid *out, long long **intersections)
 {
     size_t r, m, n;
-    int ok;
+    long long ok;
 
     /* Ensure there is enough space to manage the (pathological) case
      * of every single cell on one side of a fault connecting to all
@@ -217,24 +217,24 @@ checkmemory(int nz, struct processed_grid *out, int **intersections)
   direction == 1 : constant-j faces.
 */
 static void
-process_vertical_faces(int direction,
-                       int **intersections,
-                       int *plist, int *work,
+process_vertical_faces(long long direction,
+                       long long **intersections,
+                       long long *plist, long long *work,
                        struct processed_grid *out)
 {
-    int i,j;
-    int *cornerpts[4];
-    int d[3];
+    long long i,j;
+    long long *cornerpts[4];
+    long long d[3];
     unsigned f;
     enum face_tag tag[] = { I_FACE, J_FACE };
-    int *tmp;
-    int nx = out->dimensions[0];
-    int ny = out->dimensions[1];
-    int nz = out->dimensions[2];
-    int startface;
-    int num_intersections;
-    int *ptr;
-    int len;
+    long long *tmp;
+    long long nx = out->dimensions[0];
+    long long ny = out->dimensions[1];
+    long long nz = out->dimensions[2];
+    long long startface;
+    long long num_intersections;
+    long long *ptr;
+    long long len;
 
     assert ((direction == 0) || (direction == 1));
 
@@ -268,9 +268,9 @@ process_vertical_faces(int direction,
                 cornerpts[3] = tmp;
             }
 
-            /* int startface = ftab->position; */
+            /* long long startface = ftab->position; */
             startface = out->number_of_faces;
-            /* int num_intersections = *npoints - npillarpoints; */
+            /* long long num_intersections = *npoints - npillarpoints; */
             num_intersections = out->number_of_nodes -
                 out->number_of_nodes_on_pillars;
 
@@ -314,26 +314,26 @@ process_vertical_faces(int direction,
 
 */
 static void
-process_horizontal_faces(int **intersections,
-                         int *plist,
-                         const int* is_aquifer_cell,
+process_horizontal_faces(long long **intersections,
+                         long long *plist,
+                         const long long* is_aquifer_cell,
                          struct processed_grid *out,
-                         int pinchActive)
+                         long long pinchActive)
 {
-    int i,j,k;
+    long long i,j,k;
 
-    int nx = out->dimensions[0];
-    int ny = out->dimensions[1];
-    int nz = out->dimensions[2];
+    long long nx = out->dimensions[0];
+    long long ny = out->dimensions[1];
+    long long nz = out->dimensions[2];
 
-    int *cell  = out->local_cell_index;
-    int cellno = 0;
-    int *f, *n, *c[4];
-    int prevcell, thiscell;
-    int idx;
+    long long *cell  = out->local_cell_index;
+    long long cellno = 0;
+    long long *f, *n, *c[4];
+    long long prevcell, thiscell;
+    long long idx;
 
     /* dimensions of plist */
-    int  d[3];
+    long long  d[3];
     d[0] = 2*nx;
     d[1] = 2*ny;
     d[2] = 2+2*nz;
@@ -458,7 +458,7 @@ process_horizontal_faces(int **intersections,
   pt holds coordinates to intersection between lines given by point
   numbers L[0]-L[1] and L[2]-L[3].
 */
-static void approximate_intersection_pt(int *L, double *c, double *pt)
+static void approximate_intersection_pt(long long *L, double *c, double *pt)
 {
     double a;
     double z0, z1, z2, z3;
@@ -516,14 +516,14 @@ static void approximate_intersection_pt(int *L, double *c, double *pt)
   Compute x,y and z coordinates for points on each pillar.  Then,
   append x,y and z coordinates for extra points on faults.  */
 static void
-compute_intersection_coordinates(int                   *intersections,
+compute_intersection_coordinates(long long                   *intersections,
                                  struct processed_grid *out)
 {
-    int n  = out->number_of_nodes;
-    int np = out->number_of_nodes_on_pillars;
-    int    k;
+    long long n  = out->number_of_nodes;
+    long long np = out->number_of_nodes_on_pillars;
+    long long    k;
     double *pt;
-    int    *itsct = intersections;
+    long long    *itsct = intersections;
     /* Make sure the space allocated for nodes match the number of
      * node. */
     void *p = realloc (out->node_coordinates, 3*n*sizeof(double));
@@ -548,12 +548,12 @@ compute_intersection_coordinates(int                   *intersections,
 
 
 /* ------------------------------------------------------------------ */
-static int*
-copy_and_permute_actnum(int nx, int ny, int nz, const int *in, int *out)
+static long long*
+copy_and_permute_actnum(long long nx, long long ny, long long nz, const long long *in, long long *out)
 /* ------------------------------------------------------------------ */
 {
-    int i,j,k;
-    int *ptr = out;
+    long long i,j,k;
+    long long *ptr = out;
 
     /* Permute actnum such that values of each vertical stack of cells
      * are adjacent in memory, i.e.,
@@ -583,11 +583,11 @@ copy_and_permute_actnum(int nx, int ny, int nz, const int *in, int *out)
 
 /* ------------------------------------------------------------------ */
 static double*
-copy_and_permute_zcorn(int nx, int ny, int nz, const double *in,
+copy_and_permute_zcorn(long long nx, long long ny, long long nz, const double *in,
                        double sign, double *out)
 /* ------------------------------------------------------------------ */
 {
-    int i,j,k;
+    long long i,j,k;
     double *ptr = out;
     /* Permute zcorn such that values of each vertical stack of cells
      * are adjacent in memory, i.e.,
@@ -607,9 +607,9 @@ copy_and_permute_zcorn(int nx, int ny, int nz, const double *in,
 }
 
 /* ------------------------------------------------------------------ */
-static int
-get_zcorn_sign(int nx, int ny, int nz, const int *actnum,
-               const double *zcorn, int *error)
+static long long
+get_zcorn_sign(long long nx, long long ny, long long nz, const long long *actnum,
+               const double *zcorn, long long *error)
 /* ------------------------------------------------------------------ */
 {
     /* Ensure that zcorn (i.e., depth) is strictly nondecreasing in
@@ -622,9 +622,9 @@ get_zcorn_sign(int nx, int ny, int nz, const int *actnum,
        3) if (1) and (2) fails, return -1.0, and set *error = 1.
 
     */
-    int    sign;
-    int    i, j, k;
-    int    c1, c2;
+    long long    sign;
+    long long    i, j, k;
+    long long    c1, c2;
     double z1, z2;
 
     for (sign = 1; sign>-2; sign = sign - 2)
@@ -750,7 +750,7 @@ vertex_coord(const struct grdecl *in,
 
     /* Deem top and bottom pillar points coincident if Z coordinates along
      * pillar differ by less than 1 micrometre */
-    const int coincide = fabs(top[2] - bot[2]) < 1.0e-6;
+    const long long coincide = fabs(top[2] - bot[2]) < 1.0e-6;
 
     const double t = coincide
         ? 0.0 /* coincide => vertical */
@@ -977,7 +977,7 @@ coordinate_system_type_model_bounding_box(const struct grdecl *in,
                                           const size_t         off[8])
 /* ---------------------------------------------------------------------- */
 {
-    int           active, searching;
+    long long           active, searching;
     size_t        nx, ny, nc, c;
     size_t        origin, imax, jmax;
     double        dx[2], dy[2], dz, triple;
@@ -1065,7 +1065,7 @@ static void
 reverse_face_nodes(struct processed_grid *out)
 /* ---------------------------------------------------------------------- */
 {
-    int t, *i, *j;
+    long long t, *i, *j;
     unsigned f;
 
     for (f = 0; f < out->number_of_faces; f++) {
@@ -1089,35 +1089,35 @@ reverse_face_nodes(struct processed_grid *out)
 /* ----------------------------------------------------------------------
  * Public interface
  * ---------------------------------------------------------------------- */
-int process_grdecl(const struct grdecl   *in,
+long long process_grdecl(const struct grdecl   *in,
                    double                 tolerance,
-                   const int             *is_aquifer_cell,
+                   const long long             *is_aquifer_cell,
                    struct processed_grid *out,
-                   int                    pinchActive)
+                   long long                    pinchActive)
 {
     struct grdecl g = {0};
 
     size_t i;
-    int    sign, error, left_handed;
-    int    cellnum;
+    long long    sign, error, left_handed;
+    long long    cellnum;
 
-    int    *actnum, *iptr;
-    int    *global_cell_index;
+    long long    *actnum, *iptr;
+    long long    *global_cell_index;
 
     double *zcorn;
 
     enum CoordinateSystemType coord_sys_type;
 
     const size_t BIGNUM = 64;
-    const int    nx = in->dims[0];
-    const int    ny = in->dims[1];
-    const int    nz = in->dims[2];
+    const long long    nx = in->dims[0];
+    const long long    ny = in->dims[1];
+    const long long    nz = in->dims[2];
     const size_t nc = ((size_t) nx) * ((size_t) ny) * ((size_t) nz);
 
     /* internal work arrays */
-    int    *work;
-    int    *plist;
-    int    *intersections;
+    long long    *work;
+    long long    *plist;
+    long long    *intersections;
 
 
     sign = get_zcorn_sign(nx, ny, nz, in->actnum, in->zcorn, &error);
@@ -1133,8 +1133,8 @@ int process_grdecl(const struct grdecl   *in,
           increased)
        2) set Cartesian imensions
     */
-    out->m                = (int) (BIGNUM / 3);
-    out->n                = (int) BIGNUM;
+    out->m                = (long long) (BIGNUM / 3);
+    out->n                = (long long) BIGNUM;
 
     out->face_neighbors   = malloc( BIGNUM      * sizeof *out->face_neighbors);
     out->face_nodes       = malloc( out->n      * sizeof *out->face_nodes);
@@ -1264,7 +1264,7 @@ int process_grdecl(const struct grdecl   *in,
     cellnum = 0;
     for (i = 0; i < nc; ++i) {
         if (out->local_cell_index[i] != -1) {
-            global_cell_index[cellnum] = (int) i;
+            global_cell_index[cellnum] = (long long) i;
             out->local_cell_index[i]   = cellnum;
             cellnum++;
         }

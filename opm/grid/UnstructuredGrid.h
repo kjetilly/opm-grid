@@ -39,24 +39,24 @@ extern "C" {
 
 struct UnstructuredGrid
 {
-    int    dimensions;
-    int    number_of_cells;
-    int    number_of_faces;
-    int    number_of_nodes;
-    int    *face_nodes;
-    int    *face_nodepos;
-    int    *face_cells;
-    int    *cell_faces;
-    int    *cell_facepos;
+    long long    dimensions;
+    long long    number_of_cells;
+    long long    number_of_faces;
+    long long    number_of_nodes;
+    long long    *face_nodes;
+    long long    *face_nodepos;
+    long long    *face_cells;
+    long long    *cell_faces;
+    long long    *cell_facepos;
     double *node_coordinates;
     double *face_centroids;
     double *face_areas;
     double *face_normals;
     double *cell_centroids;
     double *cell_volumes;
-    int    *global_cell;
-    int     cartdims[3];
-    int    *cell_facetag;
+    long long    *global_cell;
+    long long     cartdims[3];
+    long long    *cell_facetag;
 };
 
 void destroy_grid(struct UnstructuredGrid *g);
@@ -105,14 +105,14 @@ struct UnstructuredGrid
        higher-dimensional spaces, such as 2d grids embedded in 3d.
        This number must be 2 or 3.
     */
-    int    dimensions;
+    long long    dimensions;
 
     /** The number of cells in the grid. */
-    int    number_of_cells;
+    long long    number_of_cells;
     /** The number of faces in the grid. */
-    int    number_of_faces;
+    long long    number_of_faces;
     /** The number of nodes in the grid. */
-    int    number_of_nodes;
+    long long    number_of_nodes;
 
     /**
        Contains for each face, the indices of its adjacent nodes.
@@ -120,7 +120,7 @@ struct UnstructuredGrid
        each face's number of adjacent nodes, which also is equal to
        face_nodepos[number_of_faces].
     */
-    int    *face_nodes;
+    long long    *face_nodes;
     /**
        For a face f, face_nodepos[f] contains the starting index
        for f's nodes in the face_nodes array.
@@ -137,7 +137,7 @@ struct UnstructuredGrid
        cell_faces and cell_facepos.
        The size of the array is equal to (2*number_of_faces).
     */
-    int    *face_cells;
+    long long    *face_cells;
 
     /**
        Contains for each cell, the indices of its adjacent faces.
@@ -145,7 +145,7 @@ struct UnstructuredGrid
        each cell's number of adjacent faces, which also is equal to
        cell_facepos[number_of_cells].
     */
-    int    *cell_faces;
+    long long    *cell_faces;
     /**
        For a cell c, cell_facepos[c] contains the starting index
        for c's faces in the cell_faces array.
@@ -213,7 +213,7 @@ struct UnstructuredGrid
        no inherent Cartesian structure. Due to this ambiguity, this
        field should not be used to check if the grid is Cartesian.
     */
-    int    *global_cell;
+    long long    *global_cell;
 
     /**
        Contains the size of the logical cartesian structure (if any) of the grid.
@@ -226,7 +226,7 @@ struct UnstructuredGrid
        of the items in the (sub-)array cartdims[0..dimensions-1]
        _could_ have the value 0 to signal this.
     */
-    int     cartdims[3];
+    long long     cartdims[3];
     /**
        If non-null, this array contains a number for cell-face
        adjacency indicating the face's position with respect to the
@@ -243,7 +243,7 @@ struct UnstructuredGrid
        degenerate) logical cartesian structure, for example
        cornerpoint grids.
     */
-    int    *cell_facetag;
+    long long    *cell_facetag;
 
 
     /*

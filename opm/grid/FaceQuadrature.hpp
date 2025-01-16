@@ -54,17 +54,17 @@ namespace Opm
     {
     public:
         FaceQuadrature(const UnstructuredGrid& grid,
-                       const int face,
-                       const int degree);
+                       const long long face,
+                       const long long degree);
 
-        int numQuadPts() const;
-        void quadPtCoord(const int index, double* coord) const;
-        double quadPtWeight(const int index) const;
+        long long numQuadPts() const;
+        void quadPtCoord(const long long index, double* coord) const;
+        double quadPtWeight(const long long index) const;
 
     private:
         const UnstructuredGrid& grid_;
-        const int face_;
-        const int degree_;
+        const long long face_;
+        const long long degree_;
     };
 
 } // namespace Opm

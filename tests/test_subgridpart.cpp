@@ -43,15 +43,15 @@ using Dune::referenceElement; //grid check assume usage of Dune::Geometry
 #if HAVE_MPI
 struct MPIError
 {
-    MPIError(std::string s, int e) : errorstring(std::move(s)), errorcode(e){}
+    MPIError(std::string s, long long e) : errorstring(std::move(s)), errorcode(e){}
     std::string errorstring;
-    int errorcode;
+    long long errorcode;
 };
 
-void MPI_err_handler(MPI_Comm*, int* err_code, ...)
+void MPI_err_handler(MPI_Comm*, long long* err_code, ...)
 {
     std::vector<char> err_string(MPI_MAX_ERROR_STRING);
-    int err_length;
+    long long err_length;
     MPI_Error_string(*err_code, err_string.data(), &err_length);
     std::string s(err_string.data(), err_length);
     std::cerr << "An MPI Error ocurred:" << std::endl << s << std::endl;
@@ -72,7 +72,7 @@ void testElement(const GridView& gridView, const Entity& entity)
     typename Geometry::GlobalCoordinate center = elemGeom.center();
     BOOST_CHECK_SMALL((center - global).two_norm(), 1e-12);
 
-    int numIs = 0;
+    long long numIs = 0;
     auto isIt = gridView.ibegin(entity);
     const auto isEndIt = gridView.iend(entity);
     for (; isIt != isEndIt; ++isIt, ++ numIs)
@@ -93,9 +93,9 @@ void testElement(const GridView& gridView, const Entity& entity)
 }
 
 template <class GridView>
-void testGridInteriorIteration( const GridView& gridView, const int nElem )
+void testGridInteriorIteration( const GridView& gridView, const long long nElem )
 {
-    int numElem = 0;
+    long long numElem = 0;
     auto elemIt = gridView.template begin<0>();
     const auto elemEndIt = gridView.template end<0>();
     for (; elemIt != elemEndIt; ++elemIt) {
@@ -110,9 +110,9 @@ void testGridInteriorIteration( const GridView& gridView, const int nElem )
 }
 
 template <class GridView, Dune::PartitionIteratorType pit>
-void testGridPartitionIteration( const GridView& gridView, const int nElem)
+void testGridPartitionIteration( const GridView& gridView, const long long nElem)
 {
-    int numElem = 0;
+    long long numElem = 0;
     auto elemIt = gridView.template begin<0, pit>();
     const auto elemEndIt = gridView.template end<0, pit>();
     for (; elemIt != elemEndIt; ++elemIt) {
@@ -125,13 +125,13 @@ void testGridPartitionIteration( const GridView& gridView, const int nElem)
 
 
 template <class Grid>
-auto getSeeds(const Grid& grid, const std::vector<int>& indices)
+auto getSeeds(const Grid& grid, const std::vector<long long>& indices)
 {
     assert(std::is_sorted(indices.begin(), indices.end()));
     using EntitySeed = typename Grid::template Codim<0>::Entity::EntitySeed;
     std::vector<EntitySeed> seeds(indices.size());
     auto it = grid.template leafbegin<0>();
-    int previous = 0;
+    long long previous = 0;
     for (std::size_t c = 0; c < indices.size(); ++c) {
         std::advance(it, indices[c] - previous);
         seeds[c] = it->seed();
@@ -202,7 +202,7 @@ TOPS
     const auto deck = Opm::Parser{}.parseString(deckString);
 
     Dune::CpGrid grid;
-    const int* actnum = deck.hasKeyword("ACTNUM") ? deck["ACTNUM"].back().getIntData().data() : nullptr;
+    const long long* actnum = deck.hasKeyword("ACTNUM") ? deck["ACTNUM"].back().getIntData().data() : nullptr;
     Opm::EclipseGrid ecl_grid(deck , actnum);
 
     grid.processEclipseFormat(&ecl_grid, nullptr, false, false, false);
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(yasp)
     testGrid(yaspGrid, "YaspGrid", 64, 125);
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
 #if HAVE_MPI

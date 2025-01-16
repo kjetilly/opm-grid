@@ -36,34 +36,34 @@ namespace cpgrid
 
 #if HAVE_MPI
 template<class Id>
-std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            WellConnections>
 makeImportAndExportLists(const Dune::CpGrid& cpgrid,
                          const Dune::Communication<MPI_Comm>& cc,
                          const std::vector<Dune::cpgrid::OpmWellType> * wells,
-                         const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                         const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                          const Dune::cpgrid::CombinedGridWellGraph* gridAndWells,
-                         int root,
-                         int numExport,
-                         int numImport,
+                         long long root,
+                         long long numExport,
+                         long long numImport,
                          const Id* exportLocalGids,
                          const Id* exportGlobalGids,
-                         const int* exportToPart,
+                         const long long* exportToPart,
                          const Id* importGlobalGids,
                          bool allowDistributedWells) {
 
-    int                         size = cpgrid.numCells();
-    int                         rank  = cc.rank();
-    std::vector<int>            parts(size, rank);
-    std::vector<std::vector<int> > wellsOnProc;
+    long long                         size = cpgrid.numCells();
+    long long                         rank  = cc.rank();
+    std::vector<long long>            parts(size, rank);
+    std::vector<std::vector<long long> > wellsOnProc;
 
     // List entry: process to export to, (global) index, process rank, attribute there (not needed?)
-    std::vector<std::tuple<int,int,char>> myExportList;
+    std::vector<std::tuple<long long,long long,char>> myExportList;
     // List entry: process to import from, global index, process rank, attribute here, local index
     // (determined later)
-    std::vector<std::tuple<int,int,char,int>> myImportList;
+    std::vector<std::tuple<long long,long long,char,long long>> myImportList;
     assert(rank==root || numExport==0);
     assert(rank!=root || numImport==0);
     constexpr double buffer = 1.05;
@@ -75,13 +75,13 @@ makeImportAndExportLists(const Dune::CpGrid& cpgrid,
     myImportList.reserve(reserveIm);
     using AttributeSet = Dune::cpgrid::CpGridData::AttributeSet;
 
-    for ( int i=0; i < numExport; ++i )
+    for ( long long i=0; i < numExport; ++i )
     {
         parts[exportLocalGids[i]] = exportToPart[i];
         myExportList.emplace_back(exportGlobalGids[i], exportToPart[i], static_cast<char>(AttributeSet::owner));
     }
 
-    for ( int i=0; i < numImport; ++i )
+    for ( long long i=0; i < numImport; ++i )
     {
         myImportList.emplace_back(importGlobalGids[i], root, static_cast<char>(AttributeSet::owner),-1);
     }
@@ -110,7 +110,7 @@ makeImportAndExportLists(const Dune::CpGrid& cpgrid,
         }
         else
         {
-            auto gidGetter = [&cpgrid](int i) { return cpgrid.globalIdSet().id(Dune::createEntity<0>(cpgrid, i, true));};
+            auto gidGetter = [&cpgrid](long long i) { return cpgrid.globalIdSet().id(Dune::createEntity<0>(cpgrid, i, true));};
             wellsOnProc =
                 postProcessPartitioningForWells(parts,
                                                 gidGetter,
@@ -123,12 +123,12 @@ makeImportAndExportLists(const Dune::CpGrid& cpgrid,
 
 #ifndef NDEBUG
             std::size_t index = 0;
-            std::unordered_set<int> distributed_wells;
+            std::unordered_set<long long> distributed_wells;
 
             for( auto well : gridAndWells->getWellsGraph() )
             {
-                int part=parts[index];
-                std::set<std::pair<int,int> > cells_on_other;
+                long long part=parts[index];
+                std::set<std::pair<long long,long long> > cells_on_other;
                 for( auto vertex : well )
                 {
                     if( part != parts[vertex] )
@@ -168,22 +168,22 @@ makeImportAndExportLists(const Dune::CpGrid& cpgrid,
 }
 
 template<class Id>
-std::tuple<int, std::vector<Id> >
-scatterExportInformation(int numExport, const Id* exportGlobalGids,
-                         const int* exportToPart, int root,
+std::tuple<long long, std::vector<Id> >
+scatterExportInformation(long long numExport, const Id* exportGlobalGids,
+                         const long long* exportToPart, long long root,
                          const Communication<MPI_Comm>& cc)
 {
-    int numImport;
-    std::vector<int> numberOfExportedVerticesPerProcess;
+    long long numImport;
+    std::vector<long long> numberOfExportedVerticesPerProcess;
     std::vector<Id> importGlobalGidsVector;
     std::vector<Id> globalIndicesToSend;
-    std::vector<int> offsets;
+    std::vector<long long> offsets;
 
     // Build and communicate import/export data.
     // 1. Send number of exports/imports.
     if (cc.rank() == root) {
         numberOfExportedVerticesPerProcess.resize(cc.size(), 0);
-        for (int i = 0; i < numExport; ++i) {
+        for (long long i = 0; i < numExport; ++i) {
             ++numberOfExportedVerticesPerProcess[exportToPart[i]];
         }
     }
@@ -199,9 +199,9 @@ scatterExportInformation(int numExport, const Id* exportGlobalGids,
                          numberOfExportedVerticesPerProcess.end(),
                          offsets.begin() + 1);
             globalIndicesToSend.resize(numExport, 0);
-            const int commSize = cc.size();
-            std::vector<int> currentIndex(commSize, 0);
-            for (int i = 0; i < numExport; ++i) {
+            const long long commSize = cc.size();
+            std::vector<long long> currentIndex(commSize, 0);
+            for (long long i = 0; i < numExport; ++i) {
                 if (exportToPart[i] >= commSize) {
                     std::ostringstream oss;
                     oss << "Something wrong with Zoltan decomposition. "
@@ -228,7 +228,7 @@ scatterExportInformation(int numExport, const Id* exportGlobalGids,
             importGlobalGidsVector.resize(numImport, 0);
         }
         // Check for errors
-        int ok = error.empty();
+        long long ok = error.empty();
         cc.broadcast(&ok, 1, root);
         if (!ok) {
             OPM_THROW(std::runtime_error, error);
@@ -240,30 +240,30 @@ scatterExportInformation(int numExport, const Id* exportGlobalGids,
         return std::make_tuple(numImport, importGlobalGidsVector);
 }
 
-// instantiate int types
+// instantiate long long types
 template
-std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            WellConnections>
 makeImportAndExportLists(const Dune::CpGrid&,
                          const Communication<MPI_Comm>&,
                          const std::vector<Dune::cpgrid::OpmWellType>*,
-                         const std::unordered_map<std::string, std::set<int>>&,
+                         const std::unordered_map<std::string, std::set<long long>>&,
                          const Dune::cpgrid::CombinedGridWellGraph*,
-                         int,
-                         int,
-                         int,
-                         const int*,
-                         const int*,
-                         const int*,
-                         const int*,
+                         long long,
+                         long long,
+                         long long,
+                         const long long*,
+                         const long long*,
+                         const long long*,
+                         const long long*,
                          bool);
 
 template
-std::tuple<int, std::vector<int> >
-scatterExportInformation(int numExport, const int*,
-                         const int*, int,
+std::tuple<long long, std::vector<long long> >
+scatterExportInformation(long long numExport, const long long*,
+                         const long long*, long long,
                          const Communication<MPI_Comm>&);
 #endif // HAVE_MPI
 } // end namespace Dune
@@ -292,28 +292,28 @@ void setDefaultZoltanParameters(Zoltan_Struct* zz) {
 
 } // anon namespace
 
-std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            WellConnections>
 zoltanGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                                const std::vector<OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                const double* transmissibilities,
                                const Communication<MPI_Comm>& cc,
                                EdgeWeightMethod edgeWeightsMethod,
-                               int root,
+                               long long root,
                                const double zoltanImbalanceTol,
                                bool allowDistributedWells,
                                const std::map<std::string,std::string>& params)
 {
-    int rc = ZOLTAN_OK - 1;
+    long long rc = ZOLTAN_OK - 1;
     float ver = 0;
     struct Zoltan_Struct *zz;
-    int changes, numGidEntries, numLidEntries, numImport, numExport;
+    long long changes, numGidEntries, numLidEntries, numImport, numExport;
     ZOLTAN_ID_PTR importGlobalGids, importLocalGids, exportGlobalGids, exportLocalGids;
-    int *importProcs, *importToPart, *exportProcs, *exportToPart;
-    int argc=0;
+    long long *importProcs, *importToPart, *exportProcs, *exportToPart;
+    long long argc=0;
     char** argv = 0 ;
     rc = Zoltan_Initialize(argc, argv, &ver);
     zz = Zoltan_Create(cc);
@@ -393,14 +393,14 @@ public:
 
     ZoltanSerialPartitioner(const CpGrid& _cpgrid,
                             const std::vector<OpmWellType>* _wells,
-                            const std::unordered_map<std::string, std::set<int>>& _possibleFutureConnections,
+                            const std::unordered_map<std::string, std::set<long long>>& _possibleFutureConnections,
                             const double* _transmissibilities,
                             const CommunicationType& _cc,
                             EdgeWeightMethod _edgeWeightsMethod,
-                            int _root,
+                            long long _root,
                             const double _zoltanImbalanceTol,
                             bool _allowDistributedWells,
-                            int _numParts,
+                            long long _numParts,
                             const std::map<std::string,std::string>& param)
         : cpgrid(_cpgrid)
         , wells(_wells)
@@ -422,31 +422,31 @@ public:
     }
 
 
-    std::vector<int> partitionForInfo()
+    std::vector<long long> partitionForInfo()
     {
         if (cc.rank() == root) {
             callZoltan();
         }
 
-        int size = cpgrid.numCells();
-        std::vector<int> parts(size, 0);
+        long long size = cpgrid.numCells();
+        std::vector<long long> parts(size, 0);
 
-        for ( int i=0; i < numExport; ++i ) {
+        for ( long long i=0; i < numExport; ++i ) {
             parts[i] = exportToPart[i];
         }
         return parts;
     }
-    std::tuple<std::vector<int>,
+    std::tuple<std::vector<long long>,
                std::vector<std::pair<std::string, bool>>,
-               std::vector<std::tuple<int, int, char>>,
-               std::vector<std::tuple<int, int, char, int>>,
+               std::vector<std::tuple<long long, long long, char>>,
+               std::vector<std::tuple<long long, long long, char, long long>>,
                WellConnections>
     partition()
     {
         MPI_Barrier(cc);
 
         // Initialize Zoltan and perform partitioning.
-        int rc = ZOLTAN_OK;
+        long long rc = ZOLTAN_OK;
         if (cc.rank() == root) {
             rc = callZoltan();
         }
@@ -490,13 +490,13 @@ public:
 private:
     // Methods
 
-    int callZoltan()
+    long long callZoltan()
     {
-        int argc = 0;
+        long long argc = 0;
         char** argv = 0;
         float ver = 0;
 
-        int rc = Zoltan_Initialize(argc, argv, &ver);
+        long long rc = Zoltan_Initialize(argc, argv, &ver);
         zz = Zoltan_Create(MPI_COMM_SELF);
         if (rc != ZOLTAN_OK) {
             return rc;
@@ -552,46 +552,46 @@ private:
     // Data members
     const CpGrid& cpgrid;
     const std::vector<OpmWellType>* wells;
-    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections;
+    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections;
     const double* transmissibilities;
     const CommunicationType& cc;
     EdgeWeightMethod edgeWeightsMethod;
-    int root;
+    long long root;
     const double zoltanImbalanceTol;
     std::string errorOnRoot;
 
     struct Zoltan_Struct* zz = nullptr;
-    int changes = 0;
-    int numGidEntries = 0;
-    int numLidEntries = 0;
-    int numImport = 0;
-    int numExport = 0;
+    long long changes = 0;
+    long long numGidEntries = 0;
+    long long numLidEntries = 0;
+    long long numImport = 0;
+    long long numExport = 0;
     ZOLTAN_ID_PTR importGlobalGids = nullptr;
     ZOLTAN_ID_PTR importLocalGids = nullptr;
     ZOLTAN_ID_PTR exportGlobalGids = nullptr;
     ZOLTAN_ID_PTR exportLocalGids = nullptr;
-    int *importProcs, *importToPart, *exportProcs, *exportToPart;
+    long long *importProcs, *importToPart, *exportProcs, *exportToPart;
     std::unique_ptr<CombinedGridWellGraph> gridAndWells;
     using ZoltanId = typename std::remove_pointer<ZOLTAN_ID_PTR>::type;
     std::vector<ZoltanId> importGlobalGidsVector;
     bool allowDistributedWells;
-    int numParts;
+    long long numParts;
     const std::map<std::string,std::string>& params;
 };
 
 
-std::tuple<std::vector<int>,
+std::tuple<std::vector<long long>,
            std::vector<std::pair<std::string, bool>>,
-           std::vector<std::tuple<int, int, char>>,
-           std::vector<std::tuple<int, int, char, int>>,
+           std::vector<std::tuple<long long, long long, char>>,
+           std::vector<std::tuple<long long, long long, char, long long>>,
            WellConnections>
 zoltanSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                                      const std::vector<OpmWellType>* wells,
-                                     const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                                     const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                      const double* transmissibilities,
                                      const Dune::Communication<MPI_Comm>& cc,
                                      EdgeWeightMethod edgeWeightsMethod,
-                                     int root,
+                                     long long root,
                                      const double zoltanImbalanceTol,
                                      bool allowDistributedWells,
                                      const std::map<std::string,std::string>& params)
@@ -601,14 +601,14 @@ zoltanSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
     return partitioner.partition();
 }
 
-std::vector<int>
+std::vector<long long>
 zoltanGraphPartitionGridForJac(const CpGrid& cpgrid,
                                const std::vector<OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                const double* transmissibilities,
                                const Dune::Communication<MPI_Comm>& cc,
-                               EdgeWeightMethod edgeWeightsMethod, int root,
-                               int numParts, const double zoltanImbalanceTol)
+                               EdgeWeightMethod edgeWeightsMethod, long long root,
+                               long long numParts, const double zoltanImbalanceTol)
 {
     // Parameters are empty, but must still have scope here since it
     // (or rather a const reference to it) is queried in

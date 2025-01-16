@@ -25,7 +25,7 @@
 #include <dune/grid/cpgrid/dgfparser.hh>
 #include <dune/common/mpihelper.hh>
 
-template<int dim>
+template<long long dim>
 struct ElementLayout
 {
     bool contains (Dune::GeometryType gt)
@@ -36,7 +36,7 @@ struct ElementLayout
 };
 
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
 //     try {
         Dune::MPIHelper::instance(argc, argv);
@@ -48,9 +48,9 @@ int main(int argc, char** argv)
         Dune::GridPtr< Grid > gridPtr( dgfStream );
         Grid &grid = *gridPtr;
 #else
-        int refinement = 1;
+        long long refinement = 1;
         Grid grid;
-        std::array<int   , 3> dims;
+        std::array<long long   , 3> dims;
         std::fill(dims.begin(), dims.end(), 1 << refinement);
         std::array<double, 3> cell_sz;
         std::fill(cell_sz.begin(), cell_sz.end(), 1.0 / (1 << refinement));
@@ -69,8 +69,8 @@ int main(int argc, char** argv)
         typedef GridView::Codim<0>::Iterator ElementIterator;
         ElementIterator endEIt = gridView.end<0>();
         for (ElementIterator eIt = gridView.begin<0>(); eIt != endEIt; ++eIt) {
-            int mapperIdx = elementMapper.map(*eIt);
-            int indexSetIdx = indexSet.index(*eIt);
+            long long mapperIdx = elementMapper.map(*eIt);
+            long long indexSetIdx = indexSet.index(*eIt);
             if (mapperIdx != indexSetIdx) {
                 std::cerr << "Mismatched mapper and indexset indices: " << mapperIdx << " vs. " << indexSetIdx << '\n';
                 return EXIT_FAILURE;

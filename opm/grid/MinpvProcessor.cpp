@@ -26,7 +26,7 @@
 namespace Opm {
 
 
-void MinpvProcessor::Result::add_nnc(int cell1, int cell2)
+void MinpvProcessor::Result::add_nnc(long long cell1, long long cell2)
 {
     auto key = std::min(cell1, cell2);
     auto value = std::max(cell1,cell2);
@@ -34,7 +34,7 @@ void MinpvProcessor::Result::add_nnc(int cell1, int cell2)
     this->nnc.insert({key, value});
 }
 
-MinpvProcessor::MinpvProcessor(const int nx, const int ny, const int nz) :
+MinpvProcessor::MinpvProcessor(const long long nx, const long long ny, const long long nz) :
     dims_( {{nx,ny,nz}} ),
     delta_( {{1 , 2*nx , 4*nx*ny}} )
 { }
@@ -61,13 +61,13 @@ MinpvProcessor::process(const std::vector<double>& thickness,
                         const double max_gap,
                         const std::vector<double>& pv,
                         const std::vector<double>& minpvv,
-                        const std::vector<int>& actnum,
+                        const std::vector<long long>& actnum,
                         const bool mergeMinPVCells,
                         double* zcorn,
                         bool pinchNOGAP,
                         bool pinchOption4ALL,
                         const std::vector<double>& permz,
-                        const std::function<double(int)>& multz,
+                        const std::function<double(long long)>& multz,
                         const double tolerance_unique_points) const
 {
     // Algorithm:
@@ -112,14 +112,14 @@ MinpvProcessor::process(const std::vector<double>& thickness,
         }
 
     // Main loop.
-    for (int jj = 0; jj < dims_[1]; ++jj) {
-        for (int ii = 0; ii < dims_[0]; ++ii) {
-            for (int kk = 0; kk < dims_[2]; ++kk) {
+    for (long long jj = 0; jj < dims_[1]; ++jj) {
+        for (long long ii = 0; ii < dims_[0]; ++ii) {
+            for (long long kk = 0; kk < dims_[2]; ++kk) {
                 // For a corner case for option ALL
                 // where one of the cells in-between has 0 transmissibility
                 // we will omit the nnc
                 bool option4ALLZero = false;
-                const int c = ii + dims_[0] * (jj + dims_[1] * kk);
+                const long long c = ii + dims_[0] * (jj + dims_[1] * kk);
                 bool c_active = actnum.empty() || actnum[c];
                 bool c_thin = (thickness[c] <= z_tolerance);
                 bool c_thin_inactive = !c_active && c_thin;
@@ -131,7 +131,7 @@ MinpvProcessor::process(const std::vector<double>& thickness,
 
                     // Move deeper (higher k) coordinates to lower k coordinates.
                     // i.e remove the cell
-                    for (int count = 0; count < 4; ++count) {
+                    for (long long count = 0; count < 4; ++count) {
                         cz[count + 4] = cz[count];
                     }
                     setCellZcorn(ii, jj, kk, cz, zcorn);
@@ -160,9 +160,9 @@ MinpvProcessor::process(const std::vector<double>& thickness,
                     }
 
                     // Find the next cell below
-                    int kk_iter = kk + 1;
+                    long long kk_iter = kk + 1;
 
-                    int c_below = ii + dims_[0] * (jj + dims_[1] * (kk_iter));
+                    long long c_below = ii + dims_[0] * (jj + dims_[1] * (kk_iter));
                     bool active = actnum.empty() || actnum[c_below];
                     bool thin = (thickness[c_below] <= z_tolerance);
                     bool thin_inactive = !active && thin;
@@ -196,7 +196,7 @@ MinpvProcessor::process(const std::vector<double>& thickness,
                             {
                                 // original algorithm collapses the unextended cell
                                 cz = getCellZcorn(ii, jj, kk_iter, zcorn);
-                                for (int count = 0; count < 4; ++count) {
+                                for (long long count = 0; count < 4; ++count) {
                                     cz[count + 4] = cz[count];
                                 }
                                 setCellZcorn(ii, jj, kk_iter, cz, zcorn);
@@ -231,7 +231,7 @@ MinpvProcessor::process(const std::vector<double>& thickness,
                         // Set lower k coordinates of cell below to upper cells's coordinates.
                         // i.e fill the void using the cell below
                         std::array<double, 8> cz_below = getCellZcorn(ii, jj, kk_iter, zcorn);
-                        for (int count = 0; count < 4; ++count) {
+                        for (long long count = 0; count < 4; ++count) {
                             cz_below[count] = cz[count];
                         }
 
@@ -253,8 +253,8 @@ MinpvProcessor::process(const std::vector<double>& thickness,
 
                         // Bypass inactive cells with thickness below tolerance and
                         // active cells with volume below minpv
-                        int k_above = kk-1;
-                        int c_above = ii + dims_[0] * (jj + dims_[1] * (kk-1));
+                        long long k_above = kk-1;
+                        long long c_above = ii + dims_[0] * (jj + dims_[1] * (kk-1));
                         auto above_active = actnum.empty() || actnum[c_above];
                         auto above_inactive = !actnum.empty() && !actnum[c_above];
                         auto above_thin = thickness[c_above] < z_tolerance;
@@ -306,8 +306,8 @@ MinpvProcessor::process(const std::vector<double>& thickness,
                     {
                         // Check whether there is a gap to the neighbor below whose thickness is less
                         // than MAX_GAP. In that case we need to create an NNC if there is a gap between the two cells.
-                        int kk_below = kk + 1;
-                        int c_below = ii + dims_[0] * (jj + dims_[1] * kk_below);
+                        long long kk_below = kk + 1;
+                        long long c_below = ii + dims_[0] * (jj + dims_[1] * kk_below);
 
                         if ((actnum.empty() || actnum[c_below]) && pv[c_below] > minpvv[c_below])
                         {
@@ -316,7 +316,7 @@ MinpvProcessor::process(const std::vector<double>& thickness,
                             std::array<double, 8> cz_below = getCellZcorn(ii, jj, kk_below, zcorn);
                             bool vertically_connected = true; // If true a connection will be there anyway -> Skip NNC
 
-                            for(int i = 0; i < 4; ++i) {
+                            for(long long i = 0; i < 4; ++i) {
                                 vertically_connected = vertically_connected && std::abs(cz_below[i] - cz[4+i])
                                     <= tolerance_unique_points;
                             }
@@ -334,11 +334,11 @@ MinpvProcessor::process(const std::vector<double>& thickness,
     return result;
 }
 
-std::array<int,8>
-MinpvProcessor::cornerIndices(const int i, const int j, const int k) const
+std::array<long long,8>
+MinpvProcessor::cornerIndices(const long long i, const long long j, const long long k) const
 {
-    const int ix = 2*(i*delta_[0] + j*delta_[1] + k*delta_[2]);
-    std::array<int, 8> ixs = {{ ix,                         ix + delta_[0],
+    const long long ix = 2*(i*delta_[0] + j*delta_[1] + k*delta_[2]);
+    std::array<long long, 8> ixs = {{ ix,                         ix + delta_[0],
                                 ix + delta_[1],             ix + delta_[1] + delta_[0],
                                 ix + delta_[2],             ix + delta_[2] + delta_[0],
                                 ix + delta_[2] + delta_[1], ix + delta_[2] + delta_[1] + delta_[0] }};
@@ -347,22 +347,22 @@ MinpvProcessor::cornerIndices(const int i, const int j, const int k) const
 }
 
 std::array<double, 8>
-MinpvProcessor::getCellZcorn(const int i, const int j,
-                             const int k, const double* z) const
+MinpvProcessor::getCellZcorn(const long long i, const long long j,
+                             const long long k, const double* z) const
 {
-    const std::array<int, 8> ixs = cornerIndices(i, j, k);
+    const std::array<long long, 8> ixs = cornerIndices(i, j, k);
     std::array<double, 8> cellz;
-    for (int count = 0; count < 8; ++count) {
+    for (long long count = 0; count < 8; ++count) {
         cellz[count] = z[ixs[count]];
     }
     return cellz;
 }
 
-void MinpvProcessor::setCellZcorn(const int i, const int j, const int k,
+void MinpvProcessor::setCellZcorn(const long long i, const long long j, const long long k,
                              const std::array<double, 8>& cellz, double* z) const
 {
-    const std::array<int, 8> ixs = cornerIndices(i, j, k);
-    for (int count = 0; count < 8; ++count) {
+    const std::array<long long, 8> ixs = cornerIndices(i, j, k);
+    for (long long count = 0; count < 8; ++count) {
         z[ixs[count]] = cellz[count];
     }
 }

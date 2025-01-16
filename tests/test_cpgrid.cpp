@@ -27,13 +27,13 @@ using Dune::referenceElement; //grid check assume usage of Dune::Geometry
 #include <iostream>
 
 template <class GridView>
-void testGridIteration( const GridView& gridView, const int nElem )
+void testGridIteration( const GridView& gridView, const long long nElem )
 {
     typedef typename GridView::template Codim<0>::Iterator ElemIterator;
     typedef typename GridView::IntersectionIterator IsIt;
     typedef typename GridView::template Codim<0>::Geometry Geometry;
 
-    int numElem = 0;
+    long long numElem = 0;
     ElemIterator elemIt = gridView.template begin<0>();
     ElemIterator elemEndIt = gridView.template end<0>();
     for (; elemIt != elemEndIt; ++elemIt) {
@@ -50,7 +50,7 @@ void testGridIteration( const GridView& gridView, const int nElem )
         }
 
 
-        int numIs = 0;
+        long long numIs = 0;
         IsIt isIt = gridView.ibegin(*elemIt);
         IsIt isEndIt = gridView.iend(*elemIt);
         for (; isIt != isEndIt; ++isIt, ++ numIs)
@@ -122,7 +122,7 @@ void testGrid(Grid& grid, const std::string& name, const size_t nElem, const siz
       VtkWriter vtkWriter(grid.leafGridView());
 
       std::cout << "create cellData\n";
-      int numElems = grid.size(0);
+      long long numElems = grid.size(0);
       std::vector<double> tmpData(numElems, 0.0);
 
       std::cout << "add cellData\n";
@@ -134,7 +134,7 @@ void testGrid(Grid& grid, const std::string& name, const size_t nElem, const siz
 
 }
 
-int main(int argc, char** argv )
+long long main(long long argc, char** argv )
 {
     // initialize MPI
     Dune::MPIHelper::instance( argc, argv );
@@ -173,7 +173,7 @@ int main(int argc, char** argv )
         const auto& elemEclCentroid = ecl_grid.getCellCenter(grid_cartMapper.cartesianIndex(element.index()));
         const auto& elemCpGridEclCentroid_Entity = grid.getEclCentroid(element);
         const auto& elemCpGridEclCentroid_Index = grid.getEclCentroid(element.index());
-        for (int coord = 0; coord < 3; ++coord)
+        for (long long coord = 0; coord < 3; ++coord)
         {
             assert(elemEclCentroid[coord] == elemCpGridEclCentroid_Entity[coord]);
             assert(elemEclCentroid[coord] == elemCpGridEclCentroid_Index[coord]);

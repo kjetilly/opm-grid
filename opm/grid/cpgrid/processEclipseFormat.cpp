@@ -64,7 +64,7 @@
 namespace Dune
 {
 
-    using NNCMap = std::set<std::pair<int, int>>;
+    using NNCMap = std::set<std::pair<long long, long long>>;
     using NNCMaps = std::array<NNCMap, 2>;
     enum NNCMapsIndex { PinchNNC = 0,
                         ExplicitNNC = 1 };
@@ -76,10 +76,10 @@ namespace Dune
 #if HAVE_ECL_INPUT
         std::vector<double>
         getSanitizedZCORN(const ::Opm::EclipseGrid& ecl_grid,
-                          const ::std::vector<int>& actnum);
+                          const ::std::vector<long long>& actnum);
 #endif
 
-        typedef std::array<int, 3> coord_t;
+        typedef std::array<long long, 3> coord_t;
         typedef std::array<double, 8> cellz_t;
 
         cellz_t getCellZvals(const coord_t& c, const coord_t& n, const double* z);
@@ -88,7 +88,7 @@ namespace Dune
         void addOuterCellLayer(const grdecl& original,
                                std::vector<double>& new_coord,
                                std::vector<double>& new_zcorn,
-                               std::vector<int>& new_actnum,
+                               std::vector<long long>& new_actnum,
                                grdecl& output);
 #endif
 
@@ -96,16 +96,16 @@ namespace Dune
         // void removeUnusedNodes(processed_grid& grid); // NOTE: not deleted, see comment at definition.
         void buildTopo(const processed_grid& output,
                        const NNCMaps& nnc,
-                       std::vector<int>& global_cell,
+                       std::vector<long long>& global_cell,
                        cpgrid::OrientedEntityTable<0, 1>& c2f,
                        cpgrid::OrientedEntityTable<1, 0>& f2c,
-                       Opm::SparseTable<int>& f2p,
-                       std::vector<std::array<int,8> >& c2p,
-                       std::vector<int>& face_to_output_face);
+                       Opm::SparseTable<long long>& f2p,
+                       std::vector<std::array<long long,8> >& c2p,
+                       std::vector<long long>& face_to_output_face);
         void buildGeom(const processed_grid& output,
                        const cpgrid::OrientedEntityTable<0, 1>& c2f,
-                       const std::vector<std::array<int,8> >& c2p,
-                       const std::vector<int>& face_to_output_face,
+                       const std::vector<std::array<long long,8> >& c2p,
+                       const std::vector<long long>& face_to_output_face,
                        const std::unordered_map<size_t, double>& aquifer_cell_volumes,
                        cpgrid::EntityVariable<cpgrid::Geometry<3, 3>, 0>& cell_geom,
                        cpgrid::EntityVariable<cpgrid::Geometry<2, 3>, 1>& face_geom,
@@ -134,7 +134,7 @@ namespace cpgrid
                 // Handle potential exception during MINPV processing
                 // Needed because later there is collective communication that will
                 // otherwise deadlock
-                int success = 1;
+                long long success = 1;
                 ccobj_.broadcast(&success, 1, 0);
                 if (success == 0) {
                     throw std::runtime_error("Error during MINPV processing");
@@ -146,7 +146,7 @@ namespace cpgrid
 
         const Opm::EclipseGrid& ecl_grid = *ecl_grid_ptr;
         std::vector<double> coordData = ecl_grid.getCOORD();
-        std::vector<int> actnumData = ecl_grid.getACTNUM();
+        std::vector<long long> actnumData = ecl_grid.getACTNUM();
 
         // Mutable because grdecl::zcorn is non-const.
         auto zcornData = getSanitizedZCORN(ecl_grid, actnumData);
@@ -190,7 +190,7 @@ namespace cpgrid
                 const auto& poreVolume = ecl_state->fieldProps().porv(true);
                 pinchOptionALL = ecl_grid.getPinchOption() == Opm::PinchMode::ALL;
                 const auto& transMult = ecl_state->getTransMult();
-                auto multZ =[ &transMult] (int cartindex) {
+                auto multZ =[ &transMult] (long long cartindex) {
                     return transMult.getMultiplier(cartindex, ::Opm::FaceDir::ZPlus) *
                         transMult.getMultiplier(cartindex, ::Opm::FaceDir::ZMinus);
                 };
@@ -202,12 +202,12 @@ namespace cpgrid
                     this->zcorn = zcornData;
                 }
             }catch(const std::runtime_error& e){
-                int success = 0;
+                long long success = 0;
                 // comminicate failure to others.
                 ccobj_.broadcast(&success, 1, 0);
                 throw; // rethrow
             }
-            int success = 1;
+            long long success = 1;
             // communicate success to others
             ccobj_.broadcast(&success, 1, 0);
 
@@ -345,7 +345,7 @@ namespace cpgrid
         // this variable is only required because getCellZvals() needs
         // a coord_t instead of a plain integer pointer...
         coord_t logicalCartesianSize;
-        for (int axisIdx = 0; axisIdx < 3; ++axisIdx)
+        for (long long axisIdx = 0; axisIdx < 3; ++axisIdx)
             logicalCartesianSize[axisIdx] = g.dims[axisIdx];
 
         // Handle zcorn clipping. The g variable points to the data in
@@ -355,8 +355,8 @@ namespace cpgrid
         if (clip_z) {
             double minz_top = 1e100;
             double maxz_bot = -1e100;
-            for (int i = 0; i < g.dims[0]; ++i) {
-                for (int j = 0; j < g.dims[1]; ++j) {
+            for (long long i = 0; i < g.dims[0]; ++i) {
+                for (long long j = 0; j < g.dims[1]; ++j) {
                     coord_t logicalCartesianCoord;
                     logicalCartesianCoord[0] = i;
                     logicalCartesianCoord[1] = j;
@@ -367,7 +367,7 @@ namespace cpgrid
                     logicalCartesianCoord[2] = g.dims[2] - 1;
                     std::array<double, 8> cellz_top = getCellZvals(logicalCartesianCoord, logicalCartesianSize, &zcornData[0]);
 
-                    for (int dd = 0; dd < 4; ++dd) {
+                    for (long long dd = 0; dd < 4; ++dd) {
                         minz_top = std::min(cellz_top[dd+4], minz_top);
                         maxz_bot = std::max(cellz_bot[dd], maxz_bot);
                     }
@@ -376,9 +376,9 @@ namespace cpgrid
             if (minz_top <= maxz_bot) {
                 OPM_THROW(std::runtime_error, "Grid cannot be clipped to a shoe-box (in z): Would be empty afterwards.");
             }
-            int num_zcorn = zcornData.size();
+            long long num_zcorn = zcornData.size();
             clipped_zcorn.resize(num_zcorn);
-            for (int i = 0; i < num_zcorn; ++i) {
+            for (long long i = 0; i < num_zcorn; ++i) {
                 clipped_zcorn[i] = std::max(maxz_bot, std::min(minz_top, g.zcorn[i]));
             }
             g.zcorn = &clipped_zcorn[0];
@@ -389,7 +389,7 @@ namespace cpgrid
             // Extend grid periodically with one layer of cells in the (i, j) directions.
             std::vector<double> new_coord;
             std::vector<double> new_zcorn;
-            std::vector<int> new_actnum;
+            std::vector<long long> new_actnum;
             grdecl new_g;
             addOuterCellLayer(g, new_coord, new_zcorn, new_actnum, new_g);
             // Make the grid.
@@ -426,13 +426,13 @@ namespace cpgrid
 #endif
 
         processed_grid output;
-        int process_ok;
+        long long process_ok;
 
 #if HAVE_ECL_INPUT
         if (ecl_state && ecl_state->aquifer().hasNumericalAquifer()) {
             const auto aquifer_cell_volumes = ecl_state->aquifer().numericalAquifers().aquiferCellVolumes();
             const size_t global_nc = input_data.dims[0] * input_data.dims[1] * input_data.dims[2];
-            std::vector<int> is_aquifer_cell(global_nc, 0);
+            std::vector<long long> is_aquifer_cell(global_nc, 0);
             for ([[maybe_unused]]const auto&[global_index, volume] : aquifer_cell_volumes) {
                 is_aquifer_cell[global_index] = 1;
             }
@@ -459,8 +459,8 @@ namespace cpgrid
             const auto& aquifer = ecl_state->aquifer();
             if (aquifer.hasNumericalAquifer()) {
                 const size_t global_nc = input_data.dims[0] * input_data.dims[1] * input_data.dims[2];
-                std::vector<int> new_actnum(global_nc, 0);
-                for (int i = 0; i < output.number_of_cells; ++i) {
+                std::vector<long long> new_actnum(global_nc, 0);
+                for (long long i = 0; i < output.number_of_cells; ++i) {
                     new_actnum[output.local_cell_index[i]] = 1;
                 }
                 const auto& ecl_grid = ecl_state->getInputGrid();
@@ -480,7 +480,7 @@ namespace cpgrid
 #ifdef VERBOSE
         std::cout << "Building topology." << std::endl;
 #endif
-        std::vector<int> face_to_output_face;
+        std::vector<long long> face_to_output_face;
         buildTopo(output, nnc, global_cell_, cell_to_face_, face_to_cell_, face_to_point_, cell_to_point_, face_to_output_face);
         std::copy(output.dimensions, output.dimensions + 3, logical_cartesian_size_.begin());
 
@@ -503,17 +503,17 @@ namespace cpgrid
         }
 #endif
         std::sort(aquifer_cells_.begin(), aquifer_cells_.end());
-        buildGeom(output, cell_to_face_, cell_to_point_, face_to_output_face, aquifer_cell_volumes_local, *(geometry_.geomVector(std::integral_constant<int,0>())),
-                  *( geometry_.geomVector(std::integral_constant<int,1>())), geometry_.geomVector(std::integral_constant<int,3>()),
+        buildGeom(output, cell_to_face_, cell_to_point_, face_to_output_face, aquifer_cell_volumes_local, *(geometry_.geomVector(std::integral_constant<long long,0>())),
+                  *( geometry_.geomVector(std::integral_constant<long long,1>())), geometry_.geomVector(std::integral_constant<long long,3>()),
                   face_normals_, turn_normals);
 
 #ifdef VERBOSE
         std::cout << "Assigning face tags." << std::endl;
 #endif
-        int nf = face_to_output_face.size();
+        long long nf = face_to_output_face.size();
         std::vector<enum face_tag> temp_tags(nf);
-        for (int i = 0; i < nf; ++i) {
-            const int output_face = face_to_output_face[i];
+        for (long long i = 0; i < nf; ++i) {
+            const long long output_face = face_to_output_face[i];
             if (output_face == -1) {
                 temp_tags[i] = NNC_FACE;
             } else {
@@ -554,7 +554,7 @@ namespace cpgrid
 #if HAVE_ECL_INPUT
         std::vector<double>
         getSanitizedZCORN(const ::Opm::EclipseGrid& ecl_grid,
-                          const ::std::vector<int>& actnumData)
+                          const ::std::vector<long long>& actnumData)
         {
             std::vector<double> zcornData = ecl_grid.getZCORN();
 
@@ -600,16 +600,16 @@ namespace cpgrid
         }
 #endif
 
-        typedef std::array<int, 3> coord_t;
+        typedef std::array<long long, 3> coord_t;
         typedef std::array<double, 8> cellz_t;
 
         cellz_t getCellZvals(const coord_t& c, const coord_t& n, const double* z)
         {
             // cout << c << endl;
-            int delta[3] = { 1,
+            long long delta[3] = { 1,
                              2*n[0],
                              4*n[0]*n[1] };
-            int ix = 2*(c[0]*delta[0] + c[1]*delta[1] + c[2]*delta[2]);
+            long long ix = 2*(c[0]*delta[0] + c[1]*delta[1] + c[2]*delta[2]);
             // cout << ix << endl;
             cellz_t cellz = {{ z[ix], z[ix + delta[0]],
                                z[ix + delta[1]], z[ix + delta[1] + delta[0]],
@@ -622,10 +622,10 @@ namespace cpgrid
 
         void setCellZvals(const coord_t& c, const coord_t& n, double* z, const cellz_t& cellvals)
         {
-            int delta[3] = { 1,
+            long long delta[3] = { 1,
                              2*n[0],
                              4*n[0]*n[1] };
-            int ix = 2*(c[0]*delta[0] + c[1]*delta[1] + c[2]*delta[2]);
+            long long ix = 2*(c[0]*delta[0] + c[1]*delta[1] + c[2]*delta[2]);
             z[ix]                                  = cellvals[0];
             z[ix + delta[0]]                       = cellvals[1];
             z[ix + delta[1]]                       = cellvals[2];
@@ -636,7 +636,7 @@ namespace cpgrid
             z[ix + delta[2] + delta[1] + delta[0]] = cellvals[7];
         }
 
-        coord_t indexToIjk(const coord_t& n, const int index)
+        coord_t indexToIjk(const coord_t& n, const long long index)
         {
             coord_t c;
             c[2] = index/(n[0]*n[1]);
@@ -647,7 +647,7 @@ namespace cpgrid
 
         void findTopAndBottomZ(const coord_t& n, const std::vector<double>& z, double& zb, double& zt)
         {
-            int numperlevel = 4*n[0]*n[1];
+            long long numperlevel = 4*n[0]*n[1];
             zb = *std::max_element(z.begin(), z.begin() + numperlevel);
             zt = *std::min_element(z.end() - numperlevel, z.end());
         }
@@ -660,7 +660,7 @@ namespace cpgrid
         void addOuterCellLayer(const grdecl& original,
                                std::vector<double>& new_coord,
                                std::vector<double>& new_zcorn,
-                               std::vector<int>& new_actnum,
+                               std::vector<long long>& new_actnum,
                                grdecl& output)
         {
             // Based on periodic_extension.cpp from the old C++ code,
@@ -675,39 +675,39 @@ namespace cpgrid
             // Build new-to-old cell index table.
             // First expand in x.
             coord_t n = {{ original.dims[0], original.dims[1], original.dims[2] }};
-            std::vector<int> x_new2old;
+            std::vector<long long> x_new2old;
             x_new2old.reserve((n[0]+2)*n[1]*n[2]);
-            for (int kz = 0; kz < n[2]; ++kz) {
-                for (int jy = 0; jy < n[1]; ++jy) {
-                    int row_ix = kz*n[0]*n[1] + jy*n[0];
+            for (long long kz = 0; kz < n[2]; ++kz) {
+                for (long long jy = 0; jy < n[1]; ++jy) {
+                    long long row_ix = kz*n[0]*n[1] + jy*n[0];
                     x_new2old.push_back(row_ix + n[0] - 1);
-                    for (int ix = 1; ix < n[0] + 1; ++ix) {
+                    for (long long ix = 1; ix < n[0] + 1; ++ix) {
                         x_new2old.push_back(row_ix + ix - 1);
                     }
                     x_new2old.push_back(row_ix);
                 }
             }
-            // copy(x_new2old.begin(), x_new2old.end(), ostream_iterator<int>(cout, " "));
+            // copy(x_new2old.begin(), x_new2old.end(), ostream_iterator<long long>(cout, " "));
             // cout << endl;
             // Then expand in y.
-            const int num_new_cells = (n[0]+2)*(n[1]+2)*n[2];
-            std::vector<int> new2old;
+            const long long num_new_cells = (n[0]+2)*(n[1]+2)*n[2];
+            std::vector<long long> new2old;
             new2old.reserve(num_new_cells);
-            for (int kz = 0; kz < n[2]; ++kz) {
-                for (int jy = 0; jy < n[1] + 2; ++jy) {
-                    int offset = kz*(n[0] + 2)*n[1] + (jy - 1)*(n[0] + 2);
+            for (long long kz = 0; kz < n[2]; ++kz) {
+                for (long long jy = 0; jy < n[1] + 2; ++jy) {
+                    long long offset = kz*(n[0] + 2)*n[1] + (jy - 1)*(n[0] + 2);
                     if (jy == 0) {
                         offset = kz*(n[0] + 2)*n[1] + (n[1] - 1)*(n[0] + 2);
                     } else if (jy == n[1] + 1) {
                         offset = kz*(n[0] + 2)*n[1];
                     }
-                    for (int ix = 0; ix < n[0] + 2; ++ix) {
+                    for (long long ix = 0; ix < n[0] + 2; ++ix) {
                         new2old.push_back(x_new2old[offset + ix]);
                     }
                 }
             }
-            assert(int(new2old.size()) == num_new_cells);
-            // copy(new2old.begin(), new2old.end(), ostream_iterator<int>(cout, " "));
+            assert((long long)(new2old.size()) == num_new_cells);
+            // copy(new2old.begin(), new2old.end(), ostream_iterator<long long>(cout, " "));
             // cout << endl;
             // On second thought, we should have used a multidimensional array or something...
 
@@ -719,9 +719,9 @@ namespace cpgrid
             double dy = old_coord[6*(n[0] + 1) + 1] - old_coord[1];
             double ox = old_coord[0] - dx;
             double oy = old_coord[1] - dy;
-            for (int jy = 0; jy < n[1] + 3; ++jy) {
+            for (long long jy = 0; jy < n[1] + 3; ++jy) {
                 double y = oy + jy*dy;
-                for (int ix = 0; ix < n[0] + 3; ++ix) {
+                for (long long ix = 0; ix < n[0] + 3; ++ix) {
                     double x = ox + ix*dx;
                     coord.push_back(x);
                     coord.push_back(y);
@@ -734,15 +734,15 @@ namespace cpgrid
 
             // Build new ZCORN field, PERMX, PORO, ACTNUM, SATNUM.
             const double* old_zcorn = original.zcorn;
-            const int* old_actnum = original.actnum;
+            const long long* old_actnum = original.actnum;
             std::vector<double> zcorn(8*num_new_cells);
-            std::vector<int> actnum(num_new_cells);
+            std::vector<long long> actnum(num_new_cells);
             coord_t new_n = {{ n[0] + 2, n[1] + 2, n[2] }};
-            for (int kz = 0; kz < new_n[2]; ++kz) {
-                for (int jy = 0; jy < new_n[1]; ++jy) {
-                    for (int ix = 0; ix < new_n[0]; ++ix) {
-                        int new_cell_index = ix + jy*(new_n[0]) + kz*(new_n[0])*(new_n[1]);
-                        int old_cell_index = new2old[new_cell_index];
+            for (long long kz = 0; kz < new_n[2]; ++kz) {
+                for (long long jy = 0; jy < new_n[1]; ++jy) {
+                    for (long long ix = 0; ix < new_n[0]; ++ix) {
+                        long long new_cell_index = ix + jy*(new_n[0]) + kz*(new_n[0])*(new_n[1]);
+                        long long old_cell_index = new2old[new_cell_index];
 
                         cellz_t cellvals = getCellZvals(indexToIjk(n, old_cell_index), n, old_zcorn);
                         // cout << new_cell_index << ' ' << old_cell_index << ' ' << cellvals << endl;
@@ -762,7 +762,7 @@ namespace cpgrid
                 double zb;
                 double zt;
                 findTopAndBottomZ(new_n, zcorn, zb, zt);
-                for (int i = 0; i < int(zcorn.size()); ++i) {
+                for (long long i = 0; i < (long long)(zcorn.size()); ++i) {
                     zcorn[i] =  std::min(zt, std::max(zb, zcorn[i]));
                 }
             }
@@ -784,17 +784,17 @@ namespace cpgrid
 
 
         /// Helper function used by removeOuterCellLayer().
-        int newLogCartFromOld(const int idx, const int dim[3])
+        long long newLogCartFromOld(const long long idx, const long long dim[3])
         {
             // Compute old (i, j, k).
-            const int Nx = dim[0];
-            const int Ny = dim[1];
-            const int NxNy = Nx*Ny;
-            int k = idx/NxNy;
+            const long long Nx = dim[0];
+            const long long Ny = dim[1];
+            const long long NxNy = Nx*Ny;
+            long long k = idx/NxNy;
             // if (k <= 0 || k >= dim[2] - 1) return -1;
-            int j = (idx - NxNy*k)/Nx;
+            long long j = (idx - NxNy*k)/Nx;
             if (j <= 0 || j >= Ny - 1) return -1;
-            int i = idx - Nx*j - Nx*Ny*k;
+            long long i = idx - Nx*j - Nx*Ny*k;
             if (i <= 0 || i >= Nx - 1) return -1;
             // return (Nx - 2)*(Ny - 2)*(k - 1) + (Nx - 2)*(j - 1) + (i - 1);
             return (Nx - 2)*(Ny - 2)*k + (Nx - 2)*(j - 1) + (i - 1);
@@ -812,13 +812,13 @@ namespace cpgrid
             // have only (-1, -1) as neighbours.
 
             // Part 1 and 2 in one pass.
-            std::vector<int> new_index_to_new_lcart;
+            std::vector<long long> new_index_to_new_lcart;
             new_index_to_new_lcart.reserve(grid.number_of_cells); // A little too large, but no problem.
-            int num_old_lcart = grid.dimensions[0]*grid.dimensions[1]*grid.dimensions[2];
-            std::vector<int> old_lcart_to_new_index(num_old_lcart, -1);
-            for (int i = 0; i < grid.number_of_cells; ++i) {
-                int old_lcart = grid.local_cell_index[i];
-                int new_lcart = newLogCartFromOld(old_lcart, grid.dimensions);
+            long long num_old_lcart = grid.dimensions[0]*grid.dimensions[1]*grid.dimensions[2];
+            std::vector<long long> old_lcart_to_new_index(num_old_lcart, -1);
+            for (long long i = 0; i < grid.number_of_cells; ++i) {
+                long long old_lcart = grid.local_cell_index[i];
+                long long new_lcart = newLogCartFromOld(old_lcart, grid.dimensions);
                 if (new_lcart != -1) {
                     old_lcart_to_new_index[old_lcart] = new_index_to_new_lcart.size();
                     new_index_to_new_lcart.push_back(new_lcart);
@@ -829,10 +829,10 @@ namespace cpgrid
 
             // Part 3, modfying the face->cell connections.
             for (unsigned i = 0; i < 2*grid.number_of_faces; ++i) {
-                int old_index = grid.face_neighbors[i];
+                long long old_index = grid.face_neighbors[i];
                 if (old_index != -1) {
-                    int old_lcart = grid.local_cell_index[old_index];
-                    int new_index = old_lcart_to_new_index[old_lcart];
+                    long long old_lcart = grid.local_cell_index[old_index];
+                    long long new_index = old_lcart_to_new_index[old_lcart];
                     grid.face_neighbors[i] = new_index; // May be -1, if cell is to be removed.
                 }
             }
@@ -875,19 +875,19 @@ namespace cpgrid
             //
             //      a) Initially, all are considered unused. We first signify usage
             //         by changing to a 0 the entries corresponding to reachable nodes.
-            std::vector<int> old_to_new(grid.number_of_nodes, -1);
-            for (int face = 0; face < grid.number_of_faces; ++face) {
+            std::vector<long long> old_to_new(grid.number_of_nodes, -1);
+            for (long long face = 0; face < grid.number_of_faces; ++face) {
                 if (grid.face_neighbors[2*face] != -1 || grid.face_neighbors[2*face + 1] != -1) {
                     // Face is reachable
-                    for (int ii = grid.face_ptr[face]; ii < grid.face_ptr[face + 1]; ++ii) {
-                        int node = grid.face_nodes[ii];
+                    for (long long ii = grid.face_ptr[face]; ii < grid.face_ptr[face + 1]; ++ii) {
+                        long long node = grid.face_nodes[ii];
                         old_to_new[node] = 0;
                     }
                 }
             }
             //      b) Set the new indices by simple array compression.
-            int nodecount = 0;
-            for (int node = 0; node < grid.number_of_nodes; ++node) {
+            long long nodecount = 0;
+            for (long long node = 0; node < grid.number_of_nodes; ++node) {
                 if (old_to_new[node] != -1) {
                     assert(old_to_new[node] == 0);
                     old_to_new[node] = nodecount;
@@ -896,13 +896,13 @@ namespace cpgrid
             }
 
             //   2. Use old_to_new to transform grid.face_nodes and grid.node_coordinates[].
-            for (int fnode = 0; fnode < grid.face_ptr[grid.number_of_faces]; ++fnode) {
-                int old = grid.face_nodes[fnode];
+            for (long long fnode = 0; fnode < grid.face_ptr[grid.number_of_faces]; ++fnode) {
+                long long old = grid.face_nodes[fnode];
                 grid.face_nodes[fnode] = old_to_new[old];
             }
             double* nc = grid.node_coordinates;
-            for (int node = 0; node < grid.number_of_nodes; ++node) {
-                int newidx = old_to_new[node];
+            for (long long node = 0; node < grid.number_of_nodes; ++node) {
+                long long newidx = old_to_new[node];
                 if (newidx != -1) {
                     nc[3*newidx]     = nc[3*node];
                     nc[3*newidx + 1] = nc[3*node + 1];
@@ -918,13 +918,13 @@ namespace cpgrid
 
 
 
-        std::vector<int> createGlobalToLocal(const processed_grid& output,
-                                             const std::vector<int>& global_cell)
+        std::vector<long long> createGlobalToLocal(const processed_grid& output,
+                                             const std::vector<long long>& global_cell)
         {
-            std::vector<int> global_to_local;
-            int cart_size = 1;
-            const int num_dims = sizeof(output.dimensions)/sizeof(*output.dimensions);
-            for (int idx = 0; idx < num_dims ; ++idx) {
+            std::vector<long long> global_to_local;
+            long long cart_size = 1;
+            const long long num_dims = sizeof(output.dimensions)/sizeof(*output.dimensions);
+            for (long long idx = 0; idx < num_dims ; ++idx) {
                 cart_size *= output.dimensions[idx];
             }
             // create the inverse map of global_cell
@@ -941,15 +941,15 @@ namespace cpgrid
 
         NNCMap filterNNCs(const processed_grid& output,
                           const NNCMap& nnc,
-                          const std::vector<int>& global_to_local)
+                          const std::vector<long long>& global_to_local)
         {
             NNCMap filtered_nnc;
-            const int num_faces = output.number_of_faces;
-            std::vector<std::pair<int, int>> face_cells(num_faces);
+            const long long num_faces = output.number_of_faces;
+            std::vector<std::pair<long long, long long>> face_cells(num_faces);
             // Sort all face->cell mappings so that lowest cell number comes first.
-            for (int f = 0; f < num_faces; ++f) {
-                const int c1 = output.face_neighbors[2*f];
-                const int c2 = output.face_neighbors[2*f + 1];
+            for (long long f = 0; f < num_faces; ++f) {
+                const long long c1 = output.face_neighbors[2*f];
+                const long long c2 = output.face_neighbors[2*f + 1];
                 if (c1 < c2) {
                     face_cells[f] = { c1, c2 };
                 } else {
@@ -961,20 +961,20 @@ namespace cpgrid
             // For each nnc, add it to filtered_nnc only if not found in face->cell mappings.
             for (const auto& nncpair : nnc) {
                 if (nncpair.first < 0 || nncpair.second < 0 ||
-                    nncpair.first >= static_cast<int>(global_to_local.size()) ||
-                    nncpair.second >= static_cast<int>(global_to_local.size())) {
+                    nncpair.first >= static_cast<long long>(global_to_local.size()) ||
+                    nncpair.second >= static_cast<long long>(global_to_local.size())) {
                     Opm::OpmLog::warning("nnc_invalid", "NNC connection requested between invalid cells.");
                     continue;
                 }
-                const int c1 = global_to_local[nncpair.first];
-                const int c2 = global_to_local[nncpair.second];
+                const long long c1 = global_to_local[nncpair.first];
+                const long long c2 = global_to_local[nncpair.second];
                 if (c1 < 0 || c2 < 0) {
                     Opm::OpmLog::warning("nnc_inactive", "NNC connection requested between inactive cells.");
                     continue;
                 }
                 const auto beg = std::lower_bound(face_cells.begin(), face_cells.end(), std::make_pair(c1, -1));
-                const auto end = std::find_if(beg, face_cells.end(), [c1](const std::pair<int, int>& p){ return p.first > c1; });
-                const auto it = std::find_if(beg, end, [c2](const std::pair<int, int>& p){ return p.second == c2; });
+                const auto end = std::find_if(beg, face_cells.end(), [c1](const std::pair<long long, long long>& p){ return p.first > c1; });
+                const auto it = std::find_if(beg, end, [c2](const std::pair<long long, long long>& p){ return p.second == c2; });
                 if (it == end) {
                     // The connection (c1, c2) was not found in the face->cell mapping.
                     filtered_nnc.insert(nncpair);
@@ -989,9 +989,9 @@ namespace cpgrid
 
         void buildFaceToCellNNC(const processed_grid& output,
                                 const NNCMap& nnc,
-                                const std::vector<int>& global_to_local,
+                                const std::vector<long long>& global_to_local,
                                 cpgrid::OrientedEntityTable<1, 0>& f2c,
-                                std::vector<int>& face_to_output_face)
+                                std::vector<long long>& face_to_output_face)
         {
             // Add nnc connections first, to preserve the
             // property that top and bottom faces come last
@@ -1004,8 +1004,8 @@ namespace cpgrid
             NNCMap filtered_nnc = filterNNCs(output, nnc, global_to_local);
             cpgrid::EntityRep<0> cells[2];
             for (const auto& nncpair : filtered_nnc) {
-                const int c1 = global_to_local[nncpair.first];
-                const int c2 = global_to_local[nncpair.second];
+                const long long c1 = global_to_local[nncpair.first];
+                const long long c2 = global_to_local[nncpair.second];
                 cells[0].setValue(c1, true);
                 cells[1].setValue(c2, false);
                 std::sort(cells, cells + 2);
@@ -1020,11 +1020,11 @@ namespace cpgrid
 
         void buildFaceToCell(const processed_grid& output,
                              const NNCMaps& nnc,
-                             const std::vector<int>& global_cell,
+                             const std::vector<long long>& global_cell,
                              cpgrid::OrientedEntityTable<1, 0>& f2c,
-                             std::vector<int>& face_to_output_face)
+                             std::vector<long long>& face_to_output_face)
         {
-            std::vector<int> global_to_local;
+            std::vector<long long> global_to_local;
             if (!nnc[ExplicitNNC].empty() || !nnc[PinchNNC].empty())
                 global_to_local = createGlobalToLocal(output, global_cell);
 
@@ -1035,12 +1035,12 @@ namespace cpgrid
             if (!nnc[ExplicitNNC].empty()) {
                 buildFaceToCellNNC(output, nnc[ExplicitNNC], global_to_local, f2c, face_to_output_face);
             }
-            int nf = output.number_of_faces;
+            long long nf = output.number_of_faces;
             cpgrid::EntityRep<0> cells[2];
-            // int next_skip_zmin_face = -1; // Not currently used, see comments further down.
-            for (int i = 0; i < nf; ++i) {
-                const int* fnc = output.face_neighbors + 2*i;
-                int cellcount = 0;
+            // long long next_skip_zmin_face = -1; // Not currently used, see comments further down.
+            for (long long i = 0; i < nf; ++i) {
+                const long long* fnc = output.face_neighbors + 2*i;
+                long long cellcount = 0;
                 if (fnc[0] != -1) {
                     cells[cellcount].setValue(fnc[0], true);
                     ++cellcount;
@@ -1057,7 +1057,7 @@ namespace cpgrid
                         {
                             auto it = nnc[PinchNNC].lower_bound({global_cell[fnc[0]], 0});
                             if (it != nnc[PinchNNC].end() && it->first == global_cell[fnc[0]]) {
-                                const int other_cell = global_to_local[it->second];
+                                const long long other_cell = global_to_local[it->second];
                                 cells[cellcount].setValue(other_cell, false);
                                 ++cellcount;
                                 // Now we must ensure that the face connecting
@@ -1102,12 +1102,12 @@ namespace cpgrid
 
         void buildTopo(const processed_grid& output,
                        const NNCMaps& nnc,
-                       std::vector<int>& global_cell,
+                       std::vector<long long>& global_cell,
                        cpgrid::OrientedEntityTable<0, 1>& c2f,
                        cpgrid::OrientedEntityTable<1, 0>& f2c,
-                       Opm::SparseTable<int>& f2p,
-                       std::vector<std::array<int,8> >& c2p,
-                       std::vector<int>& face_to_output_face)
+                       Opm::SparseTable<long long>& f2p,
+                       std::vector<std::array<long long,8> >& c2p,
+                       std::vector<long long>& face_to_output_face)
         {
             // Map local to global cell index.
             global_cell.assign(output.local_cell_index,
@@ -1115,17 +1115,17 @@ namespace cpgrid
 
             // Build face to cell mapping.
             buildFaceToCell(output, nnc, global_cell, f2c, face_to_output_face);
-            int num_faces = f2c.size();
+            long long num_faces = f2c.size();
 
             // Build cell to face.
             f2c.makeInverseRelation(c2f);
-            int num_cells = c2f.size();
+            long long num_cells = c2f.size();
 
             // Build face to point
-            const int* fn = output.face_nodes;
+            const long long* fn = output.face_nodes;
             const unsigned* fp = output.face_ptr;
-            for (int face = 0; face < num_faces; ++face) {
-                int output_face = face_to_output_face[face];
+            for (long long face = 0; face < num_faces; ++face) {
+                long long output_face = face_to_output_face[face];
                 if (output_face == cpgrid::NNCFace) {
                     // Add an empty row, i.e. no points are associated with the NNC face.
                     f2p.appendRow(fn, fn);
@@ -1137,21 +1137,21 @@ namespace cpgrid
             // Build cell to point
             c2p.clear();
             c2p.reserve(num_cells);
-            for (int i = 0; i < num_cells; ++i) {
+            for (long long i = 0; i < num_cells; ++i) {
                 cpgrid::OrientedEntityTable<0, 1>::row_type cf = c2f[cpgrid::EntityRep<0>(i, true)];
                 // We know that the bottom and top faces come last.
-                int numf = cf.size();
-                int bot_face = face_to_output_face[cf[numf - 2].index()];
+                long long numf = cf.size();
+                long long bot_face = face_to_output_face[cf[numf - 2].index()];
                 assert(output.face_tag[bot_face] == K_FACE);
-                int bfbegin = output.face_ptr[bot_face];
+                long long bfbegin = output.face_ptr[bot_face];
                 assert(output.face_ptr[bot_face + 1] - bfbegin == 4);
-                int top_face = face_to_output_face[cf[numf - 1].index()];
+                long long top_face = face_to_output_face[cf[numf - 1].index()];
                 assert(output.face_tag[top_face] == K_FACE);
-                int tfbegin = output.face_ptr[top_face];
+                long long tfbegin = output.face_ptr[top_face];
                 assert(output.face_ptr[top_face + 1] - tfbegin == 4);
                 // We want the corners in 'x fastest, then y, then z' order,
                 // so we need to take the face_nodes in noncyclic order: 0 1 3 2.
-                std::array<int,8> corners = {{ output.face_nodes[bfbegin],
+                std::array<long long,8> corners = {{ output.face_nodes[bfbegin],
                                                output.face_nodes[bfbegin + 1],
                                                output.face_nodes[bfbegin + 3],
                                                output.face_nodes[bfbegin + 2],
@@ -1176,30 +1176,30 @@ namespace cpgrid
         class IndirectArray
         {
         public:
-            IndirectArray(const std::vector<T>& data, const int* beg, const int* end)
+            IndirectArray(const std::vector<T>& data, const long long* beg, const long long* end)
                 : data_(data), beg_(beg), end_(end)
             {
             }
-            const T& operator[](int index) const
+            const T& operator[](long long index) const
             {
                 assert(index >= 0 && index < size());
                 return data_[beg_[index]];
             }
-            int size() const
+            long long size() const
             {
                 return end_ - beg_;
             }
             typedef T value_type;
         private:
             const std::vector<T>& data_;
-            const int* beg_;
-            const int* end_;
+            const long long* beg_;
+            const long long* end_;
         };
 
 
         // Helper template for making Geometry objects.
         // The generic one is suitable for dim == 0 (vertices).
-        template <int dim>
+        template <long long dim>
         struct MakeGeometry
         {
             cpgrid::Geometry<dim, 3> operator()(const FieldVector<double, 3>& pos)
@@ -1219,7 +1219,7 @@ namespace cpgrid
             }
             cpgrid::Geometry<3, 3> operator()(const FieldVector<double, 3>& pos,
                                                       double vol,
-                                                      const std::array<int,8>& corner_indices)
+                                                      const std::array<long long,8>& corner_indices)
             {
                 return cpgrid::Geometry<3, 3>(pos, vol, allcorners_, &corner_indices[0]);
             }
@@ -1239,8 +1239,8 @@ namespace cpgrid
 
         void buildGeom(const processed_grid& output,
                        const cpgrid::OrientedEntityTable<0, 1>& c2f,
-                       const std::vector<std::array<int,8> >& c2p,
-                       const std::vector<int>& face_to_output_face,
+                       const std::vector<std::array<long long,8> >& c2p,
+                       const std::vector<long long>& face_to_output_face,
                        const std::unordered_map<size_t, double>& aquifer_cell_volumes,
                        cpgrid::EntityVariable<cpgrid::Geometry<3, 3>, 0>& cell_geom,
                        cpgrid::EntityVariable<cpgrid::Geometry<2, 3>, 1>& face_geom,
@@ -1262,14 +1262,14 @@ namespace cpgrid
             clock.start();
 #endif
             // Get the points.
-            int np = output.number_of_nodes;
+            long long np = output.number_of_nodes;
             points.clear();
             points.reserve(np);
-            for (int i = 0; i < np; ++i) {
+            for (long long i = 0; i < np; ++i) {
                 // \TODO add a convenience explicit constructor
                 // for FieldVector taking an iterator.
                 point_t pt;
-                for (int dd = 0; dd < 3; ++dd) {
+                for (long long dd = 0; dd < 3; ++dd) {
                     pt[dd] = output.node_coordinates[3*i + dd];
                 }
                 points.push_back(pt);
@@ -1283,13 +1283,13 @@ namespace cpgrid
             // is not very efficient. It could be rewritten easily
             // (focus on the polygonCellXXX methods first).
             // \TODO Use exact geometry instead of these approximations.
-            int nf = face_to_output_face.size();
-            const int* fn = output.face_nodes;
+            long long nf = face_to_output_face.size();
+            const long long* fn = output.face_nodes;
             const unsigned* fp = output.face_ptr;
-            for (int face = 0; face < nf; ++face) {
+            for (long long face = 0; face < nf; ++face) {
                 // Computations in this loop could be speeded up
                 // by doing more of them simultaneously.
-                int output_face = face_to_output_face[face];
+                long long output_face = face_to_output_face[face];
                 if (output_face == cpgrid::NNCFace) {
                     // NNC faces are purely topological constructs,
                     // and do not have any embedded geometry.
@@ -1316,13 +1316,13 @@ namespace cpgrid
             std::cout << "Faces:              " << clock.secsSinceLast() << std::endl;
 #endif
             // Get the cell data.
-            int nc = output.number_of_cells;
-            std::vector<int> face_indices;
-            for (int cell = 0; cell < nc; ++cell) {
+            long long nc = output.number_of_cells;
+            std::vector<long long> face_indices;
+            for (long long cell = 0; cell < nc; ++cell) {
                 cpgrid::EntityRep<0> cell_ent(cell, true);
                 cpgrid::OrientedEntityTable<0, 1>::row_type cf = c2f[cell_ent];
                 face_indices.clear();
-                for (int local_index = 0; local_index < cf.size(); ++local_index) {
+                for (long long local_index = 0; local_index < cf.size(); ++local_index) {
                     if (face_to_output_face[cf[local_index].index()] != cpgrid::NNCFace) {
                         face_indices.push_back(cf[local_index].index());
                     }
@@ -1331,9 +1331,9 @@ namespace cpgrid
                 point_t cell_avg = average(cell_pts);
                 point_t cell_centroid(0.0);
                 double tot_cell_vol = 0.0;
-                for (int local_index = 0; local_index < cf.size(); ++local_index) {
-                    int face = cf[local_index].index();
-                    int output_face = face_to_output_face[face];
+                for (long long local_index = 0; local_index < cf.size(); ++local_index) {
+                    long long face = cf[local_index].index();
+                    long long output_face = face_to_output_face[face];
                     if (output_face == cpgrid::NNCFace) {
                         // Skip NNC face, do not contribute to cell geometry.
                         continue;
@@ -1352,7 +1352,7 @@ namespace cpgrid
                 }
 // #define HACK_CELL_CENTROIDS     // when this is defined, you get the average of top and bottom face centroids.
 #ifdef HACK_CELL_CENTROIDS
-                int numf = cf.size();
+                long long numf = cf.size();
                 cell_centroid = face_centroids[face_indices[numf - 2]];
                 cell_centroid += face_centroids[face_indices[numf - 1]];
                 cell_centroid *= 0.5;
@@ -1389,7 +1389,7 @@ namespace cpgrid
 //             std::transform(cell_centroids.begin(), cell_centroids.end(),
 //                            cell_volumes.begin(),
 //                            std::back_inserter(cell_geom, mcellg);
-            for (int c = 0;  c < nc; ++c) {
+            for (long long c = 0;  c < nc; ++c) {
                 cell_geom.push_back(mcellg(cell_centroids[c], cell_volumes[c], c2p[c]));
             }
             // Faces
@@ -1404,8 +1404,8 @@ namespace cpgrid
 
             // The final, combined object (yes, a lot of copying goes on here).
             if (turn_normals) {
-                int num_normals = face_normals.size();
-                for (int i = 0; i < num_normals; ++i) {
+                long long num_normals = face_normals.size();
+                for (long long i = 0; i < num_normals; ++i) {
                     face_normals[i] *= -1.0;
                 }
             }

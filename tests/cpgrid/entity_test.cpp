@@ -53,7 +53,7 @@ using namespace Dune;
 
 BOOST_AUTO_TEST_CASE(entity)
 {
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     Dune::MPIHelper::instance(m_argc, m_argv);
     std::vector<std::shared_ptr<cpgrid::CpGridData>> data;
@@ -92,7 +92,7 @@ init_unit_test_func()
     return true;
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     boost::unit_test::unit_test_main(&init_unit_test_func,

@@ -21,11 +21,11 @@
 #include <opm/grid/UnstructuredGrid.h>
 
 
-static int
+static long long
 fill_cell_topology(struct processed_grid  *pg,
                    struct UnstructuredGrid *g )
 {
-    int    f, c1, c2, tag;
+    long long    f, c1, c2, tag;
     size_t c, nc, nhf;
 
     nc = g->number_of_cells;
@@ -104,10 +104,10 @@ fill_cell_topology(struct processed_grid  *pg,
     return g->cell_facepos != NULL;
 }
 
-static int
+static long long
 allocate_geometry(struct UnstructuredGrid *g)
 {
-    int ok;
+    long long ok;
     size_t nc, nf, nd;
 
     assert (g->dimensions == 3);
@@ -164,7 +164,7 @@ struct UnstructuredGrid *
 create_grid_cornerpoint(const struct grdecl *in, double tol)
 {
     struct UnstructuredGrid *g;
-   int                      ok;
+   long long                      ok;
    struct processed_grid    pg;
 
    g = create_grid_empty();

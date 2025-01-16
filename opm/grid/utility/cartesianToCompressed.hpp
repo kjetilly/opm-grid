@@ -33,8 +33,8 @@ namespace Opm
     //                         to active/compressed,
     //                         or the map { {0, 0}, {1, 1}, ... , {num_cells - 1, num_cells - 1} }
     //                         if global_cell was null.
-    std::unordered_map<int, int> cartesianToCompressed(const int num_cells,
-                                                       const int* global_cell);
+    std::unordered_map<long long, long long> cartesianToCompressed(const long long num_cells,
+                                                       const long long* global_cell);
 
 } // namespace Opm
 

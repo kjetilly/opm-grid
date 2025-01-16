@@ -30,7 +30,7 @@ namespace Dune
 namespace cpgrid
 {
 
-Intersection::Intersection(const CpGridData& grid, const EntityRep<0>& cell, int subindex, bool update_now)
+Intersection::Intersection(const CpGridData& grid, const EntityRep<0>& cell, long long subindex, bool update_now)
 
                 : pgrid_(&grid),
                   index_(cell.index()),
@@ -44,9 +44,9 @@ Intersection::Intersection(const CpGridData& grid, const EntityRep<0>& cell, int
                     update();
                 }
             }
-int Intersection::boundaryId() const
+long long Intersection::boundaryId() const
             {
-                int ret = 0;
+                long long ret = 0;
                 if (boundary()) {
                     if (pgrid_->uniqueBoundaryIds()) {
                         // Use the unique boundary ids.
@@ -82,7 +82,7 @@ int Intersection::boundaryId() const
                 }
                 return ret;
             }
-int Intersection::boundarySegmentIndex() const
+long long Intersection::boundarySegmentIndex() const
             {
                 // Since this is almost the same that we did for
                 // 'unique boundary ids' we use those numbers, although since
@@ -103,10 +103,10 @@ void Intersection::update()
                 // Wether there is no nother nbcell for this intersection
                 // i.e. either this on the boundary or a front intersection
                 bool has_no_nbcell = is_on_boundary_ ||
-                    cells_of_face[0].index()==std::numeric_limits<int>::max() ||
-                    cells_of_face[1].index()==std::numeric_limits<int>::max();
+                    cells_of_face[0].index()==std::numeric_limits<long long>::max() ||
+                    cells_of_face[1].index()==std::numeric_limits<long long>::max();
                 if (has_no_nbcell) {
-                    nbcell_ = std::numeric_limits<int>::max(); // neighbor is not within this process
+                    nbcell_ = std::numeric_limits<long long>::max(); // neighbor is not within this process
                 } else {
                     assert(cells_of_face.size() == 2);
                     if (cells_of_face[0].index() == index_) {
@@ -125,7 +125,7 @@ void Intersection::increment()
                 }
             }
 
-int Intersection::indexInInside() const
+long long Intersection::indexInInside() const
 {
     // Use the face tags to decide if an intersection is
     // on an x, y, or z face and use orientations to decide

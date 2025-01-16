@@ -14,7 +14,7 @@ namespace Dune
 {
   // PersistentContainer for CpGrid
   // -------------------------------
-  template< int dim, int dimworld, class Data >
+  template< long long dim, long long dimworld, class Data >
   class PersistentContainer< PolyhedralGrid< dim, dimworld >, Data >
   : public PersistentContainerVector< PolyhedralGrid< dim, dimworld >,
                                       typename PolyhedralGrid< dim, dimworld >::Traits::LeafIndexSet,
@@ -30,7 +30,7 @@ namespace Dune
   public:
     //! Constructor filling the container with values using the default constructor
     //! Depending on the implementation this could be achieved without allocating memory
-    PersistentContainer ( const GridType &grid, const int codim, const Data& data = Data(), const Allocator &allocator = Allocator() )
+    PersistentContainer ( const GridType &grid, const long long codim, const Data& data = Data(), const Allocator &allocator = Allocator() )
     : BaseType( grid.leafIndexSet(), codim, data, allocator )
     {}
   };

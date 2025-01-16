@@ -35,7 +35,7 @@ struct iterator_range_pod {
     bool operator==(const iterator_range_pod<DataType>& rhs) const
     { return (begin_ == rhs.begin_) && (end_ == rhs.end_); }
 
-    const DataType& operator[](int idx) const { return begin_[idx]; }
+    const DataType& operator[](long long idx) const { return begin_[idx]; }
 
     const DataType* begin() const { return begin_; }
     const DataType* end() const { return end_; }
@@ -56,7 +56,7 @@ struct iterator_range {
     bool operator==(const iterator_range<Iter>& rhs) const
     { return (begin_ == rhs.begin_) && (end_ == rhs.end_); }
 
-    const typename Iter::value_type& operator[](int idx) const
+    const typename Iter::value_type& operator[](long long idx) const
     { return *(begin_+ idx); }
 
     Iter begin() const { return begin_; }
@@ -76,7 +76,7 @@ struct mutable_iterator_range {
     bool operator==(const Iter& rhs) const
     { return (begin_ == rhs.begin_) && (end_ == rhs.end_); }
 
-    typename Iter::value_type& operator[](int idx)
+    typename Iter::value_type& operator[](long long idx)
     { return begin_[idx]; }
 
     Iter begin() const { return begin_; }

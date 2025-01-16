@@ -39,7 +39,7 @@ namespace Opm
      *                'value_type', 'size_type', and
      *                'const_iterator'.
      */
-    template < class Region = std::vector<int> >
+    template < class Region = std::vector<long long> >
     class RegionMapping {
     public:
         /**

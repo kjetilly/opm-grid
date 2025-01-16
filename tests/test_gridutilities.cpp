@@ -34,13 +34,13 @@ BOOST_AUTO_TEST_CASE(cartesian_2d_cellNeighboursAcrossVertices)
 {
     const GridManager gm(2, 2);
     const UnstructuredGrid& grid = *gm.c_grid();
-    const SparseTable<int> vnb = cellNeighboursAcrossVertices(grid);
+    const SparseTable<long long> vnb = cellNeighboursAcrossVertices(grid);
 
-    const int num_elem = 12;
-    const int elem[num_elem] = { 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2 };
-    const int num_rows = 4;
-    const int rowsizes[num_rows] = { 3, 3, 3, 3 };
-    const SparseTable<int> truth(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
+    const long long num_elem = 12;
+    const long long elem[num_elem] = { 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2 };
+    const long long num_rows = 4;
+    const long long rowsizes[num_rows] = { 3, 3, 3, 3 };
+    const SparseTable<long long> truth(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
     BOOST_CHECK(vnb == truth);
 }
 
@@ -48,13 +48,13 @@ BOOST_AUTO_TEST_CASE(cartesian_3d_cellNeighboursAcrossVertices)
 {
     const GridManager gm(3, 2, 2);
     const UnstructuredGrid& grid = *gm.c_grid();
-    const SparseTable<int> vnb = cellNeighboursAcrossVertices(grid);
+    const SparseTable<long long> vnb = cellNeighboursAcrossVertices(grid);
 
-    BOOST_CHECK_EQUAL(int(vnb.size()), grid.number_of_cells);
+    BOOST_CHECK_EQUAL((long long)(vnb.size()), grid.number_of_cells);
     BOOST_REQUIRE(!vnb.empty());
-    const int n = 7;
-    BOOST_CHECK_EQUAL(int(vnb[0].size()), n);
-    const int nb[n] = { 1, 3, 4, 6, 7, 9, 10 };
+    const long long n = 7;
+    BOOST_CHECK_EQUAL((long long)(vnb[0].size()), n);
+    const long long nb[n] = { 1, 3, 4, 6, 7, 9, 10 };
     BOOST_CHECK_EQUAL_COLLECTIONS(vnb[0].begin(), vnb[0].end(), nb, nb + n);
 }
 
@@ -62,17 +62,17 @@ BOOST_AUTO_TEST_CASE(cartesian_2d_orderCounterClockwise)
 {
     const GridManager gm(2, 2);
     const UnstructuredGrid& grid = *gm.c_grid();
-    SparseTable<int> vnb = cellNeighboursAcrossVertices(grid);
+    SparseTable<long long> vnb = cellNeighboursAcrossVertices(grid);
     orderCounterClockwise(grid, vnb);
 
     BOOST_REQUIRE(!vnb.empty());
-    const int num_elem = 12;
-    const int elem[num_elem] = { 1, 3, 2, 3, 2, 0, 3, 0, 1, 2, 0, 1 };
-    const int num_rows = 4;
-    const int rowsizes[num_rows] = { 3, 3, 3, 3 };
-    const SparseTable<int> truth(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
+    const long long num_elem = 12;
+    const long long elem[num_elem] = { 1, 3, 2, 3, 2, 0, 3, 0, 1, 2, 0, 1 };
+    const long long num_rows = 4;
+    const long long rowsizes[num_rows] = { 3, 3, 3, 3 };
+    const SparseTable<long long> truth(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
     BOOST_CHECK(vnb == truth);
-    for (int c = 0; c < num_rows; ++c) {
+    for (long long c = 0; c < num_rows; ++c) {
         BOOST_CHECK_EQUAL_COLLECTIONS(vnb[c].begin(), vnb[c].end(), truth[c].begin(), truth[c].end());
     }
 }

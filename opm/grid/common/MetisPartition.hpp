@@ -61,7 +61,7 @@ namespace cpgrid
 #elif IS_SCOTCH_METIS_HEADER
   using idx_t = SCOTCH_Num;
 #else
-  using idx_t = int;
+  using idx_t = long long;
 #endif
 
 #if IS_SCOTCH_METIS_HEADER
@@ -100,18 +100,18 @@ namespace cpgrid
 ///         (if argument wells was not null and this is the root rank this will contain connections in
 ///          form of global indices)
 
-std::tuple<std::vector<int>,
+std::tuple<std::vector<long long>,
            std::vector<std::pair<std::string, bool>>,
-           std::vector<std::tuple<int, int, char>>,
-           std::vector<std::tuple<int, int, char, int>>,
+           std::vector<std::tuple<long long, long long, char>>,
+           std::vector<std::tuple<long long, long long, char, long long>>,
            WellConnections>
 metisSerialGraphPartitionGridOnRoot(const CpGrid& grid,
                                     const std::vector<OpmWellType> * wells,
-                                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                     const double* transmissibilities,
                                     const Communication<MPI_Comm>& cc,
                                     EdgeWeightMethod edgeWeightsMethod,
-                                    int root,
+                                    long long root,
                                     real_t imbalanceTol,
                                     bool allowDistributedWells,
                                     const std::map<std::string,std::string>& params);

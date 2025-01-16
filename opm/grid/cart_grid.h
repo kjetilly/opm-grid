@@ -59,7 +59,7 @@ extern "C" {
  * Must be destroyed using function destroy_grid().
  */
 struct UnstructuredGrid *
-create_grid_cart2d(int nx, int ny, double dx, double dy);
+create_grid_cart2d(long long nx, long long ny, double dx, double dy);
 
 
 /**
@@ -74,7 +74,7 @@ create_grid_cart2d(int nx, int ny, double dx, double dy);
  * Must be destroyed using function destroy_grid().
  */
 struct UnstructuredGrid *
-create_grid_cart3d(int nx, int ny, int nz);
+create_grid_cart3d(long long nx, long long ny, long long nz);
 
 
 /**
@@ -96,7 +96,7 @@ create_grid_cart3d(int nx, int ny, int nz);
  * Must be destroyed using function destroy_grid().
  */
 struct UnstructuredGrid *
-create_grid_hexa3d(int    nx, int    ny, int    nz,
+create_grid_hexa3d(long long    nx, long long    ny, long long    nz,
                    double dx, double dy, double dz);
 
 
@@ -124,7 +124,7 @@ create_grid_hexa3d(int    nx, int    ny, int    nz,
  * Must be destroyed using function destroy_grid().
  */
 struct UnstructuredGrid *
-create_grid_tensor2d(int           nx, int           ny,
+create_grid_tensor2d(long long           nx, long long           ny,
                      const double *x , const double *y );
 
 
@@ -159,9 +159,9 @@ create_grid_tensor2d(int           nx, int           ny,
  * Must be destroyed using function destroy_grid().
  */
 struct UnstructuredGrid *
-create_grid_tensor3d(int           nx    ,
-                     int           ny    ,
-                     int           nz    ,
+create_grid_tensor3d(long long           nx    ,
+                     long long           ny    ,
+                     long long           nz    ,
                      const double *x     ,
                      const double *y     ,
                      const double *z     ,

@@ -14,7 +14,7 @@ namespace Dune
   // PolyhedralGridEntityPointer
   // -------------------
 
-  template< int codim, class Grid >
+  template< long long codim, class Grid >
   class PolyhedralGridEntityPointer
   {
     typedef PolyhedralGridEntityPointer< codim, Grid > This;
@@ -24,9 +24,9 @@ namespace Dune
 
   public:
     /** \brief grid dimension */
-    static const int dimension = Grid::dimension;
+    static const long long dimension = Grid::dimension;
     /** \brief world dimension */
-    static const int codimension = codim;
+    static const long long codimension = codim;
 
     /** \brief type of entity */
     typedef typename Traits::template Codim< codimension >::Entity Entity;
@@ -71,7 +71,7 @@ namespace Dune
     operator       Entity& ()       { return entity_; }
 
     /** \brief obtain level */
-    int level () const { return entity_.level(); }
+    long long level () const { return entity_.level(); }
 
   protected:
     EntityImpl &entityImpl () const

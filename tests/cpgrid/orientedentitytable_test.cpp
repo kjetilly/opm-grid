@@ -64,17 +64,17 @@ BOOST_AUTO_TEST_CASE(oriented_entity_table)
     // Cell to face data.
     typedef cpgrid::EntityRep<0> E0;
     typedef cpgrid::EntityRep<1> E1;
-    const int num_data = 8;
+    const long long num_data = 8;
     const E1 data[num_data] = { E1(0, false), E1(1, true), E1(3, false), E1(4, true),
                                 E1(1, false), E1(2, true), E1(5, false), E1(6, true) };
-    const int num_rows = 2;
-    const int row_sizes[num_rows] = { 4, 4 };
+    const long long num_rows = 2;
+    const long long row_sizes[num_rows] = { 4, 4 };
     // Face to cell data.
-    const int num_data2 = 8;
+    const long long num_data2 = 8;
     const E0 data2[num_data2] = { E0(0, false), E0(0, true), E0(1, false), E0(1, true),
                                   E0(0, false), E0(0, true), E0(1, false), E0(1, true) };
-    const int num_rows2 = 7;
-    const int row_sizes2[num_rows2] = { 1, 2, 1, 1, 1, 1, 1 };
+    const long long num_rows2 = 7;
+    const long long row_sizes2[num_rows2] = { 1, 2, 1, 1, 1, 1, 1 };
 
     // Needing some entityreps for the rest of the checks.
     const cpgrid::EntityRep<0> e1(0, true);

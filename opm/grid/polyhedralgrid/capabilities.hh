@@ -18,66 +18,66 @@ namespace Dune
     // Capabilities from dune-grid
     // ---------------------------
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct hasSingleGeometryType< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;
-      static const unsigned int topologyId = ~0u;
+      static const size_t topologyId = ~0u;
     };
 
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct isCartesian< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;
     };
 
 
-    template< int dim, int dimworld, class coord_t, int codim >
+    template< long long dim, long long dimworld, class coord_t, long long codim >
     struct hasEntity< PolyhedralGrid< dim, dimworld, coord_t >, codim >
     {
       static const bool v = (codim == 0 || codim == 1 || codim == dim);
     };
 
 
-    template< int dim, int dimworld, class coord_t, int codim >
+    template< long long dim, long long dimworld, class coord_t, long long codim >
     struct hasEntityIterator< PolyhedralGrid< dim, dimworld, coord_t >, codim >
     {
       static const bool v = (codim == 0 || codim == 1 || codim == dim);
     };
 
-    template< int dim, int dimworld, class coord_t, int codim >
+    template< long long dim, long long dimworld, class coord_t, long long codim >
     struct canCommunicate< PolyhedralGrid< dim, dimworld, coord_t >, codim >
     {
         static const bool v = false;
     };
 
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct hasBackupRestoreFacilities< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;
     };
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct isLevelwiseConforming< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;
     };
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct isLeafwiseConforming< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;
     };
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct threadSafe< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;
     };
 
-    template< int dim, int dimworld, class coord_t >
+    template< long long dim, long long dimworld, class coord_t >
     struct viewThreadSafe< PolyhedralGrid< dim, dimworld, coord_t > >
     {
       static const bool v = false;

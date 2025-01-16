@@ -52,35 +52,35 @@ template<>
 class LevelCartesianIndexMapper<Dune::CpGrid>
 {
 public:
-    static constexpr int dimension = 3 ;
+    static constexpr long long dimension = 3 ;
 
     explicit LevelCartesianIndexMapper(const Dune::CpGrid& grid) : grid_{ &grid }
     {}
 
-    const std::array<int,3>& cartesianDimensions(int level) const
+    const std::array<long long,3>& cartesianDimensions(long long level) const
     {
         return grid_->currentData()[level]->logicalCartesianSize();
     }
 
-    int cartesianSize(int level) const
+    long long cartesianSize(long long level) const
     {
         return computeCartesianSize(level);
     }
 
-    int compressedSize(int level) const
+    long long compressedSize(long long level) const
     {
         validLevel(level);
         return grid_->currentData()[level]->size(0);
     }
 
-    int cartesianIndex( const int compressedElementIndex, const int level) const
+    long long cartesianIndex( const long long compressedElementIndex, const long long level) const
     {
         validLevel(level);
         assert(  compressedElementIndex >= 0 && compressedElementIndex <  grid_->currentData()[level]->size(0) );
         return grid_->currentData()[level]->globalCell()[compressedElementIndex];
     }
 
-    void cartesianCoordinate(const int compressedElementIndexOnLevel, std::array<int,dimension>& coordsOnLevel, int level) const
+    void cartesianCoordinate(const long long compressedElementIndexOnLevel, std::array<long long,dimension>& coordsOnLevel, long long level) const
     {
         validLevel(level);
         grid_->currentData()[level]->getIJK( compressedElementIndexOnLevel, coordsOnLevel);
@@ -89,15 +89,15 @@ public:
 private:
     const Dune::CpGrid* grid_;
 
-    int computeCartesianSize(int level) const
+    long long computeCartesianSize(long long level) const
     {
-        int size = cartesianDimensions(level)[ 0 ];
-        for( int d=1; d<dimension; ++d )
+        long long size = cartesianDimensions(level)[ 0 ];
+        for( long long d=1; d<dimension; ++d )
             size *= cartesianDimensions(level)[ d ];
         return size;
     }
 
-    void validLevel(int level) const
+    void validLevel(long long level) const
     {
         if ((level < 0) || (level > grid_->maxLevel())) {
             throw std::invalid_argument("Invalid level.\n");

@@ -73,7 +73,7 @@ struct CpGridDataTraits
     using InterfaceMap = Communicator::InterfaceMap;
 
     /// \brief type of OwnerOverlap communication for cells
-    using CommunicationType = Dune::OwnerOverlapCopyCommunication<int,int>;
+    using CommunicationType = Dune::OwnerOverlapCopyCommunication<long long,long long>;
 
     /// \brief The type of the parallel index set
     using  ParallelIndexSet = typename CommunicationType::ParallelIndexSet;
@@ -81,7 +81,7 @@ struct CpGridDataTraits
     /// \brief The type of the remote indices information
     using RemoteIndices = Dune::RemoteIndices<ParallelIndexSet>;
 #else
-    using InterfaceMap = std::map<int, std::list<int> >;
+    using InterfaceMap = std::map<long long, std::list<long long> >;
 #endif // HAVE_MPI
 };
 

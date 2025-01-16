@@ -54,13 +54,13 @@ struct ParentToChildrenCellGlobalIdHandle {
     //   - We use the number of entries in the scatter method. That number is the number of children when sending.
     //     (we still assume that the number entries is the same as the number of children of the element).
 
-    using DataType = int;
+    using DataType = long long;
 
     /// \param parent_to_children      Map from parent index to all children, and the level they are stored.
     ///                                parent_to_children_[ element.index() ] = { level, children_list local indices }
     /// \param level_cell_global_ids   A container that for the elements of a level contains all global cell ids.
     ///                                level_cell_global_ids[ level-1 ][ refined cell local index ] = its global id.
-    ParentToChildrenCellGlobalIdHandle(const std::vector<std::tuple<int, std::vector<int>>>& parent_to_children,
+    ParentToChildrenCellGlobalIdHandle(const std::vector<std::tuple<long long, std::vector<long long>>>& parent_to_children,
                                        std::vector<std::vector<DataType>>& level_cell_global_ids)
         : parent_to_children_(parent_to_children)
         , level_cell_global_ids_(level_cell_global_ids)
@@ -142,7 +142,7 @@ struct ParentToChildrenCellGlobalIdHandle {
     }
 
 private:
-    const std::vector<std::tuple<int, std::vector<int>>>& parent_to_children_;
+    const std::vector<std::tuple<long long, std::vector<long long>>>& parent_to_children_;
     std::vector<std::vector<DataType>>& level_cell_global_ids_;
 };
 #endif // HAVE_MPI

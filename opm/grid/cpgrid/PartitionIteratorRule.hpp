@@ -42,7 +42,7 @@ namespace cpgrid
     {
         enum {fullSet=false, emptySet=true};
 
-        template<int codim>
+        template<long long codim>
         bool isInvalid(const Entity<codim>&)
         {
             return true;
@@ -53,7 +53,7 @@ namespace cpgrid
     struct PartitionIteratorRule<Interior_Partition>
     {
         enum {fullSet=false, emptySet=false};
-        template<int codim>
+        template<long long codim>
         bool isInvalid(const Entity<codim>& e)
         {
             if(e.partitionType()==InteriorEntity)
@@ -66,7 +66,7 @@ namespace cpgrid
     struct PartitionIteratorRule<InteriorBorder_Partition>
     {
         enum {fullSet=false, emptySet=false};
-        template<int codim>
+        template<long long codim>
         bool isInvalid(const Entity<codim>& e)
         {
             if(e.partitionType()==InteriorEntity ||
@@ -80,7 +80,7 @@ namespace cpgrid
     struct PartitionIteratorRule<Overlap_Partition>
     {
         enum {fullSet=false, emptySet=false};
-        template<int codim>
+        template<long long codim>
         bool isInvalid(const Entity<codim>& e)
         {
             // interior, border, and overlap are valid!
@@ -94,7 +94,7 @@ namespace cpgrid
     struct PartitionIteratorRule<All_Partition>
     {
         enum {fullSet=true, emptySet=false};
-        template<int codim>
+        template<long long codim>
         bool isInvalid(const Entity<codim>&)
         {
             return false;

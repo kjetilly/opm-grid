@@ -50,11 +50,11 @@
 namespace Dune {
     class CoordinateArray {
     public:
-        CoordinateArray(int nx, int ny, int nz)
+        CoordinateArray(long long nx, long long ny, long long nz)
             : nx_(nx), ny_(ny), nz_(nz),
               data_((nx+1) * (ny+1) * (nz+1))
         {}
-        double& operator()(int i, int j, int k)
+        double& operator()(long long i, long long j, long long k)
         {
             assert ((0 <= i) && (i <= nx_));
             assert ((0 <= j) && (j <= ny_));
@@ -62,14 +62,14 @@ namespace Dune {
             return data_[i + (nx_+1)*(j + (ny_+1)*k)];
         }
     private:
-        int nx_, ny_, nz_;
+        long long nx_, ny_, nz_;
         std::vector<double> data_;
     };
 
 
     class BuildCpGrid {
     public:
-        BuildCpGrid(int nx, int ny, int nz)
+        BuildCpGrid(long long nx, long long ny, long long nz)
             : nx_(nx), ny_(ny), nz_(nz),
               X_ (nx,      ny,      nz),
               Y_ (nx,      ny,      nz),
@@ -87,7 +87,7 @@ namespace Dune {
             this->zcorn(zcorn);
             setZCORN(zcorn);
 
-            std::vector<int> actnum(Nx() * Ny() * Nz(), 1);
+            std::vector<long long> actnum(Nx() * Ny() * Nz(), 1);
             setACTNUM(actnum);
 
             if (write_grdecl) {
@@ -107,15 +107,15 @@ namespace Dune {
         }
 
     protected:
-        int Nx() const { return nx_; }
-        int Ny() const { return ny_; }
-        int Nz() const { return nz_; }
+        long long Nx() const { return nx_; }
+        long long Ny() const { return ny_; }
+        long long Nz() const { return nz_; }
 
-        double& X(int i, int j, int k) { return X_(i, j, k); }
-        double& Y(int i, int j, int k) { return Y_(i, j, k); }
-        double& Z(int i, int j, int k) { return Z_(i, j, k); }
+        double& X(long long i, long long j, long long k) { return X_(i, j, k); }
+        double& Y(long long i, long long j, long long k) { return Y_(i, j, k); }
+        double& Z(long long i, long long j, long long k) { return Z_(i, j, k); }
 
-        virtual void        setACTNUM(std::vector<int>& /* actnum */)
+        virtual void        setACTNUM(std::vector<long long>& /* actnum */)
         {
             // All active by default
         }
@@ -124,7 +124,7 @@ namespace Dune {
         virtual std::string fileName ()                           = 0;
 
     private:
-        const int nx_, ny_, nz_;
+        const long long nx_, ny_, nz_;
         CoordinateArray X_, Y_, Z_;
 
         void coord(std::vector<double>& coord)
@@ -133,8 +133,8 @@ namespace Dune {
             coord.resize(6 * (nx_+1) * (ny_+1));
 
             double* c = &coord[0];
-            for (int j = 0; j < ny_+1; ++j)
-            for (int i = 0; i < nx_+1; ++i) {
+            for (long long j = 0; j < ny_+1; ++j)
+            for (long long i = 0; i < nx_+1; ++i) {
                 *c++ = X_(i, j,  0 ); // X-top
                 *c++ = Y_(i, j,  0 ); // Y-top
                 *c++ = Z_(i, j,  0 ); // Z-top
@@ -150,9 +150,9 @@ namespace Dune {
             zcorn.resize((2*nx_) * (2*ny_) * (2*nz_));
 
             double* z = &zcorn[0];
-            for (int k = 1; k < 2*nz_ + 1; ++k)
-            for (int j = 1; j < 2*ny_ + 1; ++j)
-            for (int i = 1; i < 2*nx_ + 1; ++i) {
+            for (long long k = 1; k < 2*nz_ + 1; ++k)
+            for (long long j = 1; j < 2*ny_ + 1; ++j)
+            for (long long i = 1; i < 2*nx_ + 1; ++i) {
                 *z++ = Z_(i/2, j/2, k/2);
             }
         }
@@ -161,11 +161,11 @@ namespace Dune {
         void writeGRDECL(std::basic_ostream<charT,traits>& grdecl,
                          const std::vector<double>&        coord ,
                          const std::vector<double>&        zcorn ,
-                         const std::vector<int>&           actnum)
+                         const std::vector<long long>&           actnum)
         {
-            assert (int(coord .size()) == 6 * (nx_+1) * (ny_+1));
-            assert (int(zcorn .size()) == (2*nx_) * (2*ny_) * (2*nz_));
-            assert (int(actnum.size()) == nx_ * ny_ * nz_);
+            assert ((long long)(coord .size()) == 6 * (nx_+1) * (ny_+1));
+            assert ((long long)(zcorn .size()) == (2*nx_) * (2*ny_) * (2*nz_));
+            assert ((long long)(actnum.size()) == nx_ * ny_ * nz_);
 
             grdecl.precision(15);
             grdecl << "SPECGRID\n"
@@ -174,16 +174,16 @@ namespace Dune {
                    << nz_ << " 1 F\n/\n\n"
                    << "COORD\n";
             grdecl.setf(std::ios::scientific | std::ios::showpos);
-            for (int i = 0; i < 6 * (nx_ + 1) * (ny_ + 1); ++i) {
+            for (long long i = 0; i < 6 * (nx_ + 1) * (ny_ + 1); ++i) {
                 grdecl << coord[i] << (((i + 1) % 6 == 0) ? "\n" : " ");
             }
             grdecl << "/\n\nZCORN\n";
-            for (int i = 0; i < (2*nx_) * (2*ny_) * (2*nz_); ++i) {
+            for (long long i = 0; i < (2*nx_) * (2*ny_) * (2*nz_); ++i) {
                 grdecl << zcorn[i] << (((i + 1) % 8 == 0) ? "\n" : " ");
             }
             grdecl << "/\n\nACTNUM\n";
             grdecl.unsetf(std::ios::scientific | std::ios::showpos);
-            for (int i = 0; i < nx_ * ny_ * nz_; ++i) {
+            for (long long i = 0; i < nx_ * ny_ * nz_; ++i) {
                 grdecl << actnum[i] << (((i + 1) % 8 == 0) ? "\n" : " ");
             }
             grdecl << "/\n";
@@ -193,17 +193,17 @@ namespace Dune {
 
     class SimpleFault : public BuildCpGrid {
     public:
-        SimpleFault(int    nx, int    ny, int    nz,
+        SimpleFault(long long    nx, long long    ny, long long    nz,
                     double hx, double hy, double hz, double drop)
             : BuildCpGrid(nx, ny, nz),
               hx_(hx), hy_(hy), hz_(hz), drop_(drop)
         {
             const double pi = 3.14159265358979323846264338327950288;
-            for (int k = 0; k < nz+1; ++k) {
+            for (long long k = 0; k < nz+1; ++k) {
                 const double zeta = double(k) / (nz + 1);
-                for (int j = 0; j < ny+1; ++j) {
+                for (long long j = 0; j < ny+1; ++j) {
                     const double eta = double(j) / (ny + 1);
-                    for (int i = 0; i < nx+1; ++i) {
+                    for (long long i = 0; i < nx+1; ++i) {
                         const double xi = double(i) / (nx + 1);
 
                         // Make box.
@@ -222,15 +222,15 @@ namespace Dune {
             }
 
             std::vector<double> z_srt(nz + 1);
-            for (int j = 0; j < ny+1; ++j) {
-                for (int i = 0; i < nx+1; ++i) {
-                    for (int k = 0; k < nz+1; ++k) {
+            for (long long j = 0; j < ny+1; ++j) {
+                for (long long i = 0; i < nx+1; ++i) {
+                    for (long long k = 0; k < nz+1; ++k) {
                         z_srt[k] = Z(i,j,k);
                     }
 
                     std::sort(z_srt.begin(), z_srt.end());
 
-                    for (int k = 0; k < nz+1; ++k) {
+                    for (long long k = 0; k < nz+1; ++k) {
                         Z(i,j,k) = z_srt[k];
                     }
                 }
@@ -244,12 +244,12 @@ namespace Dune {
 
         void setZCORN(std::vector<double>& zcorn)
         {
-            const int nx = Nx(), ny = Ny(), nz = Nz();
-            const int imin = 2 * (nx / 2);
+            const long long nx = Nx(), ny = Ny(), nz = Nz();
+            const long long imin = 2 * (nx / 2);
 
-            for (int k = 0   ; k < 2*nz; ++k)
-            for (int j = 0   ; j < 2*ny; ++j)
-            for (int i = imin; i < 2*nx; ++i) {
+            for (long long k = 0   ; k < 2*nz; ++k)
+            for (long long j = 0   ; j < 2*ny; ++j)
+            for (long long i = imin; i < 2*nx; ++i) {
                 zcorn[i + 2*nx*(j + 2*ny*k)] += drop_;
             }
         }
@@ -260,16 +260,16 @@ namespace Dune {
 
     class SlopingFault : public BuildCpGrid {
     public:
-        SlopingFault(int    nx, int    ny, int    nz,
+        SlopingFault(long long    nx, long long    ny, long long    nz,
                      double hx, double hy, double hz, double drop)
             : BuildCpGrid(nx, ny, nz),
               hx_(hx), hy_(hy), hz_(hz), drop_(drop)
         {
-            for (int k = 0; k < nz+1; ++k) {
+            for (long long k = 0; k < nz+1; ++k) {
                 const double zeta = double(k) / (nz + 1);
-                for (int j = 0; j < ny+1; ++j) {
+                for (long long j = 0; j < ny+1; ++j) {
                     const double eta = double(j) / (ny + 1);
-                    for (int i = 0; i < nx+1; ++i) {
+                    for (long long i = 0; i < nx+1; ++i) {
                         const double xi = double(i) / (nx + 1);
 
                         // Make box.
@@ -290,12 +290,12 @@ namespace Dune {
 
         void setZCORN(std::vector<double>& zcorn)
         {
-            const int nx = Nx(), ny = Ny(), nz = Nz();
-            const int imin = 2 * (nx / 2);
+            const long long nx = Nx(), ny = Ny(), nz = Nz();
+            const long long imin = 2 * (nx / 2);
 
-            for (int k = 0   ; k < 2*nz; ++k)
-            for (int j = 0   ; j < 2*ny; ++j)
-            for (int i = imin; i < 2*nx; ++i) {
+            for (long long k = 0   ; k < 2*nz; ++k)
+            for (long long j = 0   ; j < 2*ny; ++j)
+            for (long long i = imin; i < 2*nx; ++i) {
                 zcorn[i + 2*nx*(j + 2*ny*k)] += drop_;
             }
         }

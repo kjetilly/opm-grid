@@ -44,7 +44,7 @@ namespace Dune
 {
 namespace cpgrid
 {
-IndexSet::IndexType IndexSet::subIndex(const cpgrid::Entity<0>& e, int i, unsigned int cc) const
+IndexSet::IndexType IndexSet::subIndex(const cpgrid::Entity<0>& e, long long i, size_t cc) const
 {
     switch(cc) {
     case 0: return index(e.subEntity<0>(i));
@@ -56,7 +56,7 @@ IndexSet::IndexType IndexSet::subIndex(const cpgrid::Entity<0>& e, int i, unsign
     }
 }
 
-IdSet::IdType IdSet::subId(const cpgrid::Entity<0>& e, int i, int cc) const
+IdSet::IdType IdSet::subId(const cpgrid::Entity<0>& e, long long i, long long cc) const
 {
     switch (cc) {
     case 0: return id(e.subEntity<0>(i));
@@ -69,7 +69,7 @@ IdSet::IdType IdSet::subId(const cpgrid::Entity<0>& e, int i, int cc) const
     return -1;
 }
 
-LevelGlobalIdSet::IdType LevelGlobalIdSet::subId(const cpgrid::Entity<0>& e, int i, int cc) const
+LevelGlobalIdSet::IdType LevelGlobalIdSet::subId(const cpgrid::Entity<0>& e, long long i, long long cc) const
 {
     assert(view_ == e.pgrid_);
 
@@ -84,7 +84,7 @@ LevelGlobalIdSet::IdType LevelGlobalIdSet::subId(const cpgrid::Entity<0>& e, int
     return -1;
 }
 
-GlobalIdSet::IdType GlobalIdSet::subId(const cpgrid::Entity<0>& e, int i, int cc) const
+GlobalIdSet::IdType GlobalIdSet::subId(const cpgrid::Entity<0>& e, long long i, long long cc) const
 {
     return levelIdSet(e.pgrid_).subId(e, i, cc);
 }

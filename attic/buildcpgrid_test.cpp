@@ -38,13 +38,13 @@
 #include <dune/common/mpihelper.hh>
 #include "BuildCpGrid.hpp"
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     Opm::parameter::ParameterGroup param(argc, argv);
-    int nx = param.getDefault<int>("nx", 100);
-    int ny = param.getDefault<int>("ny",  60);
-    int nz = param.getDefault<int>("nz",  15);
+    long long nx = param.getDefault<long long>("nx", 100);
+    long long ny = param.getDefault<long long>("ny",  60);
+    long long nz = param.getDefault<long long>("nz",  15);
 
     double hx = param.getDefault<double>("hx", 1.0);
     double hy = param.getDefault<double>("hy", 1.0);

@@ -34,37 +34,37 @@ namespace Opm
 {
 namespace UgGridHelpers
 {
-int numCells(const UnstructuredGrid& grid)
+long long numCells(const UnstructuredGrid& grid)
 {
     return grid.number_of_cells;
 }
 
-int numFaces(const UnstructuredGrid& grid)
+long long numFaces(const UnstructuredGrid& grid)
 {
     return grid.number_of_faces;
 }
-int dimensions(const UnstructuredGrid& grid)
+long long dimensions(const UnstructuredGrid& grid)
 {
     return grid.dimensions;
 }
-int numCellFaces(const UnstructuredGrid& grid)
+long long numCellFaces(const UnstructuredGrid& grid)
 {
     return grid.cell_facepos[grid.number_of_cells];
 }
 
-const int* globalCell(const UnstructuredGrid& grid)
+const long long* globalCell(const UnstructuredGrid& grid)
 {
     return grid.global_cell;
 }
 
-const int* cartDims(const UnstructuredGrid& grid)
+const long long* cartDims(const UnstructuredGrid& grid)
 {
     return grid.cartdims;
 }
 
 #if HAVE_ECL_INPUT
-std::vector<int> createACTNUM(const UnstructuredGrid& grid) {
-    const int* dims = cartDims(grid);
+std::vector<long long> createACTNUM(const UnstructuredGrid& grid) {
+    const long long* dims = cartDims(grid);
     return ActiveGridCells(dims[0], dims[1], dims[2], globalCell(grid), numCells(grid)).actNum();
 }
 #endif
@@ -74,15 +74,15 @@ const double* beginCellCentroids(const UnstructuredGrid& grid)
     return grid.cell_centroids;
 }
 
-double cellCenterDepth(const UnstructuredGrid& grid, int cell_index)
+double cellCenterDepth(const UnstructuredGrid& grid, long long cell_index)
 {
     // This method is an alternative to the method cellCentroidCoordinate(...) below.
     // The cell center depth is computed as a raw average of cell corner depths.
     // For cornerpoint grids, this is likely to give slightly different depths that seem
     // to agree with eclipse.
     assert(grid.dimensions == 3);
-    const int nd = 3; // Assuming 3-dimensional grid ...
-    const int nv = 8; // Assuming 2*4 vertices ...
+    const long long nd = 3; // Assuming 3-dimensional grid ...
+    const long long nv = 8; // Assuming 2*4 vertices ...
     double zz = 0.0;
     // Traverse the bottom and top cell-face
     for (unsigned i = grid.cell_facepos[cell_index+1] - 2; i < grid.cell_facepos[cell_index+1]; ++i) {
@@ -95,7 +95,7 @@ double cellCenterDepth(const UnstructuredGrid& grid, int cell_index)
     return zz/nv;
 }
 
-Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell_index, int face_tag)
+Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, long long cell_index, long long face_tag)
 {
     // This method is an alternative to the method faceCentroid(...) below.
     // The face center is computed as a raw average of cell corners.
@@ -107,8 +107,8 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
     // 3--2
 
     assert(grid.dimensions == 3);
-    const int nd = 3; // Assuming 3-dimensional grid ...
-    const int nv = 4; // Assuming 4 vertices ...
+    const long long nd = 3; // Assuming 3-dimensional grid ...
+    const long long nv = 4; // Assuming 4 vertices ...
     Dune::FieldVector<double,3> center(0.0);
     //Vector center(0.0);
     // Traverse the bottom and top cell-face
@@ -116,26 +116,26 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
         // Traverse the vertices associated with each face
         assert(grid.face_nodepos[grid.cell_faces[i]+1] - grid.face_nodepos[grid.cell_faces[i]] == nv);
 
-        int start = grid.face_nodepos[grid.cell_faces[i]];
+        long long start = grid.face_nodepos[grid.cell_faces[i]];
 
         // pick the right nodes. See order assumption above
         switch(face_tag) {
         case 0: {
-            for (int indx = 0; indx < nd; ++indx) {
+            for (long long indx = 0; indx < nd; ++indx) {
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+3]))[indx];
             }
         }
             break;
         case 1: {
-            for (int indx = 0; indx < nd; ++indx) {
+            for (long long indx = 0; indx < nd; ++indx) {
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+1]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[indx];
             }
         }
             break;
         case 2: {
-            for (int indx = 0; indx < nd; ++indx) {
+            for (long long indx = 0; indx < nd; ++indx) {
 
 
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start]))[indx];
@@ -145,7 +145,7 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
         }
             break;
         case 3: {
-            for (int indx = 0; indx < nd; ++indx) {
+            for (long long indx = 0; indx < nd; ++indx) {
 
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+3]))[indx];
@@ -155,7 +155,7 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
             break;
         case 4: {
             if (i == grid.cell_facepos[cell_index+1] - 2) {
-                for (int indx = 0; indx < nd; ++indx) {
+                for (long long indx = 0; indx < nd; ++indx) {
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+1]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[indx];
@@ -166,7 +166,7 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
             break;
         case 5: {
             if (i == grid.cell_facepos[cell_index+1] - 1) {
-                for (int indx = 0; indx < nd; ++indx) {
+                for (long long indx = 0; indx < nd; ++indx) {
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+1]))[indx];
                 center[indx] += (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[indx];
@@ -177,7 +177,7 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
             break;
         }
     }
-    for (int indx = 0; indx < nd; ++indx) {
+    for (long long indx = 0; indx < nd; ++indx) {
         center[indx] /= nv;
     }
 
@@ -185,7 +185,7 @@ Dune::FieldVector<double,3> faceCenterEcl(const UnstructuredGrid& grid, int cell
 }
 
 
-Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int face_index)
+Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, long long face_index)
 {
     // This method is an alternative to the method faceNormal(...) below.
     // The face Normal area is computed based on the face corners without introducing
@@ -193,9 +193,9 @@ Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int 
     // For cornerpoint grids, this is likely to give slightly different depths that seem
     // to agree with eclipse.
     assert(grid.dimensions == 3);
-    const int nd = 3; // Assuming 3-dimensional grid ...
-    const int nv = grid.face_nodepos[face_index+1] - grid.face_nodepos[face_index];
-    const int start = grid.face_nodepos[face_index];
+    const long long nd = 3; // Assuming 3-dimensional grid ...
+    const long long nv = grid.face_nodepos[face_index+1] - grid.face_nodepos[face_index];
+    const long long start = grid.face_nodepos[face_index];
 
     typedef Dune::FieldVector<double,3> Vector;
 
@@ -211,7 +211,7 @@ Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int 
     case 3:
         {
         Vector a, b;
-        for (int i = 0; i < 3; ++i) {
+        for (long long i = 0; i < 3; ++i) {
             a[i] = (grid.node_coordinates+nd*(grid.face_nodes[start] ))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[i];
             b[i] = (grid.node_coordinates+nd*(grid.face_nodes[start+1]))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[i];
         }
@@ -223,7 +223,7 @@ Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int 
     case 4:
         {
         Vector a, b;
-        for (int i = 0; i < 3; ++i) {
+        for (long long i = 0; i < 3; ++i) {
             a[i] = (grid.node_coordinates+nd*(grid.face_nodes[start] ))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start+2]))[i];
             b[i] = (grid.node_coordinates+nd*(grid.face_nodes[start+1]))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start+3]))[i];
         }
@@ -234,15 +234,15 @@ Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int 
         break;
     default:
         {
-            int h = (nv - 1)/2;
-            int k = (nv % 2) ? 0 : nv - 1;
+            long long h = (nv - 1)/2;
+            long long k = (nv % 2) ? 0 : nv - 1;
 
             Vector areaNormal ( 0 );
             Vector a, b;
             // First quads
-            for (int j = 1; j < h; ++j)
+            for (long long j = 1; j < h; ++j)
             {
-                for (int i = 0; i < 3; ++i) {
+                for (long long i = 0; i < 3; ++i) {
                     a[i] = (grid.node_coordinates+nd*(grid.face_nodes[start+2*j] ))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start]))[i];
                     b[i] = (grid.node_coordinates+nd*(grid.face_nodes[start+2*j + 1]))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start+ 2*j-1]))[i];
                 }
@@ -250,7 +250,7 @@ Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int 
             }
 
             // Last triangle or quad
-            for (int i = 0; i < 3; ++i) {
+            for (long long i = 0; i < 3; ++i) {
                 a[i] = (grid.node_coordinates+nd*(grid.face_nodes[start+2*h] ))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start]))[i];
                 b[i] = (grid.node_coordinates+nd*(grid.face_nodes[start+k]))[i] - (grid.node_coordinates+nd*(grid.face_nodes[start+ 2*h-1]))[i];
             }
@@ -262,14 +262,14 @@ Dune::FieldVector<double,3> faceAreaNormalEcl(const UnstructuredGrid& grid, int 
 
 }
 
-double cellCentroidCoordinate(const UnstructuredGrid& grid, int cell_index,
-                                 int coordinate)
+double cellCentroidCoordinate(const UnstructuredGrid& grid, long long cell_index,
+                                 long long coordinate)
 {
     return grid.cell_centroids[grid.dimensions*cell_index+coordinate];
 }
 
 const double*
-cellCentroid(const UnstructuredGrid& grid, int cell_index)
+cellCentroid(const UnstructuredGrid& grid, long long cell_index)
 {
     return grid.cell_centroids+(cell_index*grid.dimensions);
 }
@@ -288,17 +288,17 @@ const double* beginFaceCentroids(const UnstructuredGrid& grid)
     return grid.face_centroids;
 }
 
-const double* faceCentroid(const UnstructuredGrid& grid, int face_index)
+const double* faceCentroid(const UnstructuredGrid& grid, long long face_index)
 {
     return grid.face_centroids+face_index*grid.dimensions;
 }
 
-const double* faceNormal(const UnstructuredGrid& grid, int face_index)
+const double* faceNormal(const UnstructuredGrid& grid, long long face_index)
 {
     return grid.face_normals+face_index*grid.dimensions;
 }
 
-double faceArea(const UnstructuredGrid& grid, int face_index)
+double faceArea(const UnstructuredGrid& grid, long long face_index)
 {
     return grid.face_areas[face_index];
 }
@@ -313,12 +313,12 @@ SparseTableView face2Vertices(const UnstructuredGrid& grid)
     return SparseTableView(grid.face_nodes, grid.face_nodepos, numFaces(grid));
 }
 
-const double* vertexCoordinates(const UnstructuredGrid& grid, int index)
+const double* vertexCoordinates(const UnstructuredGrid& grid, long long index)
 {
     return grid.node_coordinates+dimensions(grid)*index;
 }
 
-double cellVolume(const UnstructuredGrid& grid, int cell_index)
+double cellVolume(const UnstructuredGrid& grid, long long cell_index)
 {
     return grid.cell_volumes[cell_index];
 }
@@ -331,17 +331,17 @@ FaceCellTraits<UnstructuredGrid>::Type faceCells(const UnstructuredGrid& grid)
 
 #if HAVE_ECL_INPUT
 Opm::EclipseGrid createEclipseGrid(const UnstructuredGrid& grid, const Opm::EclipseGrid& inputGrid ) {
-    const int * dims = UgGridHelpers::cartDims( grid );
+    const long long * dims = UgGridHelpers::cartDims( grid );
 
     if ((inputGrid.getNX( ) == static_cast<size_t>(dims[0])) &&
         (inputGrid.getNY( ) == static_cast<size_t>(dims[1])) &&
         (inputGrid.getNZ( ) == static_cast<size_t>(dims[2]))) {
-        std::vector<int> updatedACTNUM;
-        const int* global_cell = UgGridHelpers::globalCell( grid );
+        std::vector<long long> updatedACTNUM;
+        const long long* global_cell = UgGridHelpers::globalCell( grid );
 
         if (global_cell) {
             updatedACTNUM.assign( inputGrid.getCartesianSize( ) , 0 );
-            for (int c = 0; c < numCells( grid ); c++) {
+            for (long long c = 0; c < numCells( grid ); c++) {
                 updatedACTNUM[global_cell[c]] = 1;
             }
         }

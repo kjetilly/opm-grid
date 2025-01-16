@@ -23,7 +23,7 @@ tpfa_htrans_compute(struct UnstructuredGrid *G, const double *perm, double *htra
     return tpfa_htrans_compute<UnstructuredGrid>(G, totmob, htrans, trans);
     #endif
     
-    int    c, d, f, j;
+    long long    c, d, f, j;
     double s, dist, denom;
     unsigned i;
 
@@ -79,7 +79,7 @@ tpfa_trans_compute(struct UnstructuredGrid *G, const double *htrans, double *tra
     return tpfa_trans_compute<UnstructuredGrid>(G, totmob, htrans, trans);
     #endif
     
-    int c, f;
+    long long c, f;
     unsigned i;
 
     for (f = 0; f < G->number_of_faces; f++) {
@@ -112,7 +112,7 @@ tpfa_eff_trans_compute(struct UnstructuredGrid       *G,
     return tpfa_eff_trans_compute<UnstructuredGrid>(G, totmob, htrans, trans);
     #endif
     
-    int c, f;
+    long long c, f;
     unsigned i;
 
     for (f = 0; f < G->number_of_faces; f++) {

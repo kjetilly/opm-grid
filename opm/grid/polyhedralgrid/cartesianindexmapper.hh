@@ -6,56 +6,56 @@
 
 namespace Dune
 {
-    template< int dim, int dimworld, typename coord_t >
+    template< long long dim, long long dimworld, typename coord_t >
     class CartesianIndexMapper< PolyhedralGrid< dim, dimworld, coord_t > >
     {
         typedef PolyhedralGrid< dim, dimworld, coord_t >  Grid;
 
         const Grid& grid_;
-        const int cartesianSize_;
+        const long long cartesianSize_;
 
-        int computeCartesianSize() const
+        long long computeCartesianSize() const
         {
-            int size = cartesianDimensions()[ 0 ];
-            for( int d=1; d<dim; ++d )
+            long long size = cartesianDimensions()[ 0 ];
+            for( long long d=1; d<dim; ++d )
                 size *= cartesianDimensions()[ d ];
             return size ;
         }
     public:
-        static const int dimension = Grid :: dimension ;
+        static const long long dimension = Grid :: dimension ;
 
         explicit CartesianIndexMapper( const Grid& grid )
           : grid_( grid ),
             cartesianSize_( computeCartesianSize() )
         {}
 
-        const std::array<int, dimension>& cartesianDimensions() const
+        const std::array<long long, dimension>& cartesianDimensions() const
         {
             return grid_.logicalCartesianSize();
         }
 
-        int cartesianSize() const
+        long long cartesianSize() const
         {
             return cartesianSize_;
         }
 
-        int compressedSize() const
+        long long compressedSize() const
         {
             return grid_.size( 0 );
         }
 
-        int cartesianIndex( const int compressedElementIndex ) const
+        long long cartesianIndex( const long long compressedElementIndex ) const
         {
             assert( compressedElementIndex >= 0 && compressedElementIndex < compressedSize() );
             return grid_.globalCell()[ compressedElementIndex ];
         }
 
-        void cartesianCoordinate(const int compressedElementIndex, std::array<int,dimension>& coords) const
+        void cartesianCoordinate(const long long compressedElementIndex, std::array<long long,dimension>& coords) const
         {
-          int gc = cartesianIndex( compressedElementIndex );
+          long long gc = cartesianIndex( compressedElementIndex );
           if( dimension >=2 )
           {
-              for( int d=0; d<dimension-2; ++d )
+              for( long long d=0; d<dimension-2; ++d )
               {
                 coords[d] = gc % cartesianDimensions()[d];  gc /= cartesianDimensions()[d];
               }

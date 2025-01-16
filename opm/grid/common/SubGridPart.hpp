@@ -79,7 +79,7 @@ struct SubGridPartTraits {
         bool is_owned_;
     };
 
-    template <int cd>
+    template <long long cd>
     struct Codim {
         using BaseEntity = typename Grid ::Traits ::template Codim<cd>::Entity;
         using Entity = SubEntity<BaseEntity>;
@@ -135,7 +135,7 @@ public:
 
 
     /** \brief Codim Structure */
-    template <int cd>
+    template <long long cd>
     struct Codim : public Traits ::template Codim<cd> {
         using Entity = typename Traits::template Codim<cd>::Entity;
         class SubIterator
@@ -215,8 +215,8 @@ public:
 
         // Add neighbouring not-owned entities to subset_
         using Seed = typename Codim<0>::Entity::EntitySeed;
-        std::unordered_set<int> owned;
-        std::unordered_map<int, Seed> neighbors;
+        std::unordered_set<long long> owned;
+        std::unordered_map<long long, Seed> neighbors;
         const auto& iset = grid_->leafIndexSet();
         const auto& leaf_view = grid_->leafGridView();
         for (const auto& seed : subset_) {
@@ -237,7 +237,7 @@ public:
             }
         }
         // Now that owned is complete, we can eliminate any owned entries.
-        std::map<int, Seed> unowned_neighbors;
+        std::map<long long, Seed> unowned_neighbors;
         for (const auto& nb : neighbors) {
             if (owned.count(nb.first) == 0) {
                 unowned_neighbors.insert(nb);
@@ -263,7 +263,7 @@ public:
     // const IndexSet& indexSet() const // Not implemented
 
     /** \brief obtain number of entities in a given codimension */
-    int size(int codim) const
+    long long size(long long codim) const
     {
         if (codim == 0) {
             return subset_.size();
@@ -273,10 +273,10 @@ public:
     }
 
     /** \brief obtain number of entities with a given geometry type */
-    // int size(const GeometryType& type) const // Not implemented
+    // long long size(const GeometryType& type) const // Not implemented
 
     /** \brief obtain begin iterator for this view */
-    template <int cd>
+    template <long long cd>
     typename Codim<cd>::Iterator begin() const
     {
         static_assert(cd == 0, "Only codimension 0 iterators for SubGridPart.");
@@ -285,7 +285,7 @@ public:
     }
 
     /** \brief obtain end iterator for this view */
-    template <int cd>
+    template <long long cd>
     typename Codim<cd>::Iterator end() const
     {
         static_assert(cd == 0, "Only codimension 0 iterators for SubGridPart.");
@@ -296,7 +296,7 @@ public:
     // We support iterating over Interior_Partition, Overlap_Partition and All_Partition
 
     /** \brief obtain begin iterator for this view */
-    template <int cd, PartitionIteratorType pit>
+    template <long long cd, PartitionIteratorType pit>
     typename Codim<cd>::template Partition<pit>::Iterator begin() const
     {
         static_assert(cd == 0, "Only codimension 0 iterators for SubGridPart.");
@@ -311,7 +311,7 @@ public:
     }
 
     /** \brief obtain end iterator for this view */
-    template <int cd, PartitionIteratorType pit>
+    template <long long cd, PartitionIteratorType pit>
     typename Codim<cd>::template Partition<pit>::Iterator end() const
     {
         static_assert(cd == 0, "Only codimension 0 iterators for SubGridPart.");
@@ -343,7 +343,7 @@ public:
     }
 
     /** \brief Return size of the overlap region for a given codim on the grid view.  */
-    int overlapSize(int codim) const
+    long long overlapSize(long long codim) const
     {
         if (codim == 0) {
             return subset_.size() - num_owned_;
@@ -353,7 +353,7 @@ public:
     }
 
     /** \brief Return size of the ghost region for a given codim on the grid view.  */
-    int ghostSize([[maybe_unused]] int codim) const
+    long long ghostSize([[maybe_unused]] long long codim) const
     {
         return 0;
     }

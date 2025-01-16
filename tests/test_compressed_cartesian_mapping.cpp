@@ -28,10 +28,10 @@
 
 BOOST_AUTO_TEST_CASE(mapping)
 {
-    const std::vector<int> global_cell{0, 1, 2, 3, 5, 6, 8, 9};
-    const int num_cells = global_cell.size();
+    const std::vector<long long> global_cell{0, 1, 2, 3, 5, 6, 8, 9};
+    const long long num_cells = global_cell.size();
 
-    const std::unordered_map<int, int> cartesian_to_compressed =
+    const std::unordered_map<long long, long long> cartesian_to_compressed =
         Opm::cartesianToCompressed(num_cells, global_cell.data());
 
     BOOST_CHECK_EQUAL(cartesian_to_compressed.at(0), 0);
@@ -43,10 +43,10 @@ BOOST_AUTO_TEST_CASE(mapping)
     BOOST_CHECK_EQUAL(cartesian_to_compressed.at(8), 6);
     BOOST_CHECK_EQUAL(cartesian_to_compressed.at(9), 7);
 
-    const int non_existing_index = 1829;
+    const long long non_existing_index = 1829;
     BOOST_CHECK_THROW(cartesian_to_compressed.at(non_existing_index), std::out_of_range);
 
-    const std::vector<int> compressed_to_cartesian = Opm::compressedToCartesian(num_cells,  global_cell.data());
+    const std::vector<long long> compressed_to_cartesian = Opm::compressedToCartesian(num_cells,  global_cell.data());
 
     BOOST_CHECK_EQUAL_COLLECTIONS(compressed_to_cartesian.begin(), compressed_to_cartesian.end(),
                                   global_cell.begin(),             global_cell.end());
@@ -54,18 +54,18 @@ BOOST_AUTO_TEST_CASE(mapping)
 
 BOOST_AUTO_TEST_CASE(nullmapping)
 {
-    const int num_cells = 30;
+    const long long num_cells = 30;
 
-    const std::unordered_map<int, int> cartesian_to_compressed =
+    const std::unordered_map<long long, long long> cartesian_to_compressed =
         Opm::cartesianToCompressed(num_cells, nullptr);
 
-    for (int i = 0; i < num_cells; ++i) {
+    for (long long i = 0; i < num_cells; ++i) {
         BOOST_CHECK_EQUAL(cartesian_to_compressed.at(i), i);
     }
 
-    const std::vector<int> compressed_to_cartesian = Opm::compressedToCartesian(num_cells,  nullptr);
+    const std::vector<long long> compressed_to_cartesian = Opm::compressedToCartesian(num_cells,  nullptr);
 
-    for (int i = 0; i < num_cells; ++i) {
+    for (long long i = 0; i < num_cells; ++i) {
         BOOST_CHECK_EQUAL(compressed_to_cartesian[i], i);
     }
 }

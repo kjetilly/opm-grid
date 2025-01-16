@@ -42,11 +42,11 @@ namespace Opm {
 template<typename Grid>
 class GraphOfGrid{
     using WeightType = float;
-    using EdgeList = std::unordered_map<int,WeightType>;
+    using EdgeList = std::unordered_map<long long,WeightType>;
 
     struct VertexProperties
     {
-        int nproc = 0; // number of processor
+        long long nproc = 0; // number of processor
         WeightType weight = 1; // vertex weight
         EdgeList edges;
     };
@@ -64,7 +64,7 @@ public:
     }
 
     /// \brief Number of graph vertices
-    int size () const
+    long long size () const
     {
         return graph.size();
     }
@@ -80,7 +80,7 @@ public:
 
     /// \brief Get iterator to the vertex with this global ID
     /// or ID of the well containing it
-    auto find(int gID) const
+    auto find(long long gID) const
     {
         // search the graph first, and then wells
         auto pgID = graph.find(gID);
@@ -101,7 +101,7 @@ public:
     /// If no such vertex exists, returns vertex with
     /// process -1, weight 0, and empty edgeList.
     /// If the vertex is in a well, return the well's vertex.
-    const VertexProperties& getVertex (int gID) const
+    const VertexProperties& getVertex (long long gID) const
     {
         auto pgID = find(gID);
         if (pgID == graph.end())
@@ -114,7 +114,7 @@ public:
     /// \brief Number of vertices for given vertex
     ///
     // returns -1 if vertex with such global ID is not in the graph (or wells)
-    int numEdges (int gID) const
+    long long numEdges (long long gID) const
     {
         auto pgID = find(gID);
         if (pgID == graph.end())
@@ -128,7 +128,7 @@ public:
     }
 
     /// \brief List of neighbors for given vertex
-    const EdgeList& edgeList(int gID) const
+    const EdgeList& edgeList(long long gID) const
     {
         // get iterator to the vertex or the well containing it
         auto pgID = find(gID);
@@ -145,7 +145,7 @@ public:
     /// for their common neighbors are added up.
     /// Returns global ID of the resulting vertex, which is smaller ID.
     /// If either gID is in a well, well's ID can be returned if it is smaller.
-    int contractVertices (int gID1, int gID2);
+    long long contractVertices (long long gID1, long long gID2);
 
     /// \brief Register the well to the list of wells
     ///
@@ -154,7 +154,7 @@ public:
     /// checkIntersection==false skips those (possibly expensive) checks
     /// but leaves it to user to guarantee that wells are disjoint and
     /// that all cell global IDs are in the graph
-    void addWell (const std::set<int>& well, bool checkIntersection=true);
+    void addWell (const std::set<long long>& well, bool checkIntersection=true);
 
     /// \brief Return the list of wells
     const auto& getWells () const
@@ -168,9 +168,9 @@ public:
     /// be split over several processes. Giving the well an extra layer
     /// of cells distances that well from the subdomain boundary.
     void addNeighboringCellsToWells ();
-    void addNeighboringCellsToWells (int layers)
+    void addNeighboringCellsToWells (long long layers)
     {
-        for (int i=0; i<layers; ++i)
+        for (long long i=0; i<layers; ++i)
         {
             addNeighboringCellsToWells();
         }
@@ -185,11 +185,11 @@ private:
     ///
     /// returns the smallest cell-ID in the well or
     /// returns -1 if no well contains given gID
-    int wellID (int gID) const;
+    long long wellID (long long gID) const;
 
     const Grid& grid;
-    std::unordered_map<int, VertexProperties> graph; // <gID, VertexProperties>
-    std::list<std::set<int>> wells;
+    std::unordered_map<long long, VertexProperties> graph; // <gID, VertexProperties>
+    std::list<std::set<long long>> wells;
 };
 
 } // namespace Opm

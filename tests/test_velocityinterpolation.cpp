@@ -37,10 +37,10 @@ namespace
     // Compute flux corresponding to a constant velocity vector v.
     void computeFlux(const UnstructuredGrid& grid, const std::vector<double>& v, std::vector<double>& flux)
     {
-        const int dim = v.size();
+        const long long dim = v.size();
         assert(dim == grid.dimensions);
         flux.resize(grid.number_of_faces);
-        for (int face = 0; face < grid.number_of_faces; ++face) {
+        for (long long face = 0; face < grid.number_of_faces; ++face) {
             flux[face] = std::inner_product(v.begin(), v.end(), grid.face_normals + face*dim, 0.0);
         }
     }
@@ -52,9 +52,9 @@ namespace
                           std::vector<double>& v)
     {
         assert(v0.size() == v1.size() && v0.size() == x.size());
-        const int dim = v0.size();
+        const long long dim = v0.size();
         v.resize(dim);
-        for (int dd = 0; dd < dim; ++dd) {
+        for (long long dd = 0; dd < dim; ++dd) {
             v[dd] = v0[dd] + x[dd]*v1[dd];
         }
     }
@@ -69,12 +69,12 @@ namespace
                            const std::vector<double>& v1,
                            std::vector<double>& flux)
     {
-        const int dim = v0.size();
+        const long long dim = v0.size();
         assert(dim == grid.dimensions);
         flux.resize(grid.number_of_faces);
         std::vector<double> x(dim);
         std::vector<double> v(dim);
-        for (int face = 0; face < grid.number_of_faces; ++face) {
+        for (long long face = 0; face < grid.number_of_faces; ++face) {
             const double* fc = grid.face_centroids + face*dim;
             std::copy(fc, fc + dim, x.begin());
             computeLinearVec(v0, v1, x, v);
@@ -88,9 +88,9 @@ namespace
     double vectorDiff2(const std::vector<double>& v1, const std::vector<double>& v2)
     {
         assert(v1.size() == v2.size());
-        const int sz = v1.size();
+        const long long sz = v1.size();
         double vdiff = 0.0;
-        for (int i = 0; i < sz; ++i) {
+        for (long long i = 0; i < sz; ++i) {
             vdiff += (v1[i] - v2[i])*(v1[i] - v2[i]);
         }
         return vdiff;
@@ -143,11 +143,11 @@ namespace
     // Face numbering goes xmin, xmax, ymin, ymax, bottom.
     namespace Pyramid
     {
-        static int face_nodes[]   = { 0, 4, 2,    3, 4, 1,    0, 1, 4,    4, 3, 2,    0, 2, 3, 1,       };
-        static int face_nodepos[] = { 0,          3,          6,          9,          12,            16 };
-        static int face_cells[]   = { 0, -1,      0, -1,      0, -1,      0, -1,      0, -1             };
-        static int cell_faces[]   = { 0, 1, 2, 3, 4 };
-        static int cell_facepos[] = { 0, 5 };
+        static long long face_nodes[]   = { 0, 4, 2,    3, 4, 1,    0, 1, 4,    4, 3, 2,    0, 2, 3, 1,       };
+        static long long face_nodepos[] = { 0,          3,          6,          9,          12,            16 };
+        static long long face_cells[]   = { 0, -1,      0, -1,      0, -1,      0, -1,      0, -1             };
+        static long long cell_faces[]   = { 0, 1, 2, 3, 4 };
+        static long long cell_facepos[] = { 0, 5 };
         static double node_coordinates[] = { 0.0, 0.0, 0.0,   1.0, 0.0, 0.0,   0.0, 1.0, 0.0,   1.0, 1.0, 0.0,   0.0, 0.0, 1.0 };
         static double face_centroids[]   = { 0,       1.0/3.0, 1.0/3.0,
                                              2.0/3.0, 1.0/3.0, 1.0/3.0,
@@ -235,11 +235,11 @@ namespace
     // Data for an irregular 2d polygon.
     namespace Irreg2d
     {
-        static int face_nodes[]   = { 0, 1,    1, 2,    2, 3,    3, 4,    4, 0        };
-        static int face_nodepos[] = { 0,       2,       4,       6,       8,       10 };
-        static int face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1       };
-        static int cell_faces[]   = { 0, 1, 2, 3, 4 };
-        static int cell_facepos[] = { 0, 5 };
+        static long long face_nodes[]   = { 0, 1,    1, 2,    2, 3,    3, 4,    4, 0        };
+        static long long face_nodepos[] = { 0,       2,       4,       6,       8,       10 };
+        static long long face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1       };
+        static long long cell_faces[]   = { 0, 1, 2, 3, 4 };
+        static long long cell_facepos[] = { 0, 5 };
         static double node_coordinates[] = { 0, 0,    3, 0,    3, 2,    1, 3,    0, 2 };
         static double face_centroids[]   = { 1.5, 0,    3, 1,    2, 2.5,    0.5, 2.5,    0, 1 };
         static double face_areas[] = { 3, 2, std::sqrt(5.0), std::sqrt(2.0), 2 };
@@ -314,11 +314,11 @@ namespace
     // Data for an irregular 3d prism.
     namespace IrregPrism
     {
-        static int face_nodes[]   = { 0, 4, 2, 1, 3, 5, 0, 1, 5, 4, 2, 4, 5, 3, 2, 3, 0, 1};
-        static int face_nodepos[] = { 0, 3, 6, 10, 14, 18 };
-        static int face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1 };
-        static int cell_faces[]   = { 0, 1, 2, 3, 4 };
-        static int cell_facepos[] = { 0, 5 };
+        static long long face_nodes[]   = { 0, 4, 2, 1, 3, 5, 0, 1, 5, 4, 2, 4, 5, 3, 2, 3, 0, 1};
+        static long long face_nodepos[] = { 0, 3, 6, 10, 14, 18 };
+        static long long face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1 };
+        static long long cell_faces[]   = { 0, 1, 2, 3, 4 };
+        static long long cell_facepos[] = { 0, 5 };
         static double node_coordinates[] = { 0, 0, 0,
                                              2, 0, 0,
                                              0, 1, 0,

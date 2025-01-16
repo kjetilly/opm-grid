@@ -11,16 +11,16 @@
 namespace Dune
 {
 
-  template< int codim, class Grd >
+  template< long long codim, class Grd >
   class PolyhedralGridEntitySeed
   {
     typedef typename std::remove_const< Grd >::type::Traits Traits;
 
   public:
-    static const int codimension = codim;
-    static const int dimension = Traits::dimension;
-    static const int mydimension = dimension - codimension;
-    static const int dimensionworld = Traits::dimensionworld;
+    static const long long codimension = codim;
+    static const long long dimension = Traits::dimension;
+    static const long long mydimension = dimension - codimension;
+    static const long long dimensionworld = Traits::dimensionworld;
 
 
     typedef typename Traits::Grid Grid;
@@ -37,7 +37,7 @@ namespace Dune
       : index_( defaultIndex )
     {}
 
-    int index () const { return index_ ; }
+    long long index () const { return index_ ; }
 
     // check that index is valid, which means >= 0
     // boundary faces can be arbitrary number < 0

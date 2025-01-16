@@ -50,7 +50,7 @@
 
 /*-----------------------------------------------------------------
   Compare function passed to qsortx  */
-static int compare(const void *a, const void *b)
+static long long compare(const void *a, const void *b)
 {
     const double a0 = *(const double*) a;
     const double b0 = *(const double*) b;
@@ -63,10 +63,10 @@ static int compare(const void *a, const void *b)
 
 /*-----------------------------------------------------------------
   Creat sorted list of z-values in zcorn with actnum==1x */
-static int createSortedList(double *list, int n, int m,
-                            const double *z[], const int *a[])
+static long long createSortedList(double *list, long long n, long long m,
+                            const double *z[], const long long *a[])
 {
-    int i,j;
+    long long i,j;
     double *ptr = list;
     for (i=0; i<n; ++i){
         for (j=0; j<m; ++j){
@@ -83,10 +83,10 @@ static int createSortedList(double *list, int n, int m,
 /*-----------------------------------------------------------------
   Remove points less than <tolerance> apart in <list> of increasing
   doubles.  */
-static int uniquify(int n, double *list, double tolerance)
+static long long uniquify(long long n, double *list, double tolerance)
 {
-    int    i;
-    int    pos;
+    long long    i;
+    long long    pos;
     double val;
 
     assert (!(tolerance < 0.0));
@@ -122,26 +122,26 @@ static int uniquify(int n, double *list, double tolerance)
 
 /*-----------------------------------------------------------------
   Along single pillar: */
-static int assignPointNumbers(int    begin,
-                              int    end,
+static long long assignPointNumbers(long long    begin,
+                              long long    end,
                               const double *zlist,
-                              int    n,
+                              long long    n,
                               const double *zcorn,
-                              const int    *actnum,
-                              int    *plist,
+                              const long long    *actnum,
+                              long long    *plist,
                               double tolerance)
 {
     /* n     - number of cells */
     /* zlist - list of len unique z-values */
     /* start - number of unique z-values processed before. */
 
-    int i, k;
+    long long i, k;
     /* All points should now be within tolerance of a listed point. */
 
 
     const double *z = zcorn;
-    const int    *a = actnum;
-    int    *p = plist;
+    const long long    *a = actnum;
+    long long    *p = plist;
 
     k = begin;
     *p++ = INT_MIN; /* Padding to ease processing of faults */
@@ -178,9 +178,9 @@ static int assignPointNumbers(int    begin,
 
 /* ---------------------------------------------------------------------- */
 static void
-vector_positions(const int dims[3] ,
-                 const int i       ,
-                 const int j       ,
+vector_positions(const long long dims[3] ,
+                 const long long i       ,
+                 const long long j       ,
                  size_t    start[4])
 /* ---------------------------------------------------------------------- */
 {
@@ -203,8 +203,8 @@ vector_positions(const int dims[3] ,
   faster than j, and Cartesian dimensions <dims>, find pointers to the
   (i-1, j-1, 0), (i-1, j, 0), (i, j-1, 0) and (i, j, 0) elements of
   field.  */
-static void igetvectors(const int dims[3], int i, int j,
-                        const int *field, const int *v[])
+static void igetvectors(const long long dims[3], long long i, long long j,
+                        const long long *field, const long long *v[])
 {
     size_t p, start[4];
 
@@ -221,7 +221,7 @@ static void igetvectors(const int dims[3], int i, int j,
   faster than j, and Cartesian dimensions <dims>, find pointers to the
   (i-1, j-1, 0), (i-1, j, 0), (i, j-1, 0) and (i, j, 0) elements of
   field.  */
-static void dgetvectors(const int dims[3], int i, int j,
+static void dgetvectors(const long long dims[3], long long i, long long j,
                         const double *field, const double *v[])
 {
     size_t p, start[4];
@@ -265,44 +265,44 @@ static void interpolate_pillar(const double *coord, double *pt)
   Assign point numbers p such that "zlist(p)==zcorn".  Assume that
   coordinate number is arranged in a sequence such that the natural
   index is (k,i,j) */
-int finduniquepoints(const struct grdecl *g,
+long long finduniquepoints(const struct grdecl *g,
                      /* return values: */
-                     int           *plist, /* list of point numbers on
+                     long long           *plist, /* list of point numbers on
                                             * each pillar*/
                      double tolerance,
                      struct processed_grid *out)
 
 {
 
-    const int nx = out->dimensions[0];
-    const int ny = out->dimensions[1];
-    const int nz = out->dimensions[2];
+    const long long nx = out->dimensions[0];
+    const long long ny = out->dimensions[1];
+    const long long nz = out->dimensions[2];
     const size_t nc = g->dims[0]*g->dims[1]*g->dims[2];
 
 
     /* zlist may need extra space temporarily due to simple boundary
      * treatement  */
-    int            npillarpoints = 8*(nx+1)*(ny+1)*nz;
-    int            npillars      = (nx+1)*(ny+1);
+    long long            npillarpoints = 8*(nx+1)*(ny+1)*nz;
+    long long            npillars      = (nx+1)*(ny+1);
 
     double *zlist = malloc(npillarpoints*sizeof *zlist);
-    int     *zptr = malloc((npillars+1)*sizeof *zptr);
+    long long     *zptr = malloc((npillars+1)*sizeof *zptr);
 
 
 
 
-    int     i,j,k;
+    long long     i,j,k;
 
-    int     d1[3];
-    int     len    = 0;
+    long long     d1[3];
+    long long     len    = 0;
     double  *zout  = zlist;
-    int     pos    = 0;
+    long long     pos    = 0;
     double *pt;
     const double *z[4];
-    const int *a[4];
-    int *p;
-    int pix, cix;
-    int zix;
+    const long long *a[4];
+    long long *p;
+    long long pix, cix;
+    long long zix;
 
     const double *coord = g->coord;
 

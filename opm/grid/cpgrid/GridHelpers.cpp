@@ -36,14 +36,14 @@ namespace UgGridHelpers
 #if HAVE_ECL_INPUT
 EclipseGrid createEclipseGrid(const Dune::CpGrid& grid, const EclipseGrid& inputGrid)
 {
-    const int * dims = cartDims( grid );
+    const long long * dims = cartDims( grid );
     if ((inputGrid.getNX( ) == static_cast<size_t>(dims[0])) &&
         (inputGrid.getNY( ) == static_cast<size_t>(dims[1])) &&
         (inputGrid.getNZ( ) == static_cast<size_t>(dims[2]))) {
 
-        std::vector<int> updatedACTNUM( inputGrid.getCartesianSize( ) , 0 );
-        const int* global_cell = UgGridHelpers::globalCell( grid );
-        for (int c = 0; c < numCells( grid ); c++) {
+        std::vector<long long> updatedACTNUM( inputGrid.getCartesianSize( ) , 0 );
+        const long long* global_cell = UgGridHelpers::globalCell( grid );
+        for (long long c = 0; c < numCells( grid ); c++) {
             updatedACTNUM[global_cell[c]] = 1;
         }
 
@@ -57,39 +57,39 @@ EclipseGrid createEclipseGrid(const Dune::CpGrid& grid, const EclipseGrid& input
 }
 #endif
 
-int numCells(const Dune::CpGrid& grid)
+long long numCells(const Dune::CpGrid& grid)
 {
     return grid.numCells();
 }
 
-int numFaces(const  Dune::CpGrid& grid)
+long long numFaces(const  Dune::CpGrid& grid)
 {
     return grid.numFaces();
 }
 
-int dimensions(const Dune::CpGrid&)
+long long dimensions(const Dune::CpGrid&)
 {
     return Dune::CpGrid::dimension;
 }
 
-int numCellFaces(const Dune::CpGrid& grid)
+long long numCellFaces(const Dune::CpGrid& grid)
 {
     return grid.numCellFaces();
 }
 
-const int* cartDims(const Dune::CpGrid& grid)
+const long long* cartDims(const Dune::CpGrid& grid)
 {
     return &(grid.logicalCartesianSize()[0]);
 }
 
-const int*  globalCell(const Dune::CpGrid& grid)
+const long long*  globalCell(const Dune::CpGrid& grid)
 {
     return &(grid.globalCell()[0]);
 }
 
 #if HAVE_ECL_INPUT
-std::vector<int> createACTNUM(const Dune::CpGrid& grid) {
-    const int* dims = cartDims(grid);
+std::vector<long long> createACTNUM(const Dune::CpGrid& grid) {
+    const long long* dims = cartDims(grid);
     return ActiveGridCells(dims[0], dims[1], dims[2], globalCell(grid), numCells(grid)).actNum();
 }
 #endif
@@ -100,13 +100,13 @@ beginCellCentroids(const Dune::CpGrid& grid)
     return CellCentroidTraits<Dune::CpGrid>::IteratorType(grid, 0);
 }
 
-double cellCentroidCoordinate(const Dune::CpGrid& grid, int cell_index,
-                              int coordinate)
+double cellCentroidCoordinate(const Dune::CpGrid& grid, long long cell_index,
+                              long long coordinate)
 {
     return grid.cellCentroid(cell_index)[coordinate];
 }
 
-double cellCenterDepth(const Dune::CpGrid& grid, int cell_index)
+double cellCenterDepth(const Dune::CpGrid& grid, long long cell_index)
 {
     // This method is an alternative to the method cellCentroidCoordinate(...).
     // The cell center depth is computed as a raw average of cell corner depths.
@@ -115,7 +115,7 @@ double cellCenterDepth(const Dune::CpGrid& grid, int cell_index)
     return grid.cellCenterDepth(cell_index);
 }
 
-Vector faceCenterEcl(const Dune::CpGrid& grid, int cell_index, int face_tag, const Dune::cpgrid::Intersection& intersection)
+Vector faceCenterEcl(const Dune::CpGrid& grid, long long cell_index, long long face_tag, const Dune::cpgrid::Intersection& intersection)
 {
     // This method is an alternative to the method faceCentroid(...) below.
     // The face center is computed as a raw average of cell corners.
@@ -125,7 +125,7 @@ Vector faceCenterEcl(const Dune::CpGrid& grid, int cell_index, int face_tag, con
 }
 
 
-Vector faceAreaNormalEcl(const Dune::CpGrid& grid, int face_index)
+Vector faceAreaNormalEcl(const Dune::CpGrid& grid, long long face_index)
 {
     // This method is an alternative to the method faceNormal(...) below.
     // The face Normal area is computed based on the face corners without introducing
@@ -141,12 +141,12 @@ beginFaceCentroids(const Dune::CpGrid& grid)
     return FaceCentroidTraits<Dune::CpGrid>::IteratorType(grid, 0);
 }
 
-const double* cellCentroid(const Dune::CpGrid& grid, int cell_index)
+const double* cellCentroid(const Dune::CpGrid& grid, long long cell_index)
 {
     return &(grid.cellCentroid(cell_index)[0]);
 }
 
-double cellVolume(const  Dune::CpGrid& grid, int cell_index)
+double cellVolume(const  Dune::CpGrid& grid, long long cell_index)
 {
     return grid.cellVolume(cell_index);
 }
@@ -162,7 +162,7 @@ CellVolumeIterator endCellVolumes(const Dune::CpGrid& grid)
 }
 
 const FaceCentroidTraits<Dune::CpGrid>::ValueType&
-faceCentroid(const Dune::CpGrid& grid, int face_index)
+faceCentroid(const Dune::CpGrid& grid, long long face_index)
 {
     return grid.faceCentroid(face_index);
 }
@@ -184,22 +184,22 @@ face2Vertices(const Dune::CpGrid& grid)
     return Dune::cpgrid::FaceVerticesContainerProxy(&grid);
 }
 
-const double* vertexCoordinates(const Dune::CpGrid& grid, int index)
+const double* vertexCoordinates(const Dune::CpGrid& grid, long long index)
 {
     return &(grid.vertexPosition(index)[0]);
 }
 
-const double* faceNormal(const Dune::CpGrid& grid, int face_index)
+const double* faceNormal(const Dune::CpGrid& grid, long long face_index)
 {
     return &(grid.faceNormal(face_index)[0]);
 }
 
-double faceArea(const Dune::CpGrid& grid, int face_index)
+double faceArea(const Dune::CpGrid& grid, long long face_index)
 {
     return grid.faceArea(face_index);
 }
 
-int faceTag(const Dune::CpGrid& grid,
+long long faceTag(const Dune::CpGrid& grid,
             const Dune::cpgrid::Cell2FacesRow::iterator& cell_face)
 {
     return grid.faceTag(cell_face);

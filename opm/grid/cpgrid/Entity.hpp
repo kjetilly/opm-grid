@@ -46,9 +46,9 @@
 
 // To be able to test local and global ids of vertices
 void refinePatch_and_check(Dune::CpGrid&,
-                           const std::vector<std::array<int,3>>&,
-                           const std::vector<std::array<int,3>>&,
-                           const std::vector<std::array<int,3>>&,
+                           const std::vector<std::array<long long,3>>&,
+                           const std::vector<std::array<long long,3>>&,
+                           const std::vector<std::array<long long,3>>&,
                            const std::vector<std::string>&);
 
 namespace Dune
@@ -56,8 +56,8 @@ namespace Dune
 namespace cpgrid
 {
 
-template<int,int> class Geometry;
-template<int,PartitionIteratorType> class Iterator;
+template<long long,long long> class Geometry;
+template<long long,PartitionIteratorType> class Iterator;
 class IntersectionIterator;
 class HierarchicIterator;
 class CpGridData;
@@ -66,7 +66,7 @@ class LevelGlobalIdSet;
 /// @brief
 /// @todo Doc me!
 /// @tparam
-template <int codim>
+template <long long codim>
 class Entity : public EntityRep<codim>
 {
     friend class LevelGlobalIdSet;
@@ -74,18 +74,18 @@ class Entity : public EntityRep<codim>
     friend class HierarchicIterator;
     friend class CpGridData;
     friend void ::refinePatch_and_check(Dune::CpGrid&,
-                                        const std::vector<std::array<int,3>>&,
-                                        const std::vector<std::array<int,3>>&,
-                                        const std::vector<std::array<int,3>>&,
+                                        const std::vector<std::array<long long,3>>&,
+                                        const std::vector<std::array<long long,3>>&,
+                                        const std::vector<std::array<long long,3>>&,
                                         const std::vector<std::string>&);
 
 public:
     /// @brief
     /// @todo Doc me!
-    static constexpr int codimension = codim;
-    static constexpr int dimension = 3;
-    static constexpr int mydimension = dimension - codimension;
-    static constexpr int dimensionworld = 3;
+    static constexpr long long codimension = codim;
+    static constexpr long long dimension = 3;
+    static constexpr long long mydimension = dimension - codimension;
+    static constexpr long long dimensionworld = 3;
 
     // the official DUNE names
     typedef Entity    EntitySeed;
@@ -93,7 +93,7 @@ public:
     /// @brief
     /// @todo Doc me!
     /// @tparam
-    template <int cd>
+    template <long long cd>
     struct Codim
     {
         typedef cpgrid::Entity<cd> Entity;
@@ -112,8 +112,8 @@ public:
     /// Constructor taking a grid and an integer entity representation.
     /// This constructor should probably be removed, since it exposes
     /// details of the implementation of \see EntityRep, see comment in
-    /// EntityRep<>::EntityRep(int).
-    //             Entity(const CpGridData& grid, int entityrep)
+    /// EntityRep<>::EntityRep(long long).
+    //             Entity(const CpGridData& grid, long long entityrep)
     //              : EntityRep<codim>(entityrep), pgrid_(&grid)
     //          {
     //          }
@@ -131,13 +131,13 @@ public:
     }
 
     /// Constructor taking a grid, entity index, and orientation.
-    Entity(const CpGridData& grid, int index_arg, bool orientation_arg)
+    Entity(const CpGridData& grid, long long index_arg, bool orientation_arg)
         : EntityRep<codim>(index_arg, orientation_arg), pgrid_(&grid)
     {
     }
 
     /// Constructor taking a entity index, and orientation.
-    Entity(int index_arg, bool orientation_arg)
+    Entity(long long index_arg, bool orientation_arg)
         : EntityRep<codim>(index_arg, orientation_arg), pgrid_()
     {
     }
@@ -166,7 +166,7 @@ public:
     const Geometry& geometry() const;
 
     /// @brief Return the level of the entity in the grid hierarchy. Level = 0 represents the coarsest grid.
-    int level() const;
+    long long level() const;
 
     /// @brief Check if the entity is in the leafview.
     ///
@@ -196,12 +196,12 @@ public:
     }
 
     /// @brief Return the number of all subentities of the entity of a given codimension cc.
-    unsigned int subEntities ( const unsigned int cc ) const;
+    size_t subEntities ( const size_t cc ) const;
 
     /// @brief Obtain subentity.
     ///        Example: If cc = 3 and i = 5, it returns the 5th corner/vertex of the entity.
-    template <int cc>
-    typename Codim<cc>::Entity subEntity(int i) const;
+    template <long long cc>
+    typename Codim<cc>::Entity subEntity(long long i) const;
 
     /// Start level-iterator for the cell-cell intersections of this entity.
     inline LevelIntersectionIterator ilevelbegin() const;
@@ -217,10 +217,10 @@ public:
 
 
     /// @brief Iterator begin over the children. [If requested, also over descendants more than one generation away.]
-    HierarchicIterator hbegin(int) const;
+    HierarchicIterator hbegin(long long) const;
 
     /// @brief Iterator end over the children/beyond last child iterator.
-    HierarchicIterator hend(int) const;
+    HierarchicIterator hend(long long) const;
 
     /// \brief Returns true, if the entity has been created during the last call to adapt(). Dummy.
     bool isNew() const;
@@ -292,7 +292,7 @@ public:
     Entity<0> getEquivLevelElem() const;
 
     /// \brief Get Cartesian Index in the level grid view where the Entity was born.
-    int getLevelCartesianIdx() const;
+    long long getLevelCartesianIdx() const;
 
 protected:
     const CpGridData* pgrid_;
@@ -309,28 +309,28 @@ namespace Dune
 {
 namespace cpgrid
 {
-template<int codim>
+template<long long codim>
 typename Entity<codim>::LevelIntersectionIterator Entity<codim>::ilevelbegin() const
 {
     static_assert(codim == 0, "");
     return LevelIntersectionIterator(*pgrid_, *this, false);
 }
 
-template<int codim>
+template<long long codim>
 typename Entity<codim>::LevelIntersectionIterator Entity<codim>::ilevelend() const
 {
     static_assert(codim == 0, "");
     return LevelIntersectionIterator(*pgrid_, *this, true);
 }
 
-template<int codim>
+template<long long codim>
 typename Entity<codim>::LeafIntersectionIterator Entity<codim>::ileafbegin() const
 {
     static_assert(codim == 0, "");
     return LeafIntersectionIterator(*pgrid_, *this, false);
 }
 
-template<int codim>
+template<long long codim>
 typename Entity<codim>::LeafIntersectionIterator Entity<codim>::ileafend() const
 {
     static_assert(codim == 0, "");
@@ -338,22 +338,22 @@ typename Entity<codim>::LeafIntersectionIterator Entity<codim>::ileafend() const
 }
 
 
-template<int codim>
-HierarchicIterator Entity<codim>::hbegin(int maxLevel) const
+template<long long codim>
+HierarchicIterator Entity<codim>::hbegin(long long maxLevel) const
 {
     // Creates iterator with first child as target if there is one. Otherwise empty stack and target.
     return HierarchicIterator(*this, maxLevel);
 }
 
 /// Dummy beyond last child iterator.
-template<int codim>
-HierarchicIterator Entity<codim>::hend(int maxLevel) const
+template<long long codim>
+HierarchicIterator Entity<codim>::hend(long long maxLevel) const
 {
     // Creates iterator with empty stack and target.
     return HierarchicIterator(maxLevel);
 }
 
-template <int codim>
+template <long long codim>
 PartitionType Entity<codim>::partitionType() const
 {
     return pgrid_->partition_type_indicator_->getPartitionType(*this);
@@ -368,8 +368,8 @@ PartitionType Entity<codim>::partitionType() const
 namespace Dune {
 namespace cpgrid {
 
-template<int codim>
-unsigned int Entity<codim>::subEntities ( const unsigned int cc ) const
+template<long long codim>
+size_t Entity<codim>::subEntities ( const size_t cc ) const
 {
     if (cc == codim) {
         return 1;
@@ -382,15 +382,15 @@ unsigned int Entity<codim>::subEntities ( const unsigned int cc ) const
     return 0;
 }
 
-template <int codim>
+template <long long codim>
 const typename Entity<codim>::Geometry& Entity<codim>::geometry() const
 {
     return pgrid_->geomVector<codim>()[*this];
 }
 
-template <int codim>
-template <int cc>
-typename Entity<codim>::template Codim<cc>::Entity Entity<codim>::subEntity(int i) const
+template <long long codim>
+template <long long cc>
+typename Entity<codim>::template Codim<cc>::Entity Entity<codim>::subEntity(long long i) const
 {
     static_assert(codim == 0, "");
     if (cc == 0) { // Cell/element/Entity<0>
@@ -399,7 +399,7 @@ typename Entity<codim>::template Codim<cc>::Entity Entity<codim>::subEntity(int 
         return se;
     } else if (cc == 3) { // Corner/Entity<3>
         assert(i >= 0 && i < 8);
-        int corner_index = pgrid_->cell_to_point_[this->index()][i];
+        long long corner_index = pgrid_->cell_to_point_[this->index()][i];
         typename Codim<cc>::Entity se(*pgrid_, corner_index, true);
         return se;
     }
@@ -409,7 +409,7 @@ typename Entity<codim>::template Codim<cc>::Entity Entity<codim>::subEntity(int 
     }
 }
 
-template <int codim>
+template <long long codim>
 bool Entity<codim>::hasBoundaryIntersections() const
 {
     // Copied implementation from EntityDefaultImplementation,
@@ -422,7 +422,7 @@ bool Entity<codim>::hasBoundaryIntersections() const
     return false;
 }
 
-template <int codim>
+template <long long codim>
 bool Entity<codim>::isValid() const
 {
     return pgrid_ ?  EntityRep<codim>::index() < pgrid_->size(codim) : false;
@@ -430,8 +430,8 @@ bool Entity<codim>::isValid() const
 
 
 // level() It simply returns the level of the entity in the grid hierarchy.
-template <int codim>
-int Entity<codim>::level() const
+template <long long codim>
+long long Entity<codim>::level() const
 {
     // Parallel and LGRs:
     // If the grid has been distributed and - after that - LGRs have been added, then level_data_ptr_
@@ -454,7 +454,7 @@ int Entity<codim>::level() const
 // isLeaf() returns true <-> the element is a leaf entity of the global refinement hierarchy. Equivalently,
 // it can be checked whether parent_to_children_cells_ is empty.
 
-template<int codim>
+template<long long codim>
 bool Entity<codim>::isLeaf() const
 {
     if (pgrid_ -> parent_to_children_cells_.empty()){ // LGR cells
@@ -465,7 +465,7 @@ bool Entity<codim>::isLeaf() const
     }
 }
 
-template<int codim>
+template<long long codim>
 bool Entity<codim>::isNew() const
 {
     // WIP
@@ -479,14 +479,14 @@ bool Entity<codim>::isNew() const
 }
 
 
-template<int codim>
+template<long long codim>
 bool Entity<codim>::mightVanish() const
 {
     const auto refinementMark = pgrid_ -> getMark(*this);
     return (refinementMark == 1);
 }
 
-template<int codim>
+template<long long codim>
 bool Entity<codim>::hasFather() const
 {
     if ((pgrid_ -> child_to_parent_cells_.empty()) || (pgrid_ -> child_to_parent_cells_[this->index()][0] == -1)){
@@ -497,12 +497,12 @@ bool Entity<codim>::hasFather() const
     }
 }
 
-template<int codim>
+template<long long codim>
 Entity<0> Entity<codim>::father() const
 {
     if (this->hasFather()){
-        const int& coarser_level = pgrid_ -> child_to_parent_cells_[this->index()][0];
-        const int& parent_cell_index = pgrid_ -> child_to_parent_cells_[this->index()][1];
+        const long long& coarser_level = pgrid_ -> child_to_parent_cells_[this->index()][0];
+        const long long& parent_cell_index = pgrid_ -> child_to_parent_cells_[this->index()][1];
         return Entity<0>( *((*(pgrid_ -> level_data_ptr_))[coarser_level].get()), parent_cell_index, true);
     }
     else{
@@ -510,7 +510,7 @@ Entity<0> Entity<codim>::father() const
     }
 }
 
-template<int codim>
+template<long long codim>
 Dune::cpgrid::Geometry<3,3> Dune::cpgrid::Entity<codim>::geometryInFather() const
 {
     if (!(this->hasFather())){
@@ -518,7 +518,7 @@ Dune::cpgrid::Geometry<3,3> Dune::cpgrid::Entity<codim>::geometryInFather() cons
     }
 
     // Indices of corners in entity's geometry in father reference element.
-    static constexpr std::array<int,8> in_father_reference_elem_corner_indices = {0,1,2,3,4,5,6,7};
+    static constexpr std::array<long long,8> in_father_reference_elem_corner_indices = {0,1,2,3,4,5,6,7};
     // 'static': The returned object Geometry<3,3> stores a pointer to in_father_reference_elem_corner_indices. Therefore,
     // this variable is declared static to prolongate its lifetime beyond this function (static storage duration).
 
@@ -535,8 +535,8 @@ Dune::cpgrid::Geometry<3,3> Dune::cpgrid::Entity<codim>::geometryInFather() cons
                                                         corners_in_father_reference_elem_temp + 8);
         // Compute the center of the 'local-entity'.
         Dune::FieldVector<double, 3> center_in_father_reference_elem = {0., 0.,0.};
-        for (int corn = 0; corn < 8; ++corn) {
-            for (int c = 0; c < 3; ++c)
+        for (long long corn = 0; corn < 8; ++corn) {
+            for (long long c = 0; c < 3; ++c)
             {
                 center_in_father_reference_elem[c] += corners_in_father_reference_elem_temp[corn][c]/8.;
             }
@@ -552,7 +552,7 @@ Dune::cpgrid::Geometry<3,3> Dune::cpgrid::Entity<codim>::geometryInFather() cons
     }
 }
 
-template<int codim>
+template<long long codim>
 Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getOrigin() const
 {
     if (hasFather())
@@ -561,8 +561,8 @@ Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getOrigin() const
     }
     if (!(pgrid_ -> leaf_to_level_cells_.empty())) // entity on the LeafGridView
     {  // leaf_to_level_cells_ [leaf idx] = { level where entity was born, cell idx in that level}
-        const int& levelElem = pgrid_->leaf_to_level_cells_[this->index()][0];
-        const int& levelElemIdx = pgrid_->leaf_to_level_cells_[this->index()][1];
+        const long long& levelElem = pgrid_->leaf_to_level_cells_[this->index()][0];
+        const long long& levelElemIdx = pgrid_->leaf_to_level_cells_[this->index()][1];
         return Dune::cpgrid::Entity<0>( *((*(pgrid_ -> level_data_ptr_))[levelElem].get()), levelElemIdx, true);
     }
     else
@@ -571,7 +571,7 @@ Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getOrigin() const
     }
 }
 
-template<int codim>
+template<long long codim>
 Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getLevelElem() const
 {
     // Check that the element belongs to the leaf grid view
@@ -579,7 +579,7 @@ Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getLevelElem() const
     // leaf_to_level_cells_ [leaf idx] = {level where the entity was born, equivalent cell idx in that level}
     if (!(pgrid_ -> leaf_to_level_cells_.empty())) // entity on the LeafGridView
     {
-        const int& entityLevelIdx = pgrid_->leaf_to_level_cells_[this->index()][1];
+        const long long& entityLevelIdx = pgrid_->leaf_to_level_cells_[this->index()][1];
         return Dune::cpgrid::Entity<0>( *((*(pgrid_ -> level_data_ptr_))[this->level()].get()), entityLevelIdx, true);
     }
     else {
@@ -587,7 +587,7 @@ Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getLevelElem() const
     }
 }
 
-template<int codim>
+template<long long codim>
 Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getEquivLevelElem() const
 {
     // Check if the element belongs to the leaf grid view
@@ -595,7 +595,7 @@ Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getEquivLevelElem() const
     // leaf_to_level_cells_ [leaf idx] = {level where the entity was born, equivalent cell idx in that level}
     if (!(pgrid_ -> leaf_to_level_cells_.empty())) // entity on the LeafGridView
     {
-        const int& entityLevelIdx = pgrid_->leaf_to_level_cells_[this->index()][1];
+        const long long& entityLevelIdx = pgrid_->leaf_to_level_cells_[this->index()][1];
         return Dune::cpgrid::Entity<0>( *((*(pgrid_ -> level_data_ptr_))[this->level()].get()), entityLevelIdx, true);
     }
     else {
@@ -603,8 +603,8 @@ Dune::cpgrid::Entity<0> Dune::cpgrid::Entity<codim>::getEquivLevelElem() const
     }
 }
 
-template<int codim>
-int Dune::cpgrid::Entity<codim>::getLevelCartesianIdx() const
+template<long long codim>
+long long Dune::cpgrid::Entity<codim>::getLevelCartesianIdx() const
 {
     const auto& level_data = (*(pgrid_ -> level_data_ptr_))[level()].get();
     // getLevelElem() throws when the entity does not belong to the leaf grid view.

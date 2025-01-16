@@ -71,13 +71,13 @@ BOOST_AUTO_TEST_CASE(entity_rep)
     BOOST_CHECK(!(e1 == e2));
     BOOST_CHECK(e1 != e2);
     BOOST_CHECK(!(e1 != e1));
-    BOOST_CHECK_EQUAL(sizeof e1, sizeof(int));
+    BOOST_CHECK_EQUAL(sizeof e1, sizeof(long long));
 }
 
 BOOST_AUTO_TEST_CASE(entity_variable)
 {
     // EntityVariableBase tests
-    const int sz = 2;
+    const long long sz = 2;
     const double array[sz] = { 2.71828, 3.1415};
     cpgrid::EntityVariableBase<double> base;
     BOOST_CHECK(base.empty());

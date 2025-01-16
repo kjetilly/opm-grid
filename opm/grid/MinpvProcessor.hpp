@@ -37,9 +37,9 @@ namespace Opm
 
         struct Result {
             std::vector<std::size_t> removed_cells;
-            std::map<int,int> nnc;
+            std::map<long long,long long> nnc;
 
-            void add_nnc(int cell1, int cell2);
+            void add_nnc(long long cell1, long long cell2);
         };
 
 
@@ -47,7 +47,7 @@ namespace Opm
         /// \param[in]   nx   logical cartesian number of cells in I-direction
         /// \param[in]   ny   logical cartesian number of cells in J-direction
         /// \param[in]   nz   logical cartesian number of cells in K-direction
-        MinpvProcessor(const int nx, const int ny, const int nz);
+        MinpvProcessor(const long long nx, const long long ny, const long long nz);
         /// Change zcorn so that it respects the minpv property.
         /// \param[in]       thickness thickness of the cell
         /// \param[in]       z_tolerance cells with thickness below z_tolerance will be bypassed in the minpv process.
@@ -74,25 +74,25 @@ namespace Opm
                        const double max_gap,
                        const std::vector<double>& pv,
                        const std::vector<double>& minpvv,
-                       const std::vector<int>& actnum,
+                       const std::vector<long long>& actnum,
                        const bool mergeMinPVCells,
                        double* zcorn,
                        const bool pinchNOGAP = false,
                        const bool pinchOption4ALL = false,
                        const std::vector<double>& permz = {},
-                       const std::function<double(int)>& multZ = [](int){ return 0;},
+                       const std::function<double(long long)>& multZ = [](long long){ return 0;},
                        const double tolerance_unique_points = 0) const;
     private:
         double computeGap(const std::array<double,8>& coord_above, const std::array<double,8>& coord_below) const;
-        std::array<int,8> cornerIndices(const int i, const int j, const int k) const;
+        std::array<long long,8> cornerIndices(const long long i, const long long j, const long long k) const;
         // Returns the eight z-values associated with a given cell.
         // The ordering is such that i runs fastest. That is, with
         // L = low and H = high:
         // {LLL, HLL, LHL, HHL, LLH, HLH, LHH, HHH }.
-        std::array<double, 8> getCellZcorn(const int i, const int j, const int k, const double* z) const;
-        void setCellZcorn(const int i, const int j, const int k, const std::array<double, 8>& cellz, double* z) const;
-        std::array<int, 3> dims_;
-        std::array<int, 3> delta_;
+        std::array<double, 8> getCellZcorn(const long long i, const long long j, const long long k, const double* z) const;
+        void setCellZcorn(const long long i, const long long j, const long long k, const std::array<double, 8>& cellz, double* z) const;
+        std::array<long long, 3> dims_;
+        std::array<long long, 3> delta_;
     };
 
 } // namespace Opm

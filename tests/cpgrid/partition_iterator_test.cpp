@@ -16,7 +16,7 @@
 
 #endif
 
-template<int codim>
+template<long long codim>
 void testPartitionIteratorsBasic(const Dune::CpGrid& grid, bool parallel)
 {
     BOOST_REQUIRE((grid.leafbegin<codim,Dune::OverlapFront_Partition>()==
@@ -37,7 +37,7 @@ void testPartitionIteratorsBasic(const Dune::CpGrid& grid, bool parallel)
 
 }
 
-template<int codim>
+template<long long codim>
 void testPartitionIteratorsOnSequentialGrid(const Dune::CpGrid& grid)
 {
     typedef typename Dune::CpGrid::Traits::template Codim<codim>::template Partition<Dune::Interior_Partition>::LeafIterator ILeafIterator;
@@ -61,14 +61,14 @@ void testPartitionIteratorsOnSequentialGrid(const Dune::CpGrid& grid)
 
 BOOST_AUTO_TEST_CASE(partitionIteratorTest)
 {
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     Dune::MPIHelper& helper = Dune::MPIHelper::instance(m_argc, m_argv);
 
     if(helper.rank()==0)
     {
         Dune::CpGrid grid;
-        std::array<int, 3> dims={{2, 2, 2}};
+        std::array<long long, 3> dims={{2, 2, 2}};
         std::array<double, 3> size={{ 1.0, 1.0, 1.0}};
 
         grid.createCartesian(dims, size);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(partitionIteratorTest)
 
     bool parallel =helper.size()>1;
     Dune::CpGrid grid;
-    std::array<int, 3> dims={{10, 10, 10}};
+    std::array<long long, 3> dims={{10, 10, 10}};
     std::array<double, 3> size={{ 1.0, 1.0, 1.0}};
 
     grid.createCartesian(dims, size);
@@ -109,7 +109,7 @@ init_unit_test_func()
     return true;
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     boost::unit_test::unit_test_main(&init_unit_test_func, argc, argv);

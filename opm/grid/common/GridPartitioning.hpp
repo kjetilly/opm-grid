@@ -56,7 +56,7 @@ namespace Dune
 
     struct OrderByFirst
     {
-        bool operator()(const std::pair<int,int>& o, const std::pair<int,int>& v)
+        bool operator()(const std::pair<long long,long long>& o, const std::pair<long long,long long>& v)
         {
             return o.first < v.first;
         }
@@ -71,9 +71,9 @@ namespace Dune
     ///                      because of splits to ensure connectedness.
     /// @param[out] cell_part a vector containing, for each cell, its partition number
     void partition(const CpGrid& grid,
-                   const std::array<int, 3>& initial_split,
-                   int& num_part,
-                   std::vector<int>& cell_part,
+                   const std::array<long long, 3>& initial_split,
+                   long long& num_part,
+                   std::vector<long long>& cell_part,
                    bool recursive = false,
                    bool ensureConnectivity = true);
 
@@ -86,9 +86,9 @@ namespace Dune
     /// \param[in] all Whether to compute the overlap for all partions or just the
     ///            one associated by mypart.
     void addOverlapLayer(const CpGrid& grid,
-                         const std::vector<int>& cell_part,
-                         std::vector<std::set<int> >& cell_overlap,
-                         int mypart, int overlapLayers, bool all=false);
+                         const std::vector<long long>& cell_part,
+                         std::vector<std::set<long long> >& cell_overlap,
+                         long long mypart, long long overlapLayers, bool all=false);
 
     /// \brief Adds a layer of overlap cells to a partitioning.
     /// \param[in] grid The grid that is partitioned.
@@ -102,11 +102,11 @@ namespace Dune
     /// \param[in] addCornerCells Switch for adding corner cells to overlap layer.
     /// \param[in] trans The transmissibilities on cell faces. When trans[i]==0, no overlap is added.
     /// \param[in] layer Number of overlap layers
-    int addOverlapLayer(const CpGrid& grid, const std::vector<int>& cell_part,
-                        std::vector<std::tuple<int,int,char>>& exportList,
-                        std::vector<std::tuple<int,int,char,int>>& importList,
+    long long addOverlapLayer(const CpGrid& grid, const std::vector<long long>& cell_part,
+                        std::vector<std::tuple<long long,long long,char>>& exportList,
+                        std::vector<std::tuple<long long,long long,char,long long>>& importList,
                         const Communication<Dune::MPIHelper::MPICommunicator>& cc,
-                        bool addCornerCells, const double* trans, int layers = 1);
+                        bool addCornerCells, const double* trans, long long layers = 1);
 
 namespace cpgrid
 {
@@ -132,13 +132,13 @@ namespace cpgrid
     ///         here), and a WellConnections object containing information about the well connections
     ///         (if argument wells was not null and this is the root rank this will contain connections in
     ///          form of global indices)
-    std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-               std::vector<std::tuple<int,int,char> >,
-               std::vector<std::tuple<int,int,char,int> >,
+    std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+               std::vector<std::tuple<long long,long long,char> >,
+               std::vector<std::tuple<long long,long long,char,long long> >,
                WellConnections>
     createListsFromParts(const CpGrid& grid, const std::vector<cpgrid::OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
-                               const double* transmissibilities, const std::vector<int>& parts,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
+                               const double* transmissibilities, const std::vector<long long>& parts,
                                bool allowDistributedWells, std::shared_ptr<cpgrid::CombinedGridWellGraph> gridAndWells = nullptr);
 
     /// \brief Creates a vanilla partitioning without a real loadbalancer
@@ -161,13 +161,13 @@ namespace cpgrid
     ///         here), and a WellConnections object containing information about the well connections
     ///         (if argument wells was not null and this is the root rank this will contain connections in
     ///          form of global indices)
-    std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-               std::vector<std::tuple<int,int,char> >,
-               std::vector<std::tuple<int,int,char,int> >,
+    std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+               std::vector<std::tuple<long long,long long,char> >,
+               std::vector<std::tuple<long long,long long,char,long long> >,
                WellConnections>
     vanillaPartitionGridOnRoot(const CpGrid& grid,
                                const std::vector<cpgrid::OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                const double* transmissibilities,
                                bool allowDistributedWells);
 #endif

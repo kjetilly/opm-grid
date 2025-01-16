@@ -16,16 +16,16 @@
 class MPIError {
 public:
   /** @brief Constructor. */
-  MPIError(std::string s, int e) : errorstring(s), errorcode(e){}
+  MPIError(std::string s, long long e) : errorstring(s), errorcode(e){}
   /** @brief The error string. */
   std::string errorstring;
   /** @brief The mpi error code. */
-  int errorcode;
+  long long errorcode;
 };
 
-void MPI_err_handler(MPI_Comm *, int *err_code, ...){
+void MPI_err_handler(MPI_Comm *, long long *err_code, ...){
   char *err_string=new char[MPI_MAX_ERROR_STRING];
-  int err_length;
+  long long err_length;
   MPI_Error_string(*err_code, err_string, &err_length);
   std::string s(err_string, err_length);
   std::cerr << "An MPI Error ocurred:"<<std::endl<<s<<std::endl;

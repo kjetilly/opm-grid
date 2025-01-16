@@ -40,12 +40,12 @@ BOOST_AUTO_TEST_SUITE (CartGrid)
 
 BOOST_AUTO_TEST_CASE (facenumbers)
 {
-    int faces[] = { 0, 6, 1, 8,
+    long long faces[] = { 0, 6, 1, 8,
                     1, 7, 2, 9,
                     3, 8, 4, 10,
                     4, 9, 5, 11 };
     struct UnstructuredGrid *g = create_grid_cart2d(2, 2, 1., 1.);
-    int i;
+    long long i;
     unsigned k;
     for (i = 0; i < g->number_of_cells; ++i) {
         for (k = g->cell_facepos[i]; k < g->cell_facepos[i + 1]; ++k) {

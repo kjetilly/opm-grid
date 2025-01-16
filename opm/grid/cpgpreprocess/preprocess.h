@@ -54,10 +54,10 @@ extern "C" {
      * Raw corner-point specification of a particular geological model.
      */
     struct grdecl {
-        int           dims[3]; /**< Cartesian box dimensions. */
+        long long           dims[3]; /**< Cartesian box dimensions. */
         const double *coord;   /**< Pillar end-points. */
         const double *zcorn;   /**< Corner-point depths. */
-        const int    *actnum;  /**< Explicit "active" map.  May be NULL.*/
+        const long long    *actnum;  /**< Explicit "active" map.  May be NULL.*/
     };
 
     /**
@@ -76,33 +76,33 @@ extern "C" {
      * a geological model in corner-point format.
      */
     struct processed_grid {
-        int m; /**< Upper bound on "number_of_faces".  For internal use in
+        long long m; /**< Upper bound on "number_of_faces".  For internal use in
                     function process_grid()'s memory management. */
-        int n; /**< Upper bound on "number_of_nodes".  For internal use in
+        long long n; /**< Upper bound on "number_of_nodes".  For internal use in
                     function process_grid()'s memory management. */
 
-        int    dimensions[3];     /**< Cartesian box dimensions. */
+        long long    dimensions[3];     /**< Cartesian box dimensions. */
 
         unsigned number_of_faces;   /**< Total number of unique grid faces
                                        (i.e., connections). */
-        int    *face_nodes;       /**< Node (vertex) numbers of each face,
+        long long    *face_nodes;       /**< Node (vertex) numbers of each face,
                                        stored sequentially. */
-        unsigned int    *face_ptr;         /**< Start position for each face's
+        size_t    *face_ptr;         /**< Start position for each face's
                                        `face_nodes'. */
-        int    *face_neighbors;   /**< Global cell numbers.  Two elements per
+        long long    *face_neighbors;   /**< Global cell numbers.  Two elements per
                                        face, stored sequentially. */
         enum face_tag *face_tag;  /**< Classification of grid's individual
                                        connections (faces). */
 
-        int    number_of_nodes;   /**< Number of unique grid vertices. */
-        int    number_of_nodes_on_pillars; /**< Total number of unique cell
+        long long    number_of_nodes;   /**< Number of unique grid vertices. */
+        long long    number_of_nodes_on_pillars; /**< Total number of unique cell
                                                 vertices that lie on pillars. */
         double *node_coordinates; /**< Vertex coordinates.  Three doubles
                                        (\f$x\f$, \f$y\f$, \f$z\f$) per vertex,
                                        stored sequentially. */
 
-        int    number_of_cells;   /**< Number of active grid cells. */
-        int    *local_cell_index; /**< Deceptively named local-to-global cell
+        long long    number_of_cells;   /**< Number of active grid cells. */
+        long long    *local_cell_index; /**< Deceptively named local-to-global cell
                                        index mapping. */
     };
 
@@ -131,11 +131,11 @@ extern "C" {
      * @return One (1, true) if grid successfully generated, zero (0, false)
      * otherwise.
      */
-    int process_grdecl(const struct grdecl   *g,
+    long long process_grdecl(const struct grdecl   *g,
                        double                 tol,
-                       const int             *is_aquifer_cell,
+                       const long long             *is_aquifer_cell,
                        struct processed_grid *out,
-                       int                    pinchActive);
+                       long long                    pinchActive);
 
     /**
      * Release memory resources acquired in previous grid processing using

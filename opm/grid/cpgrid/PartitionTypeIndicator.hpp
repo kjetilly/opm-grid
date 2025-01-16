@@ -43,8 +43,8 @@ namespace Dune
 namespace cpgrid
 {
 class CpGridData;
-template<int> class Entity;
-template<int> class EntityRep;
+template<long long> class Entity;
+template<long long> class EntityRep;
 
 class PartitionTypeIndicator
 {
@@ -73,12 +73,12 @@ private:
     /// Get the partition type of a face by its index
     /// \param i The index of the face.
     /// \return The partition type of the face associated with this index.
-    PartitionType getFacePartitionType(int i) const;
+    PartitionType getFacePartitionType(long long i) const;
 
     /// Get the partition type of a face by its index
     /// \param i The index of the face.
     /// \return The partition type of the face associated with this index.
-    PartitionType getPointPartitionType(int i) const;
+    PartitionType getPointPartitionType(long long i) const;
 
     /// The data of the grid.
     const CpGridData* grid_data_;

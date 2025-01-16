@@ -63,15 +63,15 @@ public:
     {
         explicit Vector(const double* source)
         {
-            for (int i = 0; i < dimension; ++i) {
+            for (long long i = 0; i < dimension; ++i) {
                 data[i] = source[i];
             }
         }
-        double& operator[] (const int ix)
+        double& operator[] (const long long ix)
         {
             return data[ix];
         }
-        double operator[] (const int ix) const
+        double operator[] (const long long ix) const
         {
             return data[ix];
         }
@@ -79,69 +79,69 @@ public:
     };
 
     // Topology
-    int numCells() const
+    long long numCells() const
     {
         return g_.number_of_cells;
     }
-    int numFaces() const
+    long long numFaces() const
     {
         return g_.number_of_faces;
     }
-    int numVertices() const
+    long long numVertices() const
     {
         return g_.number_of_nodes;
     }
 
-    int numCellFaces(int cell) const
+    long long numCellFaces(long long cell) const
     {
         return cell_facepos_[cell + 1] - cell_facepos_[cell];
     }
-    int cellFace(int cell, int local_index) const
+    long long cellFace(long long cell, long long local_index) const
     {
         return cell_faces_[cell_facepos_[cell] + local_index];
     }
-    int faceCell(int face, int local_index) const
+    long long faceCell(long long face, long long local_index) const
     {
         return face_cells_[2*face + local_index];
     }
-    int numFaceVertices(int face) const
+    long long numFaceVertices(long long face) const
     {
         return face_nodepos_[face + 1] - face_nodepos_[face];
     }
-    int faceVertex(int face, int local_index) const
+    long long faceVertex(long long face, long long local_index) const
     {
         return face_nodes_[face_nodepos_[face] + local_index];
     }
 
     // Geometry
-    Vector vertexPosition(int vertex) const
+    Vector vertexPosition(long long vertex) const
     {
         return Vector(&node_coordinates_[g_.dimensions*vertex]);
     }
-    double faceArea(int face) const
+    double faceArea(long long face) const
     {
         return face_areas_[face];
     }
-    Vector faceCentroid(int face) const
+    Vector faceCentroid(long long face) const
     {
         return Vector(&face_centroids_[g_.dimensions*face]);
     }
-    Vector faceNormal(int face) const
+    Vector faceNormal(long long face) const
     {
         Vector fn(&face_normals_[g_.dimensions*face]);
         // We must renormalize since the stored normals are
         // 'unit normal * face area'.
         double invfa = 1.0 / faceArea(face);
-        for (int i = 0; i < dimension; ++i) {
+        for (long long i = 0; i < dimension; ++i) {
             fn[i] *= invfa;
         }
         return fn;
     }
-    double cellVolume(int cell) const
+    double cellVolume(long long cell) const
     {
         return cell_volumes_[cell];
     }
-    Vector cellCentroid(int cell) const
+    Vector cellCentroid(long long cell) const
     {
         return Vector(&cell_centroids_[g_.dimensions*cell]);
     }
@@ -162,11 +162,11 @@ public:
     }
     // make a grid which looks periodic but do not have 2 half faces for each
     // periodic boundary
-    void makeQPeriodic(const std::vector<int>& hf_ind,const std::vector<int>& periodic_cells){
-            for(int i=0; i<int(hf_ind.size());++i){
-                    //std::array<int,2> cells;
-                    int& cell0=face_cells_[2*cell_faces_[ hf_ind[i] ]+0];
-                    int& cell1=face_cells_[2*cell_faces_[ hf_ind[i] ]+1];
+    void makeQPeriodic(const std::vector<long long>& hf_ind,const std::vector<long long>& periodic_cells){
+            for(long long i=0; i<(long long)(hf_ind.size());++i){
+                    //std::array<long long,2> cells;
+                    long long& cell0=face_cells_[2*cell_faces_[ hf_ind[i] ]+0];
+                    long long& cell1=face_cells_[2*cell_faces_[ hf_ind[i] ]+1];
                     assert(periodic_cells[2*i+1]>=0);
                     if(periodic_cells[2*i+0] == cell0){
                             assert(cell1==-1);
@@ -181,10 +181,10 @@ public:
 private:
     UnstructuredGrid g_;
     // Topology storage.
-    std::vector<int> face_nodes_;
+    std::vector<long long> face_nodes_;
     std::vector<unsigned> face_nodepos_;
-    std::vector<int> face_cells_;
-    std::vector<int> cell_faces_;
+    std::vector<long long> face_cells_;
+    std::vector<long long> cell_faces_;
     std::vector<unsigned> cell_facepos_;
     // Geometry storage.
     std::vector<double> node_coordinates_;
@@ -194,23 +194,23 @@ private:
     std::vector<double> cell_centroids_;
     std::vector<double> cell_volumes_;
     // The global cell information
-    std::vector<int> global_cell_;
+    std::vector<long long> global_cell_;
     /// Build (copy of) global cell from grid
     void buildGlobalCell(const Dune::CpGrid& grid)
     {
         bool all_active=true;
-        int old_cell=-1;
+        long long old_cell=-1;
         global_cell_.resize(grid.numCells());
-        for(int c=0; c<grid.numCells(); ++c)
+        for(long long c=0; c<grid.numCells(); ++c)
         {
-            int new_cell=global_cell_[c]=grid.globalCell()[c];
+            long long new_cell=global_cell_[c]=grid.globalCell()[c];
             all_active = all_active && (new_cell==old_cell+1);
             old_cell=new_cell;
         }
         if(all_active){
             g_.global_cell=0;
             // really release memory
-            std::vector<int>().swap(global_cell_);
+            std::vector<long long>().swap(global_cell_);
         }
         else
             g_.global_cell=&(global_cell_[0]);
@@ -224,7 +224,7 @@ private:
     /// Copy the cart dims from grid.
     void copyCartDims(const Dune::CpGrid& grid)
     {
-        for(int i=0; i<3; ++i)
+        for(long long i=0; i<3; ++i)
             g_.cartdims[i] = grid.logicalCartesianSize()[i];
     }
     /// Copy the cart dims from grid.
@@ -236,38 +236,38 @@ private:
     void buildTopology(const Grid& grid)
     {
         // Face topology.
-        int num_cells = grid.numCells();
-        int num_faces = grid.numFaces();
+        long long num_cells = grid.numCells();
+        long long num_faces = grid.numFaces();
         face_nodepos_.resize(num_faces + 1);
-        int facenodecount = 0;
-        for (int f = 0; f < num_faces; ++f) {
+        long long facenodecount = 0;
+        for (long long f = 0; f < num_faces; ++f) {
             face_nodepos_[f] = facenodecount;
             facenodecount += grid.numFaceVertices(f);
         }
         face_nodepos_.back() = facenodecount;
         face_nodes_.resize(facenodecount);
-        for (int f = 0; f < num_faces; ++f) {
-            for (int local = 0; local < grid.numFaceVertices(f); ++local) {
+        for (long long f = 0; f < num_faces; ++f) {
+            for (long long local = 0; local < grid.numFaceVertices(f); ++local) {
                 face_nodes_[face_nodepos_[f] + local] = grid.faceVertex(f, local);
             }
         }
         face_cells_.resize(2*num_faces);
-        for (int f = 0; f < num_faces; ++f) {
+        for (long long f = 0; f < num_faces; ++f) {
             face_cells_[2*f] = grid.faceCell(f, 0);
             face_cells_[2*f + 1] = grid.faceCell(f, 1);
         }
 
         // Cell topology.
-        int cellfacecount = 0;
+        long long cellfacecount = 0;
         cell_facepos_.resize(num_cells + 1);
-        for (int c = 0; c < num_cells; ++c) {
+        for (long long c = 0; c < num_cells; ++c) {
             cell_facepos_[c] = cellfacecount;
             cellfacecount += grid.numCellFaces(c);
         }
         cell_facepos_.back() = cellfacecount;
         cell_faces_.resize(cellfacecount);
-        for (int c = 0; c < num_cells; ++c) {
-            for (int local = 0; local < grid.numCellFaces(c); ++local) {
+        for (long long c = 0; c < num_cells; ++c) {
+            for (long long local = 0; local < grid.numCellFaces(c); ++local) {
                 cell_faces_[cell_facepos_[c] + local] = grid.cellFace(c, local);
             }
         }
@@ -291,13 +291,13 @@ private:
     void buildGeometry(const Grid& grid)
     {
         // Node geometry.
-        int num_cells = grid.numCells();
-        int num_nodes = grid.numVertices();
-        int num_faces = grid.numFaces();
-        int dim = Grid::dimension;
+        long long num_cells = grid.numCells();
+        long long num_nodes = grid.numVertices();
+        long long num_faces = grid.numFaces();
+        long long dim = Grid::dimension;
         node_coordinates_.resize(dim*num_nodes);
-        for (int n = 0; n < num_nodes; ++n) {
-            for (int dd = 0; dd < dim; ++dd) {
+        for (long long n = 0; n < num_nodes; ++n) {
+            for (long long dd = 0; dd < dim; ++dd) {
                 node_coordinates_[dim*n + dd] = grid.vertexPosition(n)[dd];
             }
         }
@@ -306,9 +306,9 @@ private:
         face_centroids_.resize(dim*num_faces);
         face_areas_.resize(num_faces);
         face_normals_.resize(dim*num_faces);
-        for (int f = 0; f < num_faces; ++f) {
+        for (long long f = 0; f < num_faces; ++f) {
             face_areas_[f] = grid.faceArea(f);
-            for (int dd = 0; dd < dim; ++dd) {
+            for (long long dd = 0; dd < dim; ++dd) {
                 face_centroids_[dim*f + dd] = grid.faceCentroid(f)[dd];
                 face_normals_[dim*f + dd] = grid.faceNormal(f)[dd]*face_areas_[f];
             }
@@ -317,9 +317,9 @@ private:
         // Cell geometry.
         cell_centroids_.resize(dim*num_cells);
         cell_volumes_.resize(num_cells);
-        for (int c = 0; c < num_cells; ++c) {
+        for (long long c = 0; c < num_cells; ++c) {
             cell_volumes_[c] = grid.cellVolume(c);
-            for (int dd = 0; dd < dim; ++dd) {
+            for (long long dd = 0; dd < dim; ++dd) {
                 cell_centroids_[dim*c + dd] = grid.cellCentroid(c)[dd];
             }
         }

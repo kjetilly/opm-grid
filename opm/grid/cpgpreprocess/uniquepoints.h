@@ -35,8 +35,8 @@
 #ifndef OPM_UNIQUEPOINTS_HEADER
 #define OPM_UNIQUEPOINTS_HEADER
 
-int finduniquepoints(const struct grdecl *g,  /* input */
-                     int                 *p,  /* for each z0 in zcorn, z0 = z[p0] */
+long long finduniquepoints(const struct grdecl *g,  /* input */
+                     long long                 *p,  /* for each z0 in zcorn, z0 = z[p0] */
                      double               t,  /* tolerance*/
                      struct processed_grid *out);
 

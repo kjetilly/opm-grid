@@ -55,7 +55,7 @@ namespace Opm
 
         /// Calculates the volume of the parallelepiped given by
         /// the vectors n[i] for i = 0..(dim-1), each n[i] is of size dim.
-        double cornerVolume(double** n, const int dim)
+        double cornerVolume(double** n, const long long dim)
         {
             assert(dim == 2 || dim == 3);
             double det = (dim == 2) ? determinantOf(n[0], n[1]) : determinantOf(n[0], n[1], n[2]);
@@ -98,42 +98,42 @@ namespace Opm
         : grid_(grid)
     {
         enum { Maxdim = 3 };
-        const int dim = grid.dimensions;
+        const long long dim = grid.dimensions;
         if (dim > Maxdim) {
             OPM_THROW(std::runtime_error,
                       "Grid has more than " +
                       std::to_string(Maxdim) + " dimensions.");
         }
         // Compute static data for each corner.
-        const int num_cells = grid.number_of_cells;
-        int corner_id_count = 0;
-        for (int cell = 0; cell < num_cells; ++cell) {
-            std::set<int> cell_vertices;
-            std::vector<int> cell_faces;
-            std::multimap<int, int> vertex_adj_faces;
+        const long long num_cells = grid.number_of_cells;
+        long long corner_id_count = 0;
+        for (long long cell = 0; cell < num_cells; ++cell) {
+            std::set<long long> cell_vertices;
+            std::vector<long long> cell_faces;
+            std::multimap<long long, long long> vertex_adj_faces;
             for (unsigned hface = grid.cell_facepos[cell]; hface < grid.cell_facepos[cell + 1]; ++hface) {
-                const int face = grid.cell_faces[hface];
+                const long long face = grid.cell_faces[hface];
                 cell_faces.push_back(face);
-                const int fn0 = grid.face_nodepos[face];
-                const int fn1 = grid.face_nodepos[face + 1];
+                const long long fn0 = grid.face_nodepos[face];
+                const long long fn1 = grid.face_nodepos[face + 1];
                 cell_vertices.insert(grid.face_nodes + fn0, grid.face_nodes + fn1);
-                for (int fn = fn0; fn < fn1; ++fn) {
-                    const int vertex = grid.face_nodes[fn];
+                for (long long fn = fn0; fn < fn1; ++fn) {
+                    const long long vertex = grid.face_nodes[fn];
                     vertex_adj_faces.insert(std::make_pair(vertex, face));
                 }
             }
             std::sort(cell_faces.begin(), cell_faces.end()); // set_difference requires sorted ranges
             std::vector<CornerInfo> cell_corner_info;
-            std::set<int>::const_iterator it = cell_vertices.begin();
+            std::set<long long>::const_iterator it = cell_vertices.begin();
             for (; it != cell_vertices.end(); ++it) {
                 CornerInfo ci;
                 ci.corner_id = corner_id_count++;;
                 ci.vertex = *it;
                 double* fnorm[Maxdim] = { 0 };
-                typedef std::multimap<int, int>::const_iterator MMIt;
+                typedef std::multimap<long long, long long>::const_iterator MMIt;
                 std::pair<MMIt, MMIt> frange = vertex_adj_faces.equal_range(ci.vertex);
-                int fi = 0;
-                std::vector<int> vert_adj_faces(dim);
+                long long fi = 0;
+                std::vector<long long> vert_adj_faces(dim);
                 for (MMIt face_it = frange.first; face_it != frange.second; ++face_it, ++fi) {
                     if (fi >= dim) {
                         OPM_THROW(std::runtime_error,
@@ -151,7 +151,7 @@ namespace Opm
                 ci.volume = corner_vol;
                 cell_corner_info.push_back(ci);
                 std::sort(vert_adj_faces.begin(), vert_adj_faces.end());
-                std::vector<int> vert_nonadj_faces(cell_faces.size() - vert_adj_faces.size());
+                std::vector<long long> vert_nonadj_faces(cell_faces.size() - vert_adj_faces.size());
                 std::set_difference(cell_faces.begin(), cell_faces.end(),
                                     vert_adj_faces.begin(), vert_adj_faces.end(),
                                     vert_nonadj_faces.begin());
@@ -168,7 +168,7 @@ namespace Opm
     /// Count of vertices adjacent to a call.
     /// \param[in]  cell   A cell index.
     /// \return            Number of corners of cell.
-    int WachspressCoord::numCorners(const int cell) const
+    long long WachspressCoord::numCorners(const long long cell) const
     {
         return corner_info_[cell].size();
     }
@@ -185,7 +185,7 @@ namespace Opm
 
     /// The class stores some info for each corner.
     /// \return            The corner info container.
-    const std::vector<int>& WachspressCoord::adjacentFaces() const
+    const std::vector<long long>& WachspressCoord::adjacentFaces() const
     {
         return adj_faces_;
     }
@@ -199,7 +199,7 @@ namespace Opm
     ///                    Must be array of length grid.dimensions.
     /// \param[out] xb     Coordinates of point in barycentric coordinates.
     ///                    Must be array of length numCorners(cell).
-    void WachspressCoord::cartToBary(const int cell,
+    void WachspressCoord::cartToBary(const long long cell,
                                      const double* x,
                                      double* xb) const
     {
@@ -207,21 +207,21 @@ namespace Opm
         // A possible optimization is: compute all n_j * (c_j - x) factors
         // once, instead of repeating computation for all corners (for
         // which j is a nonadjacent face).
-        const int n = numCorners(cell);
-        const int dim = grid_.dimensions;
+        const long long n = numCorners(cell);
+        const long long dim = grid_.dimensions;
         double totw = 0.0;
-        for (int i = 0; i < n; ++i) {
+        for (long long i = 0; i < n; ++i) {
             const CornerInfo& ci = corner_info_[cell][i];
             // Weight (unnormalized) is equal to:
             // V_i * (prod_{j \in nonadjacent faces} n_j * (c_j - x) )
             // ^^^                                   ^^^    ^^^
             // corner "volume"                    normal    centroid
             xb[i] = ci.volume;
-            const int num_nonadj_faces = nonadj_faces_[ci.corner_id].size();
-            for (int j = 0; j < num_nonadj_faces; ++j) {
-                const int face = nonadj_faces_[ci.corner_id][j];
+            const long long num_nonadj_faces = nonadj_faces_[ci.corner_id].size();
+            for (long long j = 0; j < num_nonadj_faces; ++j) {
+                const long long face = nonadj_faces_[ci.corner_id][j];
                 double factor = 0.0;
-                for (int dd = 0; dd < dim; ++dd) {
+                for (long long dd = 0; dd < dim; ++dd) {
                     factor += grid_.face_normals[dim*face + dd]*(grid_.face_centroids[dim*face + dd] - x[dd]);
                 }
                 // Assumes outward-pointing normals, so negate factor if necessary.
@@ -233,7 +233,7 @@ namespace Opm
             }
             totw += xb[i];
         }
-        for (int i = 0; i < n; ++i) {
+        for (long long i = 0; i < n; ++i) {
             xb[i] /= totw;
         }
     }

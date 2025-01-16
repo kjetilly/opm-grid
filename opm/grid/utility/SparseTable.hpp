@@ -118,13 +118,13 @@ namespace Opm
         }
 
         /// Returns the number of rows in the table.
-        int size() const
+        long long size() const
         {
             return row_start_.size() - 1;
         }
 
         /// Allocate storage for table of expected size
-        void reserve(int exptd_nrows, int exptd_ndata)
+        void reserve(long long exptd_nrows, long long exptd_ndata)
         {
             row_start_.reserve(exptd_nrows + 1);
             data_.reserve(exptd_ndata);
@@ -138,13 +138,13 @@ namespace Opm
         }
 
         /// Returns the number of data elements.
-        int dataSize() const
+        long long dataSize() const
         {
             return data_.size();
         }
 
         /// Returns the size of a table row.
-        int rowSize(int row) const
+        long long rowSize(long long row) const
         {
 #ifndef NDEBUG
             OPM_ERROR_IF(row < 0 || row >= size(),
@@ -165,7 +165,7 @@ namespace Opm
         using mutable_row_type = mutable_iterator_range<typename std::vector<T>::iterator>;
 
         /// Returns a row of the table.
-        row_type operator[](int row) const
+        row_type operator[](long long row) const
         {
             assert(row >= 0 && row < size());
             return row_type{data_.begin()+ row_start_[row],
@@ -173,7 +173,7 @@ namespace Opm
         }
 
         /// Returns a mutable row of the table.
-        mutable_row_type operator[](int row)
+        mutable_row_type operator[](long long row)
         {
             assert(row >= 0 && row < size());
             return mutable_row_type{data_.begin() + row_start_[row],
@@ -185,7 +185,7 @@ namespace Opm
         class Iterator
         {
         public:
-            Iterator(const SparseTable& table, const int begin_row_index)
+            Iterator(const SparseTable& table, const long long begin_row_index)
                 : table_(table)
                 , row_index_(begin_row_index)
             {
@@ -210,7 +210,7 @@ namespace Opm
             }
         private:
             const SparseTable& table_;
-            int row_index_;
+            long long row_index_;
         };
 
         /// Iterator access.
@@ -236,7 +236,7 @@ namespace Opm
 
             os << "Row starts = [";
             std::copy(row_start_.begin(), row_start_.end(),
-                      std::ostream_iterator<int>(os, " "));
+                      std::ostream_iterator<long long>(os, " "));
             os << "\b]\n";
 
             os << "Data values = [";
@@ -244,7 +244,7 @@ namespace Opm
                       std::ostream_iterator<T>(os, " "));
             os << "\b]\n";
         }
-        const T data(int i)const {
+        const T data(long long i)const {
         	return data_[i];
         }
 
@@ -252,7 +252,7 @@ namespace Opm
         std::vector<T> data_;
         // Like in the compressed row sparse matrix format,
         // row_start_.size() is equal to the number of rows + 1.
-        std::vector<int> row_start_;
+        std::vector<long long> row_start_;
 
 	template <class IntegerIter>
 	void setRowStartsFromSizes(IntegerIter rowsize_beg, IntegerIter rowsize_end)
@@ -267,12 +267,12 @@ namespace Opm
 #endif
             // Since we do not store the row sizes, but cumulative row sizes,
             // we have to create the cumulative ones.
-            int num_rows = rowsize_end - rowsize_beg;
+            long long num_rows = rowsize_end - rowsize_beg;
             row_start_.resize(num_rows + 1);
             row_start_[0] = 0;
             std::partial_sum(rowsize_beg, rowsize_end, row_start_.begin() + 1);
             // Check that data_ and row_start_ match.
-            if (int(data_.size()) != row_start_.back()) {
+            if ((long long)(data_.size()) != row_start_.back()) {
                 OPM_THROW(std::runtime_error, "End of row start indices different from data size.");
             }
 

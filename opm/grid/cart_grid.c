@@ -36,7 +36,7 @@
 
 #include <opm/grid/cart_grid.h>
 
-static struct UnstructuredGrid *allocate_cart_grid_3d(int nx, int ny, int nz);
+static struct UnstructuredGrid *allocate_cart_grid_3d(long long nx, long long ny, long long nz);
 static void fill_cart_topology_3d(struct UnstructuredGrid *G);
 static void fill_cart_geometry_3d(struct UnstructuredGrid *G,
                                   const double            *x,
@@ -50,16 +50,16 @@ fill_layered_geometry_3d(struct UnstructuredGrid *G,
                          const double            *depthz);
 
 struct UnstructuredGrid *
-create_grid_cart3d(int nx, int ny, int nz)
+create_grid_cart3d(long long nx, long long ny, long long nz)
 {
     return create_grid_hexa3d(nx, ny, nz, 1.0, 1.0, 1.0);
 }
 
 struct UnstructuredGrid *
-create_grid_hexa3d(int    nx, int    ny, int    nz,
+create_grid_hexa3d(long long    nx, long long    ny, long long    nz,
                    double dx, double dy, double dz)
 {
-    int     i;
+    long long     i;
     double *x, *y, *z;
     struct UnstructuredGrid *G;
 
@@ -85,16 +85,16 @@ create_grid_hexa3d(int    nx, int    ny, int    nz,
 
 /* --------------------------------------------------------------------- */
 
-static struct UnstructuredGrid *allocate_cart_grid_2d(int nx, int ny);
+static struct UnstructuredGrid *allocate_cart_grid_2d(long long nx, long long ny);
 static void fill_cart_topology_2d(struct UnstructuredGrid *G);
 static void fill_cart_geometry_2d(struct UnstructuredGrid *G,
                                   const double            *x,
                                   const double            *y);
 
 struct UnstructuredGrid*
-create_grid_cart2d(int nx, int ny, double dx, double dy)
+create_grid_cart2d(long long nx, long long ny, double dx, double dy)
 {
-    int     i;
+    long long     i;
     double *x, *y;
     struct UnstructuredGrid *G;
 
@@ -119,7 +119,7 @@ create_grid_cart2d(int nx, int ny, double dx, double dy)
 /* --------------------------------------------------------------------- */
 
 struct UnstructuredGrid *
-create_grid_tensor2d(int nx, int ny, const double *x, const double *y)
+create_grid_tensor2d(long long nx, long long ny, const double *x, const double *y)
 {
     struct UnstructuredGrid *G;
 
@@ -137,9 +137,9 @@ create_grid_tensor2d(int nx, int ny, const double *x, const double *y)
 /* --------------------------------------------------------------------- */
 
 struct UnstructuredGrid *
-create_grid_tensor3d(int           nx    ,
-                     int           ny    ,
-                     int           nz    ,
+create_grid_tensor3d(long long           nx    ,
+                     long long           ny    ,
+                     long long           nz    ,
                      const double *x     ,
                      const double *y     ,
                      const double *z     ,
@@ -186,13 +186,13 @@ allocate_cart_grid(size_t ndims ,
 
 
 static struct UnstructuredGrid*
-allocate_cart_grid_3d(int nx, int ny, int nz)
+allocate_cart_grid_3d(long long nx, long long ny, long long nz)
 {
     struct UnstructuredGrid *G;
-    int Nx, Ny, Nz;
-    int nxf, nyf, nzf;
+    long long Nx, Ny, Nz;
+    long long nxf, nyf, nzf;
 
-    int ncells, nfaces, nnodes;
+    long long ncells, nfaces, nnodes;
 
     Nx  = nx + 1;
     Ny  = ny + 1;
@@ -228,12 +228,12 @@ allocate_cart_grid_3d(int nx, int ny, int nz)
 static void
 fill_cart_topology_3d(struct UnstructuredGrid *G)
 {
-    int nx, ny, nz;
-    int Nx, Ny;
-    int nxf, nyf;
-    int i,j,k;
+    long long nx, ny, nz;
+    long long Nx, Ny;
+    long long nxf, nyf;
+    long long i,j,k;
 
-    int *cfaces, *fnodes, *fcells;
+    long long *cfaces, *fnodes, *fcells;
     unsigned *fnodepos, *cfacepos;
 
     nx = G->cartdims[0];
@@ -361,8 +361,8 @@ fill_cart_geometry_3d(struct UnstructuredGrid *G,
                       const double            *y,
                       const double            *z)
 {
-    int nx, ny, nz;
-    int i,j,k;
+    long long nx, ny, nz;
+    long long i,j,k;
 
     double dx, dy, dz;
 
@@ -475,8 +475,8 @@ fill_layered_geometry_3d(struct UnstructuredGrid *G,
                          const double            *z,
                          const double            *depthz)
 {
-    int i , j , k ;
-    int nx, ny, nz;
+    long long i , j , k ;
+    long long nx, ny, nz;
 
     const double *depth;
     double       *coord;
@@ -503,12 +503,12 @@ fill_layered_geometry_3d(struct UnstructuredGrid *G,
 /* --------------------------------------------------------------------- */
 
 static struct UnstructuredGrid*
-allocate_cart_grid_2d(int nx, int ny)
+allocate_cart_grid_2d(long long nx, long long ny)
 {
-    int nxf, nyf;
-    int Nx , Ny ;
+    long long nxf, nyf;
+    long long Nx , Ny ;
 
-    int ncells, nfaces, nnodes;
+    long long ncells, nfaces, nnodes;
 
     struct UnstructuredGrid *G;
 
@@ -544,12 +544,12 @@ allocate_cart_grid_2d(int nx, int ny)
 static void
 fill_cart_topology_2d(struct UnstructuredGrid *G)
 {
-    int    i,j;
-    int    nx, ny;
-    int    nxf;
-    int    Nx;
+    long long    i,j;
+    long long    nx, ny;
+    long long    nxf;
+    long long    Nx;
 
-    int    *fnodes, *fcells, *cfaces;
+    long long    *fnodes, *fcells, *cfaces;
     unsigned *cfacepos, *fnodepos;
 
     cfaces     = G->cell_faces;
@@ -638,8 +638,8 @@ fill_cart_geometry_2d(struct UnstructuredGrid *G,
                       const double            *x,
                       const double            *y)
 {
-    int    i,j;
-    int    nx, ny;
+    long long    i,j;
+    long long    nx, ny;
 
     double dx, dy;
 

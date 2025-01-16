@@ -39,13 +39,13 @@ namespace cpgrid
 
 // We want to use METIS, but if METIS is installed as part of the ScotchMetis package, then the following options are not available.
 #if !IS_SCOTCH_METIS_HEADER
-void setMetisOptions(const std::map<std::string, std::string>& optionsMap, int& manuallySelectedMethod, idx_t* options) {
+void setMetisOptions(const std::map<std::string, std::string>& optionsMap, long long& manuallySelectedMethod, idx_t* options) {
     // Initialize all options to default values
     METIS_SetDefaultOptions(options);
 
     // A map containing the METIS option keys
     // This is the list of options available for METIS Version 5.1.0 - possibly more can be added in the future
-    std::unordered_map<std::string, int> metisOptionKeys = {
+    std::unordered_map<std::string, long long> metisOptionKeys = {
         // These options are only valid for the METIS_PartGraphKway method
         {"METIS_OPTION_OBJTYPE", METIS_OPTION_OBJTYPE},
         {"METIS_OPTION_MINCONN", METIS_OPTION_MINCONN},
@@ -63,7 +63,7 @@ void setMetisOptions(const std::map<std::string, std::string>& optionsMap, int& 
         {"METIS_OPTION_DBGLVL", METIS_OPTION_DBGLVL}
     };
     // A map containing the METIS option values
-    std::unordered_map<std::string, int> metisOptionValues = {
+    std::unordered_map<std::string, long long> metisOptionValues = {
         {"METIS_PTYPE_RB", METIS_PTYPE_RB}, 
         {"METIS_PTYPE_KWAY", METIS_PTYPE_KWAY},
         {"METIS_OBJTYPE_CUT", METIS_OBJTYPE_CUT},
@@ -132,18 +132,18 @@ void setMetisOptions(const std::map<std::string, std::string>& optionsMap, int& 
 #endif
 
 
-std::tuple<std::vector<int>,
+std::tuple<std::vector<long long>,
            std::vector<std::pair<std::string, bool>>,
-           std::vector<std::tuple<int, int, char>>,
-           std::vector<std::tuple<int, int, char, int>>,
+           std::vector<std::tuple<long long, long long, char>>,
+           std::vector<std::tuple<long long, long long, char, long long>>,
            WellConnections>
 metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                                     const std::vector<OpmWellType> * wells,
-                                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                     const double* transmissibilities,
                                     const Communication<MPI_Comm>& cc,
                                     EdgeWeightMethod edgeWeightsMethod,
-                                    int root,
+                                    long long root,
                                     real_t imbalanceTol,
                                     bool allowDistributedWells,
                                     [[maybe_unused]] const std::map<std::string,std::string>& params)
@@ -166,8 +166,8 @@ metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
                                                        edgeWeightsMethod));
     }
 
-    std::vector<int> partitionVector;
-    int rc = METIS_OK;
+    std::vector<long long> partitionVector;
+    long long rc = METIS_OK;
 
     cc.barrier();
     //Metis is a serial graph partitioner, we do everything only on root
@@ -195,7 +195,7 @@ metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
         idx_t* gids = new idx_t[n];
         idx_t* lids = new idx_t[n];
 
-        int idx = 0;
+        long long idx = 0;
         for (auto cell = cpgrid.leafbegin<0>(), cellEnd = cpgrid.leafend<0>(); cell != cellEnd; ++cell)
         {
             gids[idx]   = globalIdSet.id(*cell);
@@ -210,7 +210,7 @@ metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
         idx_t* xadj = new idx_t[n+1];
         xadj[0] = 0;
         
-        int manuallySelectedMethod = 0; // 0: choose according to number of partitions, 1: recursive, 2: kway
+        long long manuallySelectedMethod = 0; // 0: choose according to number of partitions, 1: recursive, 2: kway
 #if IS_SCOTCH_METIS_HEADER
         Opm::OpmLog::info("Not setting specific METIS Options since you're using Scotch-METIS.");
         idx_t* options = nullptr;
@@ -238,13 +238,13 @@ metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
 
         if( wells )
         {            
-            for (int i = 0; i < n;  i++) {
+            for (long long i = 0; i < n;  i++) {
                 xadj[i+1] = xadj[i] + Dune::cpgrid::getNumberOfEdgesForSpecificCellForGridWithWells(*gridAndWells, lids[i]);
             }
         }
         else
         {
-            for (int i = 0; i < n;  i++) {
+            for (long long i = 0; i < n;  i++) {
                 xadj[i+1] = xadj[i] + Dune::cpgrid::getNumberOfEdgesForSpecificCell(cpgrid, lids[i]);
             }
         }
@@ -265,16 +265,16 @@ metisSerialGraphPartitionGridOnRoot(const CpGrid& cpgrid,
 
         if( wells )
         {
-            int neighborCounter = 0;
-            for( int cell = 0; cell < n;  cell++ )
+            long long neighborCounter = 0;
+            for( long long cell = 0; cell < n;  cell++ )
             {
                 fillNBORGIDAndWeightsForSpecificCellAndIncrementNeighborCounterForGridWithWells(*gridAndWells, lids[cell], gids, neighborCounter, adjncy, adjwgt);
             }
         }
         else
         {
-            int neighborCounter = 0;
-            for( int cell = 0; cell < n;  cell++ )
+            long long neighborCounter = 0;
+            for( long long cell = 0; cell < n;  cell++ )
             {
                 fillNBORGIDForSpecificCellAndIncrementNeighborCounter(cpgrid, lids[cell], gids, neighborCounter, adjncy);
             }

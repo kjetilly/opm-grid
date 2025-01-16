@@ -65,28 +65,28 @@ namespace cpgrid
 ///         (if argument wells was not null and this is the root rank this will contain connections in
 ///          form of global indices)
 template<class Id>
-std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            WellConnections>
 makeImportAndExportLists(const Dune::CpGrid& cpgrid,
                          const Dune::Communication<MPI_Comm>& cc,
                          const std::vector<Dune::cpgrid::OpmWellType> * wells,
-                         const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                         const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                          const Dune::cpgrid::CombinedGridWellGraph* gridAndWells,
-                         int root,
-                         int numExport,
-                         int numImport,
+                         long long root,
+                         long long numExport,
+                         long long numImport,
                          const Id* exportLocalGids,
                          const Id* exportGlobalGids,
-                         const int* exportToPart,
+                         const long long* exportToPart,
                          const Id* importGlobalGids,
                          bool allowDistributedWells = false);
 
 template<class Id>
-std::tuple<int, std::vector<Id> >
-scatterExportInformation(int numExport, const Id* exportGlobalGids,
-                         const int* exportToPart, int root,
+std::tuple<long long, std::vector<Id> >
+scatterExportInformation(long long numExport, const Id* exportGlobalGids,
+                         const long long* exportToPart, long long root,
                          const Dune::Communication<MPI_Comm>& cc);
 } // end namespace cpgrid
 } // end namespace Dune
@@ -129,16 +129,16 @@ namespace cpgrid
 ///         (if argument wells was not null and this is the root rank this will contain connections in
 ///          form of global indices)
 
-std::tuple<std::vector<int>,std::vector<std::pair<std::string,bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>,std::vector<std::pair<std::string,bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            WellConnections>
 zoltanGraphPartitionGridOnRoot(const CpGrid& grid,
                                const std::vector<OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                const double* transmissibilities,
                                const Communication<MPI_Comm>& cc,
-                               EdgeWeightMethod edgeWeightsMethod, int root,
+                               EdgeWeightMethod edgeWeightsMethod, long long root,
                                const double zoltanImbalanceTol,
                                bool allowDistributedWells,
                                const std::map<std::string,std::string>& params);
@@ -176,16 +176,16 @@ zoltanGraphPartitionGridOnRoot(const CpGrid& grid,
 ///          form of global indices)
 ///
 /// @note This function will only do *serial* partioning.
-std::tuple<std::vector<int>, std::vector<std::pair<std::string,bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>, std::vector<std::pair<std::string,bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            WellConnections>
 zoltanSerialGraphPartitionGridOnRoot(const CpGrid& grid,
                                const std::vector<OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                const double* transmissibilities,
                                      const Communication<MPI_Comm>& cc,
-                               EdgeWeightMethod edgeWeightsMethod, int root,
+                               EdgeWeightMethod edgeWeightsMethod, long long root,
                                const double zoltanImbalanceTol,
                                bool allowDistributedWells,
                                const std::map<std::string,std::string>& params);
@@ -212,14 +212,14 @@ zoltanSerialGraphPartitionGridOnRoot(const CpGrid& grid,
 /// @param root The process number that holds the global grid.
 /// @param numParts How many parts to divide the grid into.
 /// @return A list containing the part of cell i for all cells.
-std::vector<int>
+std::vector<long long>
 zoltanGraphPartitionGridForJac(const CpGrid& cpgrid,
                                const std::vector<OpmWellType> * wells,
-                               const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                               const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
 			       const double* transmissibilities,
                                const Communication<MPI_Comm>& cc,
-			       EdgeWeightMethod edgeWeightsMethod, int root,
-			       int numParts, const double zoltanImbalanceTol);
+			       EdgeWeightMethod edgeWeightsMethod, long long root,
+			       long long numParts, const double zoltanImbalanceTol);
 
 }
 }

@@ -59,11 +59,11 @@ along with OPM.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     try{
         // define the problem dimensions
-        const int dim=2;
+        const long long dim=2;
 
         // create a grid object
         typedef double NumberType;
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
         Dune::FieldVector<GridType::ctype,dim> L(0);
         Dune::FieldVector<GridType::ctype,dim> R(300);
-        Dune::FieldVector<int,dim> N(2);
+        Dune::FieldVector<long long,dim> N(2);
         GridType grid(N,L,R);
         typedef GridType::LevelGridView GridView;
         GridView gridView(grid.levelView(0));
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 #if 0
 using namespace Dune;
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     // Create a grid.
     Opm::parameter::ParameterGroup param(argc, argv);

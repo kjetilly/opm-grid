@@ -49,15 +49,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -66,8 +66,8 @@ struct Fixture
 BOOST_GLOBAL_FIXTURE(Fixture);
 
 void disjointPatches_check(Dune::CpGrid& grid,
-                           const std::vector<std::array<int,3>>& startIJK_vec,
-                           const std::vector<std::array<int,3>>& endIJK_vec)
+                           const std::vector<std::array<long long,3>>& startIJK_vec,
+                           const std::vector<std::array<long long,3>>& endIJK_vec)
 {
     const auto& data = grid.currentData();
     try
@@ -87,10 +87,10 @@ BOOST_AUTO_TEST_CASE(lgrs_disjointPatches)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {3,2,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,1,1}, {1,1,3}, {4,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {3,2,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,1}, {1,1,3}, {4,3,3}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -99,10 +99,10 @@ BOOST_AUTO_TEST_CASE(lgrs_disjointPatchesB)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {3,2,0}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,2,1}, {4,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {3,2,0}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,2,1}, {4,3,3}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -111,10 +111,10 @@ BOOST_AUTO_TEST_CASE(patches_share_corner)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {1,1,1}, {3,2,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,1}, {2,2,2}, {4,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {1,1,1}, {3,2,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,1}, {2,2,2}, {4,3,3}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -123,10 +123,10 @@ BOOST_AUTO_TEST_CASE(patches_share_corners)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {2,0,1}, {3,2,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,1,1}, {3,1,2}, {4,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {2,0,1}, {3,2,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,1}, {3,1,2}, {4,3,3}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -135,11 +135,11 @@ BOOST_AUTO_TEST_CASE(pathces_share_face)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {2,2,2}, {2,2,2}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {2,0,0}, {3,2,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,1,1}, {3,1,1}, {4,3,3}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {2,2,2}, {2,2,2}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {2,0,0}, {3,2,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,1}, {3,1,1}, {4,3,3}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
@@ -149,10 +149,10 @@ BOOST_AUTO_TEST_CASE(pathces_share_faceB)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,1}, {1,1,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,2,1}, {3,2,2}, {4,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,1}, {1,1,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,2,1}, {3,2,2}, {4,3,3}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -161,10 +161,10 @@ BOOST_AUTO_TEST_CASE(invalid_argument_sizes)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,1}, {1,1,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,2,1}, {3,2,1}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,1}, {1,1,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,2,1}, {3,2,1}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -173,10 +173,10 @@ BOOST_AUTO_TEST_CASE(invalid_argument_sizesB)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {3,2,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,1,1}, {1,1,3}, {4,3,3}, {2,1,1}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {3,2,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,1}, {1,1,3}, {4,3,3}, {2,1,1}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }
 
@@ -186,9 +186,9 @@ BOOST_AUTO_TEST_CASE(disjoint_patches_C)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    const std::vector<std::array<int,3>> startIJK_vec = {{2,2,2}, {0,0,0}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{3,3,3}, {4,1,1}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{2,2,2}, {0,0,0}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{3,3,3}, {4,1,1}};
     disjointPatches_check(grid, startIJK_vec, endIJK_vec);
 }

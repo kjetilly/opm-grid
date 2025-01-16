@@ -42,7 +42,7 @@ namespace Dune
 {
 namespace cpgrid
 {
-template<int codim> class Entity;
+template<long long codim> class Entity;
 class CpGridData;
 
 /// \brief Wrapper that turns a data handle suitable for dune-grid into one based on
@@ -51,7 +51,7 @@ class CpGridData;
 /// \tparam DataHandle The type of the data handle to wrap. Has to adhere to the interface
 /// of Dune::DataHandleIf
 ///  \tparam codim The codimension to use when mapping indices to Entities.
-template<class DataHandle, int codim>
+template<class DataHandle, long long codim>
 class Entity2IndexDataHandle
 {
 public:

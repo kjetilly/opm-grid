@@ -29,29 +29,29 @@ norm(const double w[3])
 
 /* ------------------------------------------------------------------ */
 static void
-compute_face_geometry_3d(double *coords, int nfaces,
-                         unsigned* nodepos, int *facenodes, double *fnormals,
+compute_face_geometry_3d(double *coords, long long nfaces,
+                         unsigned* nodepos, long long *facenodes, double *fnormals,
                          double *fcentroids, double *fareas)
 /* ------------------------------------------------------------------ */
 {
 
    /* Assume 3D for now */
-   const int ndims = 3;
-   int f;
+   const long long ndims = 3;
+   long long f;
    double x[3];
    double u[3];
    double v[3];
    double w[3];
 
-   int i;
+   long long i;
    unsigned k;
-   int node;
+   long long node;
 
    double cface[3]  = {0};
    double n[3]  = {0};
    double twothirds = 0.666666666666666666666666666667;
    double a;
-   int    num_face_nodes;
+   long long    num_face_nodes;
    double area;
    /*#pragma omp parallel for  */
 
@@ -124,9 +124,9 @@ compute_face_geometry_3d(double *coords, int nfaces,
 static void
 compute_edge_geometry_2d(
       /* in  */ double *node_coords,
-      /* in  */ int     num_edges,
+      /* in  */ long long     num_edges,
       /* in  */ unsigned* edge_node_pos,
-      /* in  */ int    *edge_nodes,
+      /* in  */ long long    *edge_nodes,
       /* out */ double *edge_normals,
       /* out */ double *edge_midpoints,
       /* out */ double *edge_lengths)
@@ -134,15 +134,15 @@ compute_edge_geometry_2d(
    const unsigned num_dims = 2;
 
    /* offsets to each of the nodes in a compacted edge */
-   const int a_ofs = 0;
-   const int b_ofs = 1;
+   const long long a_ofs = 0;
+   const long long b_ofs = 1;
 
    /* offsets to each dimension is a compacted point */
-   const int x_ofs = 0;
-   const int y_ofs = 1;
+   const long long x_ofs = 0;
+   const long long y_ofs = 1;
 
-   int edge;                     /* edge index       */
-   int a_nod, b_nod;             /* node indices     */
+   long long edge;                     /* edge index       */
+   long long a_nod, b_nod;             /* node indices     */
    double a_x, a_y, b_x, b_y;    /* node coordinates */
    double v_x, v_y;              /* vector elements  */
 
@@ -188,8 +188,8 @@ compute_edge_geometry_2d(
 
 /* ------------------------------------------------------------------ */
 void
-compute_face_geometry(int ndims, double *coords, int nfaces,
-                      unsigned* nodepos, int *facenodes, double *fnormals,
+compute_face_geometry(long long ndims, double *coords, long long nfaces,
+                      unsigned* nodepos, long long *facenodes, double *fnormals,
                       double *fcentroids, double *fareas)
 /* ------------------------------------------------------------------ */
 {
@@ -214,17 +214,17 @@ compute_face_geometry(int ndims, double *coords, int nfaces,
 /* ------------------------------------------------------------------ */
 static void
 compute_cell_geometry_3d(double *coords,
-                         unsigned* nodepos, int *facenodes, int *neighbors,
+                         unsigned* nodepos, long long *facenodes, long long *neighbors,
                          double *fnormals,
                          double *fcentroids,
-                         int ncells, unsigned* facepos, int *cellfaces,
+                         long long ncells, unsigned* facepos, long long *cellfaces,
                          double *ccentroids, double *cvolumes)
 /* ------------------------------------------------------------------ */
 {
-   const int ndims = 3;
-   int i, c;
+   const long long ndims = 3;
+   long long i, c;
    unsigned f, k;
-   int face,node;
+   long long face,node;
    double x[3];
    double u[3];
    double v[3];
@@ -232,7 +232,7 @@ compute_cell_geometry_3d(double *coords,
    double xcell[3];
    double ccell[3];
    double cface[3]  = {0};
-   int num_faces;
+   long long num_faces;
    double volume;
    double tet_volume, subnormal_sign;
    double twothirds = 0.666666666666666666666666666667;
@@ -271,7 +271,7 @@ compute_cell_geometry_3d(double *coords,
       volume=0.0;
       for(f=facepos[c]; f<facepos[c+1]; ++f)
       {
-         int num_face_nodes;
+         long long num_face_nodes;
 
          for(i=0; i<ndims; ++i) x[i] = 0.0;
          for(i=0; i<ndims; ++i) cface[i] = 0.0;
@@ -345,32 +345,32 @@ static void
 compute_cell_geometry_2d(
       /* in  */ double *node_coords,
       /* in  */ unsigned *edge_node_pos,
-      /* in  */ int    *edge_nodes,
+      /* in  */ long long    *edge_nodes,
       /* in  */ double *edge_midpoints,
-      /* in  */ int     num_cells,
+      /* in  */ long long     num_cells,
       /* in  */ unsigned *cell_edge_pos,
-      /* in  */ int    *cell_edges,
+      /* in  */ long long    *cell_edges,
       /* out */ double *cell_centers,
       /* out */ double *cell_areas)
 {
-   const int num_dims = 2;
+   const long long num_dims = 2;
 
    /* offsets to each of the nodes in a compacted edge */
-   const int a_ofs = 0;
-   const int b_ofs = 1;
+   const long long a_ofs = 0;
+   const long long b_ofs = 1;
 
    /* offsets to each dimension is a compacted point */
-   const int x_ofs = 0;
-   const int y_ofs = 1;
+   const long long x_ofs = 0;
+   const long long y_ofs = 1;
 
-   int cell;            /* cell index */
-   int num_nodes;       /* number of vertices in current cell */
+   long long cell;            /* cell index */
+   long long num_nodes;       /* number of vertices in current cell */
    unsigned edge_ndx;        /* relative edge index within cell */
-   int edge;            /* absolute cell index */
+   long long edge;            /* absolute cell index */
    double center_x;     /* x-coordinate for cell barycenter */
    double center_y;     /* y-coordinate for cell barycenter */
    double area;         /* (accumulated) cell area */
-   int a_nod, b_nod;    /* node indices for edge start and end points */
+   long long a_nod, b_nod;    /* node indices for edge start and end points */
    double a_x, a_y,
           b_x, b_y;     /* vectors from center to edge points */
 
@@ -436,11 +436,11 @@ compute_cell_geometry_2d(
 
 /* ------------------------------------------------------------------ */
 void
-compute_cell_geometry(int ndims, double *coords,
-                      unsigned* nodepos, int *facenodes, int *neighbors,
+compute_cell_geometry(long long ndims, double *coords,
+                      unsigned* nodepos, long long *facenodes, long long *neighbors,
                       double *fnormals,
                       double *fcentroids,
-                      int ncells, unsigned *facepos, int *cellfaces,
+                      long long ncells, unsigned *facepos, long long *cellfaces,
                       double *ccentroids, double *cvolumes)
 /* ------------------------------------------------------------------ */
 {

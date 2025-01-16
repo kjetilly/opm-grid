@@ -57,7 +57,7 @@ namespace Opm
 
 
     /// Construct a 2d cartesian grid with cells of unit size.
-    GridManager::GridManager(int nx, int ny)
+    GridManager::GridManager(long long nx, long long ny)
     {
         ug_ = create_grid_cart2d(nx, ny, 1.0, 1.0);
         if (!ug_) {
@@ -65,7 +65,7 @@ namespace Opm
         }
     }
 
-    GridManager::GridManager(int nx, int ny,double dx, double dy)
+    GridManager::GridManager(long long nx, long long ny,double dx, double dy)
     {
         ug_ = create_grid_cart2d(nx, ny, dx, dy);
         if (!ug_) {
@@ -75,7 +75,7 @@ namespace Opm
 
 
     /// Construct a 3d cartesian grid with cells of unit size.
-    GridManager::GridManager(int nx, int ny, int nz)
+    GridManager::GridManager(long long nx, long long ny, long long nz)
     {
         ug_ = create_grid_cart3d(nx, ny, nz);
         if (!ug_) {
@@ -87,7 +87,7 @@ namespace Opm
 
 
     /// Construct a 3d cartesian grid with cells of size [dx, dy, dz].
-    GridManager::GridManager(int nx, int ny, int nz,
+    GridManager::GridManager(long long nx, long long ny, long long nz,
                              double dx, double dy, double dz)
     {
         ug_ = create_grid_hexa3d(nx, ny, nz, dx, dy, dz);
@@ -143,7 +143,7 @@ namespace Opm
 
         std::vector<double> coord = inputGrid.getCOORD( );
         std::vector<double> zcorn = inputGrid.getZCORN( );
-        std::vector<int> actnum = inputGrid.getACTNUM(  );
+        std::vector<long long> actnum = inputGrid.getACTNUM(  );
 
         g.coord = coord.data();
         g.zcorn = zcorn.data();

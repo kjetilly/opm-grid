@@ -61,8 +61,8 @@ BOOST_AUTO_TEST_SUITE (Repair_AllActive)
 
 BOOST_AUTO_TEST_CASE (NoChange)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE (NoChange)
 
 BOOST_AUTO_TEST_CASE (TopBelowBottom)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_CASE (TopBelowBottom)
 
 BOOST_AUTO_TEST_CASE (BottomBelowLowerTop)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -213,8 +213,8 @@ BOOST_AUTO_TEST_CASE (BottomBelowLowerTop)
 
 BOOST_AUTO_TEST_CASE (TBB_And_BBLT)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -267,8 +267,8 @@ BOOST_AUTO_TEST_CASE (TBB_And_BBLT)
 
 BOOST_AUTO_TEST_CASE (Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -321,8 +321,8 @@ BOOST_AUTO_TEST_CASE (Elevation)
 
 BOOST_AUTO_TEST_CASE (TBB_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -375,8 +375,8 @@ BOOST_AUTO_TEST_CASE (TBB_And_Elevation)
 
 BOOST_AUTO_TEST_CASE (BBLT_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -429,8 +429,8 @@ BOOST_AUTO_TEST_CASE (BBLT_And_Elevation)
 
 BOOST_AUTO_TEST_CASE (TBB_And_BBLT_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 2 };
-    const auto actnum   = std::vector<int>{};  // empty => all active
+    const auto cartDims = std::vector<long long>{ 1, 1, 2 };
+    const auto actnum   = std::vector<long long>{};  // empty => all active
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -489,8 +489,8 @@ BOOST_AUTO_TEST_SUITE (Repair_With_Inactive)
 
 BOOST_AUTO_TEST_CASE (NoChange)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
           0.0,  0.0,
@@ -538,8 +538,8 @@ BOOST_AUTO_TEST_CASE (NoChange)
 
 BOOST_AUTO_TEST_CASE (TopBelowBottom)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -602,8 +602,8 @@ BOOST_AUTO_TEST_CASE (TopBelowBottom)
 
 BOOST_AUTO_TEST_CASE (BottomBelowLowerTop)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -666,8 +666,8 @@ BOOST_AUTO_TEST_CASE (BottomBelowLowerTop)
 
 BOOST_AUTO_TEST_CASE (TBB_And_BBLT)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -730,8 +730,8 @@ BOOST_AUTO_TEST_CASE (TBB_And_BBLT)
 
 BOOST_AUTO_TEST_CASE (Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -794,8 +794,8 @@ BOOST_AUTO_TEST_CASE (Elevation)
 
 BOOST_AUTO_TEST_CASE (TBB_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -858,8 +858,8 @@ BOOST_AUTO_TEST_CASE (TBB_And_Elevation)
 
 BOOST_AUTO_TEST_CASE (BBLT_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -922,8 +922,8 @@ BOOST_AUTO_TEST_CASE (BBLT_And_Elevation)
 
 BOOST_AUTO_TEST_CASE (TBB_And_BBLT_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 1 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 1 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -992,8 +992,8 @@ BOOST_AUTO_TEST_SUITE (Repair_With_NoBottomNeigh)
 
 BOOST_AUTO_TEST_CASE (NoChange)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
           0.0,  0.0,
@@ -1041,8 +1041,8 @@ BOOST_AUTO_TEST_CASE (NoChange)
 
 BOOST_AUTO_TEST_CASE (TopBelowBottom)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -1105,8 +1105,8 @@ BOOST_AUTO_TEST_CASE (TopBelowBottom)
 
 BOOST_AUTO_TEST_CASE (BottomBelowLowerTop)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -1169,8 +1169,8 @@ BOOST_AUTO_TEST_CASE (BottomBelowLowerTop)
 
 BOOST_AUTO_TEST_CASE (TBB_And_BBLT)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
         0.0, 0.0,
@@ -1233,8 +1233,8 @@ BOOST_AUTO_TEST_CASE (TBB_And_BBLT)
 
 BOOST_AUTO_TEST_CASE (Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -1300,8 +1300,8 @@ BOOST_AUTO_TEST_CASE (Elevation)
 // results are arguably wrong.
 BOOST_AUTO_TEST_CASE (TBB_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -1368,8 +1368,8 @@ BOOST_AUTO_TEST_CASE (TBB_And_Elevation)
 
 BOOST_AUTO_TEST_CASE (BBLT_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,
@@ -1435,8 +1435,8 @@ BOOST_AUTO_TEST_CASE (BBLT_And_Elevation)
 // results are arguably wrong.
 BOOST_AUTO_TEST_CASE (TBB_And_BBLT_And_Elevation)
 {
-    const auto cartDims = std::vector<int>{ 1, 1, 3 };
-    const auto actnum   = std::vector<int>{ 1, 0, 0 };
+    const auto cartDims = std::vector<long long>{ 1, 1, 3 };
+    const auto actnum   = std::vector<long long>{ 1, 0, 0 };
 
     auto zcorn = std::vector<double> {
          0.0,  0.0,

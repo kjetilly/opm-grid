@@ -43,7 +43,7 @@
 
 using namespace Dune;
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     Opm::parameter::ParameterGroup param(argc, argv);
@@ -52,10 +52,10 @@ int main(int argc, char** argv)
     typedef CpGrid::LeafGridView View;
     View g = grid.leafView();
     typedef FieldVector<double, 3> Pt;
-    int c_local = 0;
+    long long c_local = 0;
     for (View::Codim<0>::Iterator c_it = g.begin<0>(); c_it != g.end<0>(); ++c_it, ++c_local) {
         Pt cell_centroid = c_it->geometry().center();
-        int f_local = 0;
+        long long f_local = 0;
         bool trouble = false;
         for (View::IntersectionIterator f_it = g.ibegin(*c_it); f_it != g.iend(*c_it); ++f_it, ++f_local) {
             Pt face_centroid = f_it->geometry().center();

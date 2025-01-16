@@ -56,10 +56,10 @@ namespace Dune
         public:
             /// @brief
             /// @todo Doc me!
-            typedef int IndexType;
+            typedef long long IndexType;
 
             /** \brief Export the type of the entity used as parameter in the index(...) method */
-            template <int cc>
+            template <long long cc>
             struct Codim
             {
               typedef cpgrid::Entity< cc > Entity;
@@ -90,7 +90,7 @@ namespace Dune
             /// @todo Doc me!
             /// @param
             /// @return
-            const Types& geomTypes(int codim) const
+            const Types& geomTypes(long long codim) const
             {
                 return geom_types_[codim];
             }
@@ -99,7 +99,7 @@ namespace Dune
             /// @todo Doc me!
             /// @param
             /// @return
-            const Types& types(int codim) const
+            const Types& types(long long codim) const
             {
                 return geom_types_[codim];
             }
@@ -108,7 +108,7 @@ namespace Dune
             /// @todo Doc me!
             /// @param
             /// @return
-            int size(GeometryType type) const
+            long long size(GeometryType type) const
             {
                 if (type.isCube()) {
                     return size(3 - type.dim());  // return grid_.size(type);
@@ -122,7 +122,7 @@ namespace Dune
             /// @todo Doc me!
             /// @param
             /// @return
-            int size(int codim) const
+            long long size(long long codim) const
             {
                 return size_codim_map_[codim]; //grid_.size(codim)
             }
@@ -133,7 +133,7 @@ namespace Dune
             /// @tparam
             /// @return
             /// @param
-            template<int cd>
+            template<long long cd>
             IndexType index(const cpgrid::Entity<cd>& e) const
             {
                 return e.index();
@@ -155,8 +155,8 @@ namespace Dune
             /// @tparam
             /// @return
             /// @param
-            template <int cc>
-            IndexType subIndex(const cpgrid::Entity<0>& e, int i) const
+            template <long long cc>
+            IndexType subIndex(const cpgrid::Entity<0>& e, long long i) const
             {
                 return index(e.template subEntity<cc>(i));
             }
@@ -166,11 +166,11 @@ namespace Dune
             /// @tparam
             /// @return
             /// @param
-            IndexType subIndex(const cpgrid::Entity<0>& e, int i, unsigned int cc) const;
+            IndexType subIndex(const cpgrid::Entity<0>& e, long long i, size_t cc) const;
 
 
-            template<int codim>
-	    IndexType subIndex(const cpgrid::Entity<codim>& /* e */, int /* i */, unsigned int /* cc */) const
+            template<long long codim>
+	    IndexType subIndex(const cpgrid::Entity<codim>& /* e */, long long /* i */, size_t /* cc */) const
 	    {
 	      DUNE_THROW(NotImplemented, "subIndex not implemented for codim"
 			 << codim << "entities.");
@@ -190,7 +190,7 @@ namespace Dune
         private:
             // const CpGridData& grid_;
             Types geom_types_[4];
-            std::array<int,4> size_codim_map_{0,0,0,0};
+            std::array<long long,4> size_codim_map_{0,0,0,0};
         };
 
 
@@ -200,7 +200,7 @@ namespace Dune
             friend class Dune::cpgrid::CpGridData;
             //friend class Dune::cpgrid::LevelGlobalIdSet; Not needed due to repeated code in LevelGlobalIdSet (computeId_cell and computeId_point)
         public:
-            typedef int IdType;
+            typedef long long IdType;
 
             IdSet(const CpGridData& grid)
                 : grid_(grid)
@@ -229,13 +229,13 @@ namespace Dune
                 return intersection.id();
             }
 
-            template<int cc>
-            IdType subId(const cpgrid::Entity<0>& e, int i) const
+            template<long long cc>
+            IdType subId(const cpgrid::Entity<0>& e, long long i) const
             {
                 return id(e.template subEntity<cc>(i));
             }
 
-            IdType subId(const cpgrid::Entity<0>& e, int i, int cc) const;
+            IdType subId(const cpgrid::Entity<0>& e, long long i, long long cc) const;
 
         private:
 
@@ -243,7 +243,7 @@ namespace Dune
             IdType computeId(const EntityType& e) const
             {
                 IdType myId = 0;
-                for( int c=0; c<EntityType::codimension; ++c )
+                for( long long c=0; c<EntityType::codimension; ++c )
                     myId += grid_.indexSet().size( c );
                 return  myId + e.index();
             }
@@ -261,15 +261,15 @@ namespace Dune
                         return  myId + e.index();
                     }
                     // Level 1, 2, ...., maxLevel refined grids
-                    if ( (gridIdx>0) && (gridIdx < static_cast<int>(grid_.levelData().size() -1)) ) {
+                    if ( (gridIdx>0) && (gridIdx < static_cast<long long>(grid_.levelData().size() -1)) ) {
                         if ((e.level() != gridIdx)) { // cells equiv to pre-existing cells
                             return  grid_.levelData()[e.level()]->localIdSet().id(e.getEquivLevelElem());
                         }
                         else {
                             // Count (and add to myId) all the entities of all the codimensions (for CpGrid, only 0 and 3)
                             // from all the "previous" level grids.
-                            for (int lowerLevel = 0; lowerLevel< gridIdx; ++lowerLevel) {
-                                for( int c=0; c<4; ++c ) {
+                            for (long long lowerLevel = 0; lowerLevel< gridIdx; ++lowerLevel) {
+                                for( long long c=0; c<4; ++c ) {
                                     myId += grid_.levelData()[lowerLevel]->indexSet().size( c );
                                 }
                             }
@@ -277,10 +277,10 @@ namespace Dune
                         }
                     }
                     else { // Leaf grid view (grid view with mixed coarse and refined cells).
-                        assert( grid_.getGridIdx() == (static_cast<int>(grid_.levelData().size()) -1) );
+                        assert( grid_.getGridIdx() == (static_cast<long long>(grid_.levelData().size()) -1) );
                         // In this case, we search for the ids defined in previous levels
                         // (since each entities must keep its id along the entire hiearchy)
-                        std::array<int,2> level_levelIdx = {0,0};
+                        std::array<long long,2> level_levelIdx = {0,0};
                         level_levelIdx = grid_.leaf_to_level_cells_[e.index()];
                         const auto& levelEntity =  cpgrid::Entity<0>(*(grid_.levelData()[level_levelIdx[0]]), level_levelIdx[1], true);
                         return  grid_.levelData()[level_levelIdx[0]]->local_id_set_ ->id(levelEntity);
@@ -300,13 +300,13 @@ namespace Dune
                     // Level zero grid
                     if ( gridIdx == 0 ) {
                         // Count all the entities of (all the levels) level 0 of all codimensions lower than 3 (for CpGrid, only codim = 0 cells).
-                        for( int c=0; c<3; ++c ) {
+                        for( long long c=0; c<3; ++c ) {
                             myId += grid_.indexSet().size( c );
                         }
                         return  myId + e.index();
                     }
                     // Level 1, 2, ...., maxLevel refined grids.
-                    if ( (gridIdx>0) && (gridIdx < static_cast<int>(grid_.levelData().size() -1)) ) {
+                    if ( (gridIdx>0) && (gridIdx < static_cast<long long>(grid_.levelData().size() -1)) ) {
                         const auto& level_levelIdx = grid_.corner_history_[e.index()];
                         if(level_levelIdx[0] != -1) { // corner equiv to a pre-exisiting level corner
                             const auto& levelEntity =  cpgrid::Entity<3>(*(grid_.levelData()[level_levelIdx[0]]), level_levelIdx[1], true);
@@ -315,30 +315,30 @@ namespace Dune
                         else {
                             // Count (and add to myId) all the entities of all the codimensions (for CpGrid, only 0 and 3)
                             // from all the "previous" level grids.
-                            for (int lowerLevel = 0; lowerLevel< gridIdx; ++lowerLevel) {
-                                for( int c=0; c<4; ++c ) {
+                            for (long long lowerLevel = 0; lowerLevel< gridIdx; ++lowerLevel) {
+                                for( long long c=0; c<4; ++c ) {
                                     myId += grid_.levelData()[lowerLevel]->indexSet().size( c );
                                 }
                             }
                             // Count (and add to myId) all the entities of the refined level grid of codim < 3.
-                            for( int c=0; c<3; ++c ) {
+                            for( long long c=0; c<3; ++c ) {
                                 myId += grid_.indexSet().size( c );
                             }
                             return  myId + e.index();
                         }
                     }
                     else { // Leaf grid view (grid view with mixed coarse and refined cells).
-                        assert( grid_.getGridIdx() == (static_cast<int>(grid_.levelData().size()) -1) );
+                        assert( grid_.getGridIdx() == (static_cast<long long>(grid_.levelData().size()) -1) );
                         // In this case, we search for the ids defined in previous levels
                         // (since each entities must keep its id along the entire hiearchy)
-                        std::array<int,2> level_levelIdx = {0,0};
+                        std::array<long long,2> level_levelIdx = {0,0};
                         level_levelIdx = grid_.corner_history_[e.index()];
                         const auto& levelEntity =  cpgrid::Entity<3>(*(grid_.levelData()[level_levelIdx[0]]), level_levelIdx[1], true);
                         return  grid_.levelData()[level_levelIdx[0]]->local_id_set_ ->id(levelEntity);
                     }
                 } // end-if-data_.size()>1
                 else { // Case: No LGRs / No refined level grids. Only level 0 grid (GLOBAL grid).
-                    for( int c=0; c<3; ++c ) {
+                    for( long long c=0; c<3; ++c ) {
                         myId += grid_.indexSet().size( c );
                     }
                     return  myId + e.index();
@@ -352,11 +352,11 @@ namespace Dune
             friend class CpGridData;
             friend class ReversePointGlobalIdSet;
         public:
-            typedef int IdType;
+            typedef long long IdType;
 
-            void swap(std::vector<int>& cellMapping,
-                      std::vector<int>& faceMapping,
-                      std::vector<int>& pointMapping)
+            void swap(std::vector<long long>& cellMapping,
+                      std::vector<long long>& faceMapping,
+                      std::vector<long long>& pointMapping)
             {
                 idSet_=nullptr;
                 GlobalIdMapping::swap(cellMapping,
@@ -369,7 +369,7 @@ namespace Dune
             LevelGlobalIdSet()
                 : idSet_(), view_()
             {}
-            template<int codim>
+            template<long long codim>
             IdType id(const Entity<codim>& e) const
             {
                 assert(view_ == e.pgrid_);
@@ -383,7 +383,7 @@ namespace Dune
                     // build from the ids of the sequential grid
                     return this->template getMapping<codim>()[e.index()];
             }
-            template<int codim>
+            template<long long codim>
             IdType id(const EntityRep<codim>& e) const
             {
                 if(idSet_)
@@ -392,29 +392,29 @@ namespace Dune
                     return this->template getMapping<codim>()[e.index()];
             }
 
-            template<int cc>
-            IdType subId(const cpgrid::Entity<0>& e, int i) const
+            template<long long cc>
+            IdType subId(const cpgrid::Entity<0>& e, long long i) const
             {
                 assert(view_ == e.pgrid_);
                 return id(e.template subEntity<cc>(i));
             }
 
-            IdType subId(const cpgrid::Entity<0>& e, int i, int cc) const;
+            IdType subId(const cpgrid::Entity<0>& e, long long i, long long cc) const;
 
-            template<int codim>
+            template<long long codim>
             IdType getMaxCodimGlobalId()
             {
                 if(idSet_)
                 {
                     IdType max_codim_id = 0;
                     if (codim == 0) {
-                        for (int elemIdx = 0; elemIdx < view_-> size(0); ++elemIdx) {
+                        for (long long elemIdx = 0; elemIdx < view_-> size(0); ++elemIdx) {
                             const auto& element=  cpgrid::Entity<0>(*view_, elemIdx, true);
                             max_codim_id = std::max(max_codim_id, idSet_->id(element));
                         }
                     }
                     if (codim == 3) {
-                        for (int pointIdx = 0; pointIdx < view_->size(3); ++pointIdx) {
+                        for (long long pointIdx = 0; pointIdx < view_->size(3); ++pointIdx) {
                             const auto& point =  cpgrid::Entity<3>(*view_, pointIdx, true);
                             max_codim_id = std::max(max_codim_id, idSet_->id(point));
                         }
@@ -455,19 +455,19 @@ namespace Dune
 
         GlobalIdSet(const CpGridData& view);
 
-        template<int codim>
+        template<long long codim>
         IdType id(const Entity<codim>& e) const
         {
             return levelIdSet(e.pgrid_).id(e);
         }
 
-        template<int cc>
-        IdType subId(const cpgrid::Entity<0>& e, int i) const
+        template<long long cc>
+        IdType subId(const cpgrid::Entity<0>& e, long long i) const
         {
             return levelIdSet(e.pgrid_).template subId<cc>(e, i);
         }
 
-        IdType subId(const cpgrid::Entity<0>& e, int i, int cc) const;
+        IdType subId(const cpgrid::Entity<0>& e, long long i, long long cc) const;
 
         void insertIdSet(const CpGridData& view);
     private:
@@ -493,13 +493,13 @@ namespace Dune
             }
             else
             {
-                mapping_.reset(new std::unordered_map<int,int>);
-                int localId = 0;
+                mapping_.reset(new std::unordered_map<long long,long long>);
+                long long localId = 0;
                 for (const  auto& globalId: idSet.template getMapping<3>())
                     (*mapping_)[globalId] = localId++;
             }
         }
-        int operator[](int i) const
+        long long operator[](long long i) const
         {
             if (mapping_)
             {
@@ -517,7 +517,7 @@ namespace Dune
             mapping_.reset(nullptr);
         }
     private:
-        std::unique_ptr<std::unordered_map<int,int> > mapping_;
+        std::unique_ptr<std::unordered_map<long long,long long> > mapping_;
         const CpGridData* grid_ = nullptr;
     };
 

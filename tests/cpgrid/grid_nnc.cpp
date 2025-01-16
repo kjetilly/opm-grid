@@ -36,7 +36,7 @@
 
 namespace std
 {
-    ostream& operator<<(ostream& os, const pair<int, int>& x)
+    ostream& operator<<(ostream& os, const pair<long long, long long>& x)
     {
         os << "{ " << x.first << ", " << x.second << " }";
         return os;
@@ -49,7 +49,7 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
@@ -59,10 +59,10 @@ struct Fixture
 
     void testCase(const std::string& filename,
                   const Opm::NNC& nnc,
-                  const int ex_elemcount,
-                  const int ex_intercount,
-                  const int ex_bdycount,
-                  const std::vector<std::pair<int, int>>& ex_nb,
+                  const long long ex_elemcount,
+                  const long long ex_intercount,
+                  const long long ex_bdycount,
+                  const std::vector<std::pair<long long, long long>>& ex_nb,
                   const bool use_deck_porv = false)
     {
         Opm::Deck deck = parser.parseFile(filename);
@@ -78,10 +78,10 @@ struct Fixture
         grid.processEclipseFormat(&es.getInputGrid(), &es, false, false, false);
         const auto& gv = grid.leafGridView();
         ElementMapper elmap(gv, Dune::mcmgElementLayout());
-        int elemcount = 0;
-        int intercount = 0;
-        int bdycount = 0;
-        std::vector<std::pair<int, int>> nb;
+        long long elemcount = 0;
+        long long intercount = 0;
+        long long bdycount = 0;
+        std::vector<std::pair<long long, long long>> nb;
         for (const auto& elem : elements(gv)) {
             ++elemcount;
             for (const auto& inter : intersections(gv, elem)) {
@@ -90,8 +90,8 @@ struct Fixture
                     ++bdycount;
                 } else {
                     // Internal connection, store in vector of pairs, if c1 < c2.
-                    const int c1 = elmap.index(elem);
-                    const int c2 = elmap.index(inter.outside());
+                    const long long c1 = elmap.index(elem);
+                    const long long c2 = elmap.index(inter.outside());
                     if (c1 < c2) {
                         nb.push_back(std::make_pair(c1, c2));
                     }

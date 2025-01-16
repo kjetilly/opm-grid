@@ -66,7 +66,7 @@ namespace Opm { namespace UgGridHelpers {
         ///
         /// \tparam CartDims Representation of Cartesian model dimensions.
         ///     Must support \code operator[]() \endcode.  Typically \code
-        ///     std::vector<int> \endcode or \code std::array<int, 3>
+        ///     std::vector<long long> \endcode or \code std::array<long long, 3>
         ///     \endcode or similar (e.g., \code std::array<std::size_t, 3>
         ///     \endcode).
         ///
@@ -82,7 +82,7 @@ namespace Opm { namespace UgGridHelpers {
         ///    least three elements with indices \c 0, \c 1, and \c 2.
         template <class CartDims>
         RepairZCORN(std::vector<double>&&   zcorn,
-                    const std::vector<int>& actnum,
+                    const std::vector<long long>& actnum,
                     const CartDims&         cartDims)
             : active_   (actnum, cartDims)
             , zcorn_idx_(cartDims)
@@ -155,8 +155,8 @@ namespace Opm { namespace UgGridHelpers {
             ///
             /// \tparam CartDims Representation of Cartesian model
             ///     dimensions.  Must support \code operator[]() \endcode.
-            ///     Typically \code std::vector<int> \endcode or \code
-            ///     std::array<int, 3> \endcode or similar (e.g., \code
+            ///     Typically \code std::vector<long long> \endcode or \code
+            ///     std::array<long long, 3> \endcode or similar (e.g., \code
             ///     std::array<std::size_t, 3> \endcode).
             ///
             /// \param[in] actnum Explicit cell activation flag.  Empty
@@ -166,7 +166,7 @@ namespace Opm { namespace UgGridHelpers {
             /// \param[in] cartDims Model's Cartesian dimensions.  Must have
             ///    at least three elements.
             template <class CartDims>
-            ActiveCells(const std::vector<int>& actnum,
+            ActiveCells(const std::vector<long long>& actnum,
                         const CartDims&         cartDims)
                 : nx_(cartDims[0])
                 , ny_(cartDims[1])
@@ -592,7 +592,7 @@ namespace Opm { namespace UgGridHelpers {
         /// increasing for increasing layer index).
         bool zcornIsElevation() const
         {
-            auto all_signs = std::vector<int>{};
+            auto all_signs = std::vector<long long>{};
             all_signs.reserve(this->active_.numGlobalCells());
 
             for (const auto& globCell : this->active_.activeGlobal()) {
@@ -600,7 +600,7 @@ namespace Opm { namespace UgGridHelpers {
             }
 
             // Ignore twisted cells (i.e., cells of indeterminate signs).
-            const int ignore = 0;
+            const long long ignore = 0;
 
             // Elevation implies that ZCORN values are decreasing which
             // means that the signs in all non-twisted cells equal -1.
@@ -629,16 +629,16 @@ namespace Opm { namespace UgGridHelpers {
         ///    negative (-1) if ZCORN does not *INCREASE* along any of the
         ///    cell's pillars.
         template <typename CellIndex>
-        int getZCornSign(const CellIndex globCell) const
+        long long getZCornSign(const CellIndex globCell) const
         {
-            auto sign = [](const double x) -> int
+            auto sign = [](const double x) -> long long
             {
                 return (x > 0.0) - (x < 0.0);
             };
 
             const auto ijk = this->active_.getCellIJK(globCell);
 
-            auto sgn = std::vector<int>{};  sgn.reserve(4);
+            auto sgn = std::vector<long long>{};  sgn.reserve(4);
 
             for (const auto& pt : this->zcorn_idx_.pillarPoints(ijk)) {
                 const auto dz =
@@ -647,7 +647,7 @@ namespace Opm { namespace UgGridHelpers {
                 sgn.push_back(sign(dz));
             }
 
-            const int ignore = 0;
+            const long long ignore = 0;
 
             if (! allEqual(sgn, ignore)) {
                 return 0;
@@ -666,8 +666,8 @@ namespace Opm { namespace UgGridHelpers {
         ///
         /// \return Whether or not all non-ignored elements of \p coll have
         ///    the same value.
-        bool allEqual(const std::vector<int>& coll,
-                      const int               ignore) const
+        bool allEqual(const std::vector<long long>& coll,
+                      const long long               ignore) const
         {
             return this->allEqual(coll, ignore, ignore);
         }
@@ -693,15 +693,15 @@ namespace Opm { namespace UgGridHelpers {
         ///
         /// \return Whether or not all non-ignored elements of \p coll have
         ///    the same value.
-        bool allEqual(const std::vector<int>& coll,
-                      const int               ignore,
-                      const int               lookfor) const
+        bool allEqual(const std::vector<long long>& coll,
+                      const long long               ignore,
+                      const long long               lookfor) const
         {
             const auto x0 = (lookfor != ignore)
                 ? lookfor : first(coll, ignore);
 
             return std::all_of(std::begin(coll), std::end(coll),
-                               [x0, ignore](const int xi)
+                               [x0, ignore](const long long xi)
                    {
                        return (xi == x0) || (xi == ignore);
                    });
@@ -717,13 +717,13 @@ namespace Opm { namespace UgGridHelpers {
         /// \return First non-ignored element value in \p coll.  If there
         ///    are no non-ignored elements in \p coll, then first() returns
         ///    \p ignore.
-        int first(const std::vector<int>& coll,
-                  const int               ignore) const
+        long long first(const std::vector<long long>& coll,
+                  const long long               ignore) const
         {
             auto e = std::end(coll);
 
             auto p = std::find_if(std::begin(coll), e,
-                                  [ignore](const int xi)
+                                  [ignore](const long long xi)
                                   {
                                       return xi != ignore;
                                   });

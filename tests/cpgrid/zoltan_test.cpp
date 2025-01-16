@@ -33,17 +33,17 @@
 class MPIError {
 public:
   /** @brief Constructor. */
-  MPIError(std::string s, int e) : errorstring(s), errorcode(e){}
+  MPIError(std::string s, long long e) : errorstring(s), errorcode(e){}
   /** @brief The error string. */
   std::string errorstring;
   /** @brief The mpi error code. */
-  int errorcode;
+  long long errorcode;
 };
 
 #ifdef HAVE_MPI
-void MPI_err_handler(MPI_Comm *, int *err_code, ...){
+void MPI_err_handler(MPI_Comm *, long long *err_code, ...){
   char *err_string=new char[MPI_MAX_ERROR_STRING];
-  int err_length;
+  long long err_length;
   MPI_Error_string(*err_code, err_string, &err_length);
   std::string s(err_string, err_length);
   std::cerr << "An MPI Error ocurred:"<<std::endl<<s<<std::endl;
@@ -57,7 +57,7 @@ struct MPIFixture
     MPIFixture()
     {
 #if HAVE_MPI
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     helper = &Dune::MPIHelper::instance(m_argc, m_argv);
 #ifdef MPI_2
@@ -86,21 +86,21 @@ BOOST_GLOBAL_FIXTURE(MPIFixture);
 BOOST_AUTO_TEST_CASE(zoltan)
 {
 
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     {
         auto& inst = Dune::MPIHelper::instance(m_argc, m_argv);
         (void) inst; //omit unused variable warning.
 
 #if defined(HAVE_ZOLTAN) && defined(HAVE_MPI)
-        int rc;
+        long long rc;
         float ver;
-        int procs=1;
+        long long procs=1;
         struct Zoltan_Struct *zz;
-        int changes, numGidEntries, numLidEntries, numImport, numExport;
-        int myRank;
+        long long changes, numGidEntries, numLidEntries, numImport, numExport;
+        long long myRank;
         ZOLTAN_ID_PTR importGlobalGids, importLocalGids, exportGlobalGids, exportLocalGids;
-        int *importProcs, *importToPart, *exportProcs, *exportToPart;
+        long long *importProcs, *importToPart, *exportProcs, *exportToPart;
         rc = Zoltan_Initialize(m_argc, m_argv, &ver);
         BOOST_REQUIRE (rc == ZOLTAN_OK);
 
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(zoltan)
         MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
         Dune::CpGrid grid;
-        std::array<int, 3> dims={{1, procs, procs}};
+        std::array<long long, 3> dims={{1, procs, procs}};
         std::array<double, 3> size={{ 1.0, 1.0, 1.0}};
 #ifdef ONE_TO_ALL
         if (myRank==0)
@@ -168,17 +168,17 @@ BOOST_AUTO_TEST_CASE(zoltan)
         if(myRank > 0)
         {
             MPI_Status stat;
-            int i=0;
+            long long i=0;
             MPI_Recv(&i, 1, MPI_INT, myRank-1, 787, MPI_COMM_WORLD, &stat);
         }
         std::cout<<"Begin Rank "<<myRank<<":"<<std::endl;
-        for ( int i=0; i < numExport; i++ )
+        for ( long long i=0; i < numExport; i++ )
         {
             std::cout<<"e"<<exportLocalGids[i]<<" ("<<exportGlobalGids[i]<<") => part="<<exportToPart[i]<<
                 " proc="<<exportProcs[i]<<", ";
         }
         std::cout<<std::endl;
-        for ( int i=0; i < numImport; i++ )
+        for ( long long i=0; i < numImport; i++ )
         {
             std::cout<<"i"<<importLocalGids[i]<<" ("<<importGlobalGids[i]<<") => part="<<importToPart[i]<<
                 " proc="<<importProcs[i]<<", ";
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(zoltan)
         std::cout<<std::endl;
         if(myRank <procs-1)
         {
-            int i=0;
+            long long i=0;
             MPI_Send(&i, 1, MPI_INT, myRank+1, 787, MPI_COMM_WORLD);
         }
 #endif

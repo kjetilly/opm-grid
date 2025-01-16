@@ -55,7 +55,7 @@ namespace Dune
 {
     namespace cpgrid
     {
-    template<int>
+    template<long long>
     class Entity;
     class CpGridData;
 
@@ -93,7 +93,7 @@ namespace Dune
             /// @brief
             /// @todo Doc me!
             /// @param
-            Intersection(const CpGridData& grid, const EntityRep<0>& cell, int subindex, bool update_now = true);
+            Intersection(const CpGridData& grid, const EntityRep<0>& cell, long long subindex, bool update_now = true);
 
             /// @brief
             /// @todo Doc me!
@@ -123,18 +123,18 @@ namespace Dune
             }
 
             /// Returns the boundary id of this intersection.
-            int boundaryId() const;
+            long long boundaryId() const;
 
 
             /// Returns the boundary segment index of this intersection.
-            int boundarySegmentIndex() const;
+            long long boundarySegmentIndex() const;
 
             /// @brief
             /// @todo Doc me!
             /// @return
             bool neighbor() const
             {
-                return !boundary() && nbcell_!=std::numeric_limits<int>::max();
+                return !boundary() && nbcell_!=std::numeric_limits<long long>::max();
             }
 
             /// @brief
@@ -193,13 +193,13 @@ namespace Dune
 
             /// Local index of codim 1 entity in the inside() entity
             /// where intersection is contained in.
-            int indexInInside() const;
+            long long indexInInside() const;
 
             /// Local index of codim 1 entity in outside() entity
             /// where intersection is contained in.
-            int indexInOutside() const
+            long long indexInOutside() const
             {
-                int in_inside = indexInInside();
+                long long in_inside = indexInInside();
                 if (in_inside == -1) {
                     // NNC face, return -1 here as well.
                     return -1;
@@ -231,7 +231,7 @@ namespace Dune
             /// @return
             FieldVector<ctype, 3> centerUnitOuterNormal() const;
 
-            int id() const
+            long long id() const
             {
                 const EntityRep<1>& face = faces_of_cell_[subindex_];
                 return face.index();
@@ -239,10 +239,10 @@ namespace Dune
 
         protected:
             const CpGridData* pgrid_;
-            int index_;
-            int subindex_;
+            long long index_;
+            long long subindex_;
             OrientedEntityTable<0,1>::row_type faces_of_cell_;
-            int nbcell_;
+            long long nbcell_;
             bool is_on_boundary_;
 
             void increment();
@@ -259,12 +259,12 @@ namespace Dune
                 return subindex_ == faces_of_cell_.size();
             }
 
-            int nbcell() const
+            long long nbcell() const
             {
                 if (is_on_boundary_) {
                     OPM_THROW(std::runtime_error, "There is no outside cell, intersection is at boundary.");
                 }
-                if(nbcell_==std::numeric_limits<int>::max())
+                if(nbcell_==std::numeric_limits<long long>::max())
                     OPM_THROW(std::runtime_error, "There is no outside cell, intersection is at processor boundary.");
                 return nbcell_;
             }

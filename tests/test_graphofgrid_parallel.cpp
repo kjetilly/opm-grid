@@ -41,7 +41,7 @@
 BOOST_AUTO_TEST_CASE(ImportExportListExpansion)
 {
     Dune::CpGrid grid;
-    std::array<int,3> dims{3,3,2};
+    std::array<long long,3> dims{3,3,2};
     std::array<double,3> size{1.,1.,1.};
     grid.createCartesian(dims,size);
     const auto& cc = grid.comm();
@@ -52,31 +52,31 @@ BOOST_AUTO_TEST_CASE(ImportExportListExpansion)
     // grid is nonempty only on the rank 0
     if (cc.rank()==0)
     {
-        gog.addWell(std::set<int>{0,1,2});
-        gog.addWell(std::set<int>{3,4,5});
-        gog.addWell(std::set<int>{6,7,8});
-        gog.addWell(std::set<int>{9,13,17});
+        gog.addWell(std::set<long long>{0,1,2});
+        gog.addWell(std::set<long long>{3,4,5});
+        gog.addWell(std::set<long long>{6,7,8});
+        gog.addWell(std::set<long long>{9,13,17});
         BOOST_REQUIRE(gog.size()==10);
     }
 
     // rank-specific export and import lists
-    std::vector<std::tuple<int,int,char>> exportList, exportSolution;
-    std::vector<std::tuple<int,int,char,int>> importList, importSolution;
+    std::vector<std::tuple<long long,long long,char>> exportList, exportSolution;
+    std::vector<std::tuple<long long,long long,char,long long>> importList, importSolution;
     // this test works on any number or ranks although from rank 4 (including) all are empty
     // if ranks<4, the highest rank gobbles leftovers
-    int maxrank = cc.size()-1;
-    std::vector<int> ranks{0,std::min(maxrank,1),std::min(maxrank,2),std::min(maxrank,3)};
+    long long maxrank = cc.size()-1;
+    std::vector<long long> ranks{0,std::min(maxrank,1),std::min(maxrank,2),std::min(maxrank,3)};
 
     // cells[rank] holds solution, each rank 0..3 has 1 well
-    std::vector<std::vector<int>> cells(4);
-    cells[0] = std::vector<int>{0,1,2,10,11};
-    cells[1] = std::vector<int>{3,4,5,12};
-    cells[2] = std::vector<int>{6,7,8,15,16};
-    cells[3] = std::vector<int>{9,13,14,17};
+    std::vector<std::vector<long long>> cells(4);
+    cells[0] = std::vector<long long>{0,1,2,10,11};
+    cells[1] = std::vector<long long>{3,4,5,12};
+    cells[2] = std::vector<long long>{6,7,8,15,16};
+    cells[3] = std::vector<long long>{9,13,14,17};
     using AttributeSet = Dune::cpgrid::CpGridData::AttributeSet;
     char owner = AttributeSet::owner;
 
-    for (int i=0; i<4; ++i)
+    for (long long i=0; i<4; ++i)
     {
         for (const auto& c : cells[i])
         {
@@ -145,7 +145,7 @@ init_unit_test_func()
     return true;
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     boost::unit_test::unit_test_main(&init_unit_test_func,

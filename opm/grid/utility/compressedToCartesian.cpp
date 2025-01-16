@@ -31,10 +31,10 @@ namespace Opm
     // \return                 A vector containing the same data as global_cell,
     //                         or the sequence { 0, 1, ... , num_cells - 1 } if
     //                         global_cell was null.
-    std::vector<int> compressedToCartesian(const int num_cells,
-                                           const int* global_cell)
+    std::vector<long long> compressedToCartesian(const long long num_cells,
+                                           const long long* global_cell)
     {
-        std::vector<int> retval;
+        std::vector<long long> retval;
         if (global_cell) {
             retval.assign(global_cell, global_cell + num_cells);
         } else {

@@ -36,9 +36,9 @@
 #define OPM_FACETOPOLOGY_HEADER
 
 
-void findconnections(int n, int *pts[4],
-                     int *intersectionlist,
-                     int *work,
+void findconnections(long long n, long long *pts[4],
+                     long long *intersectionlist,
+                     long long *work,
                      struct processed_grid *out);
 
 #endif /* OPM_FACETOPOLOGY_HEADER */

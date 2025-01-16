@@ -11,7 +11,7 @@ void Dune::cpgrid::PointViaCellWarner::warn()
         std::cerr << "Communication of variable data attached to points is "
                   << "not fully supported. Your code/handle must not use the "
                   << "last parameter of "
-                  << "DataHandle::scatter(B& buffer, E& entity, int size) "
+                  << "DataHandle::scatter(B& buffer, E& entity, long long size) "
                   << "as it will not be correct!\n";
         printWarn = false;
     }

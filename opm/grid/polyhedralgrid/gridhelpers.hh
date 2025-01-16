@@ -27,37 +27,37 @@ namespace Opm
 namespace UgGridHelpers
 {
 
-template<int dim, int dimworld>
+template<long long dim, long long dimworld>
 struct CellCentroidTraits< Dune::PolyhedralGrid< dim, dimworld > >
   : public CellCentroidTraits<UnstructuredGrid>
 {
 };
 
-template<int dim, int dimworld>
+template<long long dim, long long dimworld>
 struct CellVolumeIteratorTraits< Dune::PolyhedralGrid< dim, dimworld > >
   : public CellVolumeIteratorTraits<UnstructuredGrid>
 {
 };
 
-template<int dim, int dimworld>
+template<long long dim, long long dimworld>
 struct FaceCentroidTraits< Dune::PolyhedralGrid< dim, dimworld > >
  : public FaceCentroidTraits< UnstructuredGrid >
 {
 };
 
-template<int dim, int dimworld>
+template<long long dim, long long dimworld>
 struct Cell2FacesTraits< Dune::PolyhedralGrid< dim, dimworld > >
  : public Cell2FacesTraits<UnstructuredGrid>
 {
 };
 
-template<int dim, int dimworld>
+template<long long dim, long long dimworld>
 struct Face2VerticesTraits< Dune::PolyhedralGrid< dim, dimworld > >
  : public Face2VerticesTraits<UnstructuredGrid>
 {
 };
 
-template<int dim, int dimworld>
+template<long long dim, long long dimworld>
 struct FaceCellTraits< Dune::PolyhedralGrid< dim, dimworld > >
  : public FaceCellTraits<UnstructuredGrid>
 {

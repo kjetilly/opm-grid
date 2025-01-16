@@ -14,16 +14,16 @@ namespace Dune
     class CartesianIndexMapper< CpGrid >
     {
     public:
-        static const int dimension = 3 ;
+        static const long long dimension = 3 ;
     protected:
         typedef CpGrid Grid;
         const Grid& grid_;
-        const int cartesianSize_;
+        const long long cartesianSize_;
 
-        int computeCartesianSize() const
+        long long computeCartesianSize() const
         {
-            int size = cartesianDimensions()[ 0 ];
-            for( int d=1; d<dimension; ++d )
+            long long size = cartesianDimensions()[ 0 ];
+            for( long long d=1; d<dimension; ++d )
                 size *= cartesianDimensions()[ d ];
             return size;
         }
@@ -35,28 +35,28 @@ namespace Dune
         {
         }
 
-        const std::array<int, dimension>& cartesianDimensions() const
+        const std::array<long long, dimension>& cartesianDimensions() const
         {
             return grid_.logicalCartesianSize();
         }
 
-        int cartesianSize() const
+        long long cartesianSize() const
         {
             return cartesianSize_;
         }
 
-        int compressedSize() const
+        long long compressedSize() const
         {
             return grid_.globalCell().size();
         }
 
-        int cartesianIndex( const int compressedElementIndex ) const
+        long long cartesianIndex( const long long compressedElementIndex ) const
         {
             assert(  compressedElementIndex >= 0 && compressedElementIndex < compressedSize() );
             return grid_.globalCell()[ compressedElementIndex ];
         }
 
-        void cartesianCoordinate(const int compressedElementIndex, std::array<int,dimension>& coords) const
+        void cartesianCoordinate(const long long compressedElementIndex, std::array<long long,dimension>& coords) const
         {
             grid_.getIJK( compressedElementIndex, coords );
         }

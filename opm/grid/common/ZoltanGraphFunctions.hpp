@@ -45,7 +45,7 @@ namespace cpgrid
 ///
 /// The cells are the vertices of the graph.
 /// \return The number of vertices of the graph representing the grid.
-inline int getCpGridNumCells(void* cpGridPointer, int* err)
+inline long long getCpGridNumCells(void* cpGridPointer, long long* err)
 {
     const Dune::CpGrid&  grid = *static_cast<const Dune::CpGrid*>(cpGridPointer);
     *err = ZOLTAN_OK;
@@ -53,54 +53,54 @@ inline int getCpGridNumCells(void* cpGridPointer, int* err)
 }
 
 /// \brief Get the list of vertices of the graph of the grid.
-void getCpGridVertexList(void* cpGridPointer, int numGlobalIds,
-                         int numLocalIds, ZOLTAN_ID_PTR gids,
-                         ZOLTAN_ID_PTR lids, int wgtDim,
-                         float *objWgts, int *err);
+void getCpGridVertexList(void* cpGridPointer, long long numGlobalIds,
+                         long long numLocalIds, ZOLTAN_ID_PTR gids,
+                         ZOLTAN_ID_PTR lids, long long wgtDim,
+                         float *objWgts, long long *err);
 
 /// \brief Get the number of edges for one vertex of the graph of the grid.
-int getNumberOfEdgesForSpecificCell(const Dune::CpGrid& grid, int localCellId);
+long long getNumberOfEdgesForSpecificCell(const Dune::CpGrid& grid, long long localCellId);
 
 /// \brief Get the number of edges of the graph of the grid.
-void getCpGridNumEdgesList(void *cpGridPointer, int sizeGID, int sizeLID,
-                           int numCells,
+void getCpGridNumEdgesList(void *cpGridPointer, long long sizeGID, long long sizeLID,
+                           long long numCells,
                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                           int *numEdges, int *err);
+                           long long *numEdges, long long *err);
 
 /// \brief Get the list of edges for one cell of a grid witout wells
 template <typename ID>
-void fillNBORGIDForSpecificCellAndIncrementNeighborCounter(const Dune::CpGrid& grid, int localCellId, ID globalID, int& neighborCounter, ID& nborGID);
+void fillNBORGIDForSpecificCellAndIncrementNeighborCounter(const Dune::CpGrid& grid, long long localCellId, ID globalID, long long& neighborCounter, ID& nborGID);
 
 /// \brief Get the list of edges of the graph of the grid.
-void getCpGridEdgeList(void *cpGridPointer, int sizeGID, int sizeLID,
-                       int numCells, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                       int *num_edges,
-                       ZOLTAN_ID_PTR nborGID, int *nborProc,
-                       int wgt_dim, float *ewgts, int *err);
+void getCpGridEdgeList(void *cpGridPointer, long long sizeGID, long long sizeLID,
+                       long long numCells, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                       long long *num_edges,
+                       ZOLTAN_ID_PTR nborGID, long long *nborProc,
+                       long long wgt_dim, float *ewgts, long long *err);
 
 /// \brief Get a list of vertices with zero enties
-void getNullVertexList(void* cpGridPointer, int numGlobalIds,
-                         int numLocalIds, ZOLTAN_ID_PTR gids,
-                         ZOLTAN_ID_PTR lids, int wgtDim,
-                         float *objWgts, int *err);
+void getNullVertexList(void* cpGridPointer, long long numGlobalIds,
+                         long long numLocalIds, ZOLTAN_ID_PTR gids,
+                         ZOLTAN_ID_PTR lids, long long wgtDim,
+                         float *objWgts, long long *err);
 
 /// \brief Get zero as the number of edges the graph of the grid.
-void getNullNumEdgesList(void *cpGridPointer, int sizeGID, int sizeLID,
-                           int numCells,
+void getNullNumEdgesList(void *cpGridPointer, long long sizeGID, long long sizeLID,
+                           long long numCells,
                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                           int *numEdges, int *err);
+                           long long *numEdges, long long *err);
 
 /// \brief Get a list of edges of size zero.
-void getNullEdgeList(void *cpGridPointer, int sizeGID, int sizeLID,
-                       int numCells, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                       int *num_edges,
-                       ZOLTAN_ID_PTR nborGID, int *nborProc,
-                       int wgt_dim, float *ewgts, int *err);
+void getNullEdgeList(void *cpGridPointer, long long sizeGID, long long sizeLID,
+                       long long numCells, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                       long long *num_edges,
+                       ZOLTAN_ID_PTR nborGID, long long *nborProc,
+                       long long wgt_dim, float *ewgts, long long *err);
 
 /// \brief Get always zero as the number of cells of the grid.
 ///
 /// The cells are the vertices of the graph.
-inline int getNullNumCells(void* cpGridPointer, int* err)
+inline long long getNullNumCells(void* cpGridPointer, long long* err)
 {
     (void) cpGridPointer;
     *err = ZOLTAN_OK;
@@ -108,17 +108,17 @@ inline int getNullNumCells(void* cpGridPointer, int* err)
 }
 
 /// \brief Get the number of edges the graph of the grid and the wells.
-void getCpGridWellsNumEdgesList(void *cpGridWellsPointer, int sizeGID, int sizeLID,
-                           int numCells,
+void getCpGridWellsNumEdgesList(void *cpGridWellsPointer, long long sizeGID, long long sizeLID,
+                           long long numCells,
                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                           int *numEdges, int *err);
+                           long long *numEdges, long long *err);
 
 /// \brief Get the list of edges of the graph of the grid and the wells
-void getCpGridWellsEdgeList(void *cpGridWellsPointer, int sizeGID, int sizeLID,
-                       int numCells, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                       int *num_edges,
-                       ZOLTAN_ID_PTR nborGID, int *nborProc,
-                       int wgt_dim, float *ewgts, int *err);
+void getCpGridWellsEdgeList(void *cpGridWellsPointer, long long sizeGID, long long sizeLID,
+                       long long numCells, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                       long long *num_edges,
+                       ZOLTAN_ID_PTR nborGID, long long *nborProc,
+                       long long wgt_dim, float *ewgts, long long *err);
 } // end namespace cpgrid
 } // end namespace Dune
 
@@ -137,7 +137,7 @@ namespace cpgrid
 class CombinedGridWellGraph
 {
 public:
-    typedef std::vector<std::set<int> > GraphType;
+    typedef std::vector<std::set<long long> > GraphType;
 
     /// \brief Create a graph representing a grid together with the wells.
     /// \param grid The grid.
@@ -150,7 +150,7 @@ public:
     /// \param edgeWeightsMethod The method used to calculated the edge weights.
     CombinedGridWellGraph(const Dune::CpGrid& grid,
                           const std::vector<OpmWellType> * wells,
-                          const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                          const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                           const double* transmissibilities,
                           bool pretendEmptyGrid,
                           EdgeWeightMethod edgeWeightsMethod);
@@ -166,12 +166,12 @@ public:
         return wellsGraph_;
     }
 
-    double transmissibility(int face_index) const
+    double transmissibility(long long face_index) const
     {
         return transmissibilities_ ? (1.0e18*transmissibilities_[face_index]) : 1;
     }
 
-    double logTransmissibilityWeights(int face_index) const
+    double logTransmissibilityWeights(long long face_index) const
     {
         double trans = transmissibilities_ ?  transmissibilities_[face_index] : 1; 
         return trans == 0.0 ? 0.0 : 1.0 + std::log(trans) - log_min_;
@@ -182,7 +182,7 @@ public:
         return well_indices_;
     }
 
-    double edgeWeight(int face_index) const
+    double edgeWeight(long long face_index) const
     {
         if (edgeWeightsMethod_ == uniformEdgeWgt)
             return 1.0;
@@ -218,7 +218,7 @@ private:
         double min_val = std::numeric_limits<float>::max();
 
         if (transmissibilities_) {
-            for (int face = 0; face < getGrid().numFaces(); ++face)
+            for (long long face = 0; face < getGrid().numFaces(); ++face)
             {
                 double trans = transmissibilities_[face];
                 if (trans > 0)
@@ -237,17 +237,17 @@ private:
     const Dune::CpGrid& grid_;
     GraphType wellsGraph_;
     const double* transmissibilities_;
-    int edgeWeightsMethod_;
+    long long edgeWeightsMethod_;
     WellConnections well_indices_;
     double log_min_;
 };
 
 /// \brief Get the number of edges of the graph of the grid and the wells for one cell
-int getNumberOfEdgesForSpecificCellForGridWithWells(const CombinedGridWellGraph& graph, int localCellId);
+long long getNumberOfEdgesForSpecificCellForGridWithWells(const CombinedGridWellGraph& graph, long long localCellId);
 
 /// \brief Get the list of edges and weights for one cell of a grid with wells
 template<typename ID, typename weightType>
-void fillNBORGIDAndWeightsForSpecificCellAndIncrementNeighborCounterForGridWithWells(const CombinedGridWellGraph& graph, const int localCellId, ID globalID, int& neighborCounter, ID& nborGID, weightType *ewgts);
+void fillNBORGIDAndWeightsForSpecificCellAndIncrementNeighborCounterForGridWithWells(const CombinedGridWellGraph& graph, const long long localCellId, ID globalID, long long& neighborCounter, ID& nborGID, weightType *ewgts);
 
 #ifdef HAVE_ZOLTAN
 /// \brief Sets up the call-back functions for ZOLTAN's graph partitioning.

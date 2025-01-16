@@ -65,9 +65,9 @@ void printInitMessage(std::ofstream& out, const char* origfilename, std::string 
 
 /// Write keyword values to file
 template <class T>
-void printKeywordValues(std::ofstream& out, std::string keyword, std::vector<T> values, int nCols) {
+void printKeywordValues(std::ofstream& out, std::string keyword, std::vector<T> values, long long nCols) {
     out << keyword << std::endl;
-    int col = 0;
+    long long col = 0;
     typename std::vector<T>::iterator iter;
     for (iter = values.begin(); iter != values.end(); ++iter) {
         out << *iter << " ";
@@ -108,15 +108,15 @@ void mirror_mapaxes( const Opm::Deck& deck, std::string direction, std::ofstream
 void mirror_specgrid( const Opm::Deck& deck, std::string direction, std::ofstream& out) {
     // We only need to multiply the dimension by 2 in the correct direction.
     const auto& specgridRecord = deck["SPECGRID"].back().getRecord(0);
-    std::vector<int> dimensions(3);
-    dimensions[0] = specgridRecord.getItem("NX").get< int >(0);
-    dimensions[1] = specgridRecord.getItem("NY").get< int >(0);
-    dimensions[2] = specgridRecord.getItem("NZ").get< int >(0);
+    std::vector<long long> dimensions(3);
+    dimensions[0] = specgridRecord.getItem("NX").get< long long >(0);
+    dimensions[1] = specgridRecord.getItem("NY").get< long long >(0);
+    dimensions[2] = specgridRecord.getItem("NZ").get< long long >(0);
     if (direction == "x")      {dimensions[0] *= 2;}
     else if (direction == "y") {dimensions[1] *= 2;}
     else                       {std::cerr << "Direction should be either x or y" << std::endl; exit(1);}
     out << "SPECGRID" << std::endl << dimensions[0] << " " << dimensions[1] << " " << dimensions[2] << " "
-        << specgridRecord.getItem("NUMRES").get< int >(0) << " "
+        << specgridRecord.getItem("NUMRES").get< long long >(0) << " "
         << specgridRecord.getItem("COORD_TYPE").get< std::string >(0) << " "
         << std::endl << "/" << std::endl << std::endl;
 }
@@ -125,19 +125,19 @@ void mirror_specgrid( const Opm::Deck& deck, std::string direction, std::ofstrea
 void mirror_coord(const Opm::Deck& deck, std::string direction, std::ofstream& out) {
     // We assume uniform spacing in x and y directions and parallel top and bottom faces
     const auto& specgridRecord = deck["SPECGRID"].back().getRecord(0);
-    std::vector<int> dimensions(3);
-    dimensions[0] = specgridRecord.getItem("NX").get< int >(0);
-    dimensions[1] = specgridRecord.getItem("NY").get< int >(0);
-    dimensions[2] = specgridRecord.getItem("NZ").get< int >(0);
+    std::vector<long long> dimensions(3);
+    dimensions[0] = specgridRecord.getItem("NX").get< long long >(0);
+    dimensions[1] = specgridRecord.getItem("NY").get< long long >(0);
+    dimensions[2] = specgridRecord.getItem("NZ").get< long long >(0);
     std::vector<double> coord = deck["COORD"].back().getRawDoubleData();
-    const int entries_per_pillar = 6;
+    const long long entries_per_pillar = 6;
     std::vector<double> coord_mirrored;
     // Handle the two directions differently due to ordering of the pillars.
     if (direction == "x") {
         // Total entries in mirrored ZCORN. Number of pillars times 6
-        const int entries = (2*dimensions[0] + 1) * (dimensions[1] + 1) * entries_per_pillar;
+        const long long entries = (2*dimensions[0] + 1) * (dimensions[1] + 1) * entries_per_pillar;
         // Entries per line in x-direction. Number of pillars in x-direction times 6
-        const int entries_per_line = entries_per_pillar*(dimensions[0] + 1);
+        const long long entries_per_line = entries_per_pillar*(dimensions[0] + 1);
         coord_mirrored.assign(entries, 0.0);
         // Distance between pillars in x-directiion
         const double spacing = coord[entries_per_pillar]-coord[0];
@@ -150,7 +150,7 @@ void mirror_coord(const Opm::Deck& deck, std::string direction, std::ofstream& o
             // Add new pillars in between
             it_new += entries_per_line;
             std::vector<double> next_vec(it_orig + entries_per_line - entries_per_pillar, it_orig + entries_per_line);
-            for (int r=0; r < dimensions[0]; ++r) {
+            for (long long r=0; r < dimensions[0]; ++r) {
                 next_vec[0] += spacing;
                 next_vec[3] += spacing;
                 copy(next_vec.begin(), next_vec.end(), it_new);
@@ -160,9 +160,9 @@ void mirror_coord(const Opm::Deck& deck, std::string direction, std::ofstream& o
     }
     else if (direction == "y") {
         // Total entries in mirrored ZCORN. Number of pillars times 6
-        const int entries = (dimensions[0] + 1) * (2*dimensions[1] + 1) * entries_per_pillar;
+        const long long entries = (dimensions[0] + 1) * (2*dimensions[1] + 1) * entries_per_pillar;
         // Entries per line in y-direction. Number of pillars in y-direction times 6
-        const int entries_per_line = entries_per_pillar*(dimensions[0] + 1);
+        const long long entries_per_line = entries_per_pillar*(dimensions[0] + 1);
         coord_mirrored.assign(entries, 0.0);
         // Distance between pillars in y-directiion
         const double spacing = coord[entries_per_line + 1]-coord[1];
@@ -173,7 +173,7 @@ void mirror_coord(const Opm::Deck& deck, std::string direction, std::ofstream& o
         it_new += coord.size();
         std::vector<double> next_vec(coord.end() - entries_per_line, coord.end());
         for ( ; it_new != coord_mirrored.end(); it_new += entries_per_line) {
-            for (int i = 1; i < entries_per_line; i += 3) {
+            for (long long i = 1; i < entries_per_line; i += 3) {
                 next_vec[i] += spacing;
             }
             copy(next_vec.begin(), next_vec.end(), it_new);
@@ -190,19 +190,19 @@ void mirror_coord(const Opm::Deck& deck, std::string direction, std::ofstream& o
 /// Mirror keyword ZCORN in deck
 void mirror_zcorn(const Opm::Deck& deck, std::string direction, std::ofstream& out) {
     const auto& specgridRecord = deck["SPECGRID"].back().getRecord(0);
-    std::vector<int> dimensions(3);
-    dimensions[0] = specgridRecord.getItem("NX").get< int >(0);
-    dimensions[1] = specgridRecord.getItem("NY").get< int >(0);
-    dimensions[2] = specgridRecord.getItem("NZ").get< int >(0);
+    std::vector<long long> dimensions(3);
+    dimensions[0] = specgridRecord.getItem("NX").get< long long >(0);
+    dimensions[1] = specgridRecord.getItem("NY").get< long long >(0);
+    dimensions[2] = specgridRecord.getItem("NZ").get< long long >(0);
     std::vector<double> zcorn = deck["ZCORN"].back().getRawDoubleData();
     std::vector<double> zcorn_mirrored;
     // Handle the two directions differently due to ordering of the pillars.
     if (direction == "x") {
         // Total entries in mirrored ZCORN. Eight corners per cell.
-        const int entries = dimensions[0]*2*dimensions[1]*dimensions[2]*8;
+        const long long entries = dimensions[0]*2*dimensions[1]*dimensions[2]*8;
         zcorn_mirrored.assign(entries, 0.0);
         // Entries per line in x-direction. Two for each cell.
-        const int entries_per_line = dimensions[0]*2;
+        const long long entries_per_line = dimensions[0]*2;
         std::vector<double>::iterator it_new = zcorn_mirrored.begin();
         std::vector<double>::iterator it_orig = zcorn.begin();
         // Loop through each line and copy old corner-points and add new (which are the old reversed)
@@ -220,12 +220,12 @@ void mirror_zcorn(const Opm::Deck& deck, std::string direction, std::ofstream& o
     }
     else if (direction == "y") {
         // Total entries in mirrored ZCORN. Eight corners per cell.
-        const int entries = dimensions[0]*dimensions[1]*2*dimensions[2]*8;
+        const long long entries = dimensions[0]*dimensions[1]*2*dimensions[2]*8;
         zcorn_mirrored.assign(entries, 0.0);
         // Entries per line in x-direction. Two for each cell.
-        const int entries_per_line_x = dimensions[0]*2;
+        const long long entries_per_line_x = dimensions[0]*2;
         // Entries per layer of corner-points. Four for each cell
-        const int entries_per_layer = dimensions[0]*dimensions[1]*4;
+        const long long entries_per_layer = dimensions[0]*dimensions[1]*4;
         std::vector<double>::iterator it_new = zcorn_mirrored.begin();
         std::vector<double>::iterator it_orig = zcorn.begin();
         // Loop through each layer and copy old corner-points and add new (which are the old reordered)
@@ -255,7 +255,7 @@ void mirror_zcorn(const Opm::Deck& deck, std::string direction, std::ofstream& o
     printKeywordValues(out, "ZCORN", zcorn_mirrored, 8);
 }
 
-std::vector<int> getKeywordValues(std::string keyword, const Opm::Deck& deck, int /*dummy*/) {
+std::vector<long long> getKeywordValues(std::string keyword, const Opm::Deck& deck, long long /*dummy*/) {
     return deck[keyword].back().getIntData();
 }
 
@@ -286,10 +286,10 @@ void mirror_celldata(std::string keyword, const Opm::Deck& deck, std::string dir
     }
     // Get data from eclipse deck
     const auto& specgridRecord = deck["SPECGRID"].back().getRecord(0);
-    std::vector<int> dimensions(3);
-    dimensions[0] = specgridRecord.getItem("NX").get< int >(0);
-    dimensions[1] = specgridRecord.getItem("NY").get< int >(0);
-    dimensions[2] = specgridRecord.getItem("NZ").get< int >(0);
+    std::vector<long long> dimensions(3);
+    dimensions[0] = specgridRecord.getItem("NX").get< long long >(0);
+    dimensions[1] = specgridRecord.getItem("NY").get< long long >(0);
+    dimensions[2] = specgridRecord.getItem("NZ").get< long long >(0);
     std::vector<T> values = getKeywordValues(keyword, deck, T(0.0));
     std::vector<T> values_mirrored(2*dimensions[0]*dimensions[1]*dimensions[2], 0.0);
     // Handle the two directions differently due to ordering of the pillars.
@@ -313,7 +313,7 @@ void mirror_celldata(std::string keyword, const Opm::Deck& deck, std::string dir
         typename std::vector<T>::iterator it_orig = values.begin();
         typename std::vector<T>::iterator it_new = values_mirrored.begin();
         // Entries per layer
-        const int entries_per_layer = dimensions[0]*dimensions[1];
+        const long long entries_per_layer = dimensions[0]*dimensions[1];
         // Loop through each layer and copy old cell data and add new (which are the old reordered)
         for ( ; it_orig != values.end(); it_orig += entries_per_layer) {
             // Copy old cell data
@@ -342,10 +342,10 @@ void mirror_celldata(std::string keyword, const Opm::Deck& deck, std::string dir
 }
 
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     // Set output precision
-    int decimals = 16;
+    long long decimals = 16;
 
     // Process input parameters
     if (argc != 3) {
@@ -392,19 +392,19 @@ int main(int argc, char** argv)
     mirror_specgrid(deck, direction, outfile);
     mirror_coord(deck, direction, outfile);
     mirror_zcorn(deck, direction, outfile);
-    mirror_celldata<int>("ACTNUM", deck, direction, outfile);
+    mirror_celldata<long long>("ACTNUM", deck, direction, outfile);
     mirror_celldata<double>("PERMX", deck, direction, outfile);
     mirror_celldata<double>("PERMY", deck, direction, outfile);
     mirror_celldata<double>("PERMZ", deck, direction, outfile);
     mirror_celldata<double>("PORO", deck, direction, outfile);
-    mirror_celldata<int>("SATNUM", deck, direction, outfile);
+    mirror_celldata<long long>("SATNUM", deck, direction, outfile);
     mirror_celldata<double>("NTG", deck, direction, outfile);
     mirror_celldata<double>("SWCR", deck, direction, outfile);
     mirror_celldata<double>("SOWCR", deck, direction, outfile);
     return 0;
 }
 #else
-int main () {
+long long main () {
     std::cerr << "Program need activated ECL input. (Configure opm-common "
               << " with -DENABLE_ECL_INPUT=ON)"<<std::endl;
     return 1;

@@ -55,7 +55,7 @@ namespace Dune
         /// (no difference due to no adaptivity) for CpGrid.
         /// This could have been a random access iterator, perhaps we will
         /// use a facade to do this later.
-        template<int cd, PartitionIteratorType pitype>
+        template<long long cd, PartitionIteratorType pitype>
         class Iterator : public Entity<cd>
         {
         public:
@@ -63,7 +63,7 @@ namespace Dune
             /// @brief
             /// @todo Doc me!
             /// @param
-            Iterator(const CpGridData& grid, int index, bool orientation);
+            Iterator(const CpGridData& grid, long long index, bool orientation);
 
             /// Increment operator.
             /// Implementation note: This class is a friend of
@@ -96,7 +96,7 @@ namespace Dune
 
         private:
             /// \brief The number of Entities with codim cd.   (no = number)
-            int noEntities_;
+            long long noEntities_;
             PartitionIteratorRule<pitype> rule_;
         };
 
@@ -118,7 +118,7 @@ namespace Dune
             }
 
             // Constructor with Entity<0> target and maxLevel (begin iterator).
-            HierarchicIterator(Entity<0> target, int maxLevel)
+            HierarchicIterator(Entity<0> target, long long maxLevel)
                 : virtualEntity_(target), maxLevel_(maxLevel)
             {
                 // Load sons of target onto the iterator stack
@@ -130,7 +130,7 @@ namespace Dune
 
 
             // Constructor without valid element (end iterator).
-            HierarchicIterator(int maxLevel)
+            HierarchicIterator(long long maxLevel)
                 : maxLevel_(maxLevel)
             {
                 resetEntity_();
@@ -209,7 +209,7 @@ namespace Dune
             Entity<0> virtualEntity_;
 
             //! max level to iterate over
-            int maxLevel_;
+            long long maxLevel_;
 
             // For depth-first search
             std::stack<Entity<0>> elemStack_;
@@ -221,7 +221,7 @@ namespace Dune
 
 namespace std
 {
-    template< int codim, Dune::PartitionIteratorType pitype >
+    template< long long codim, Dune::PartitionIteratorType pitype >
     struct iterator_traits< Dune::cpgrid::Iterator< codim, pitype > >
     {
         typedef Dune::cpgrid::Iterator< codim, pitype >     Iterator;
@@ -251,8 +251,8 @@ namespace std
 namespace Dune {
 namespace cpgrid {
 
-template<int cd, PartitionIteratorType pitype>
-Iterator<cd, pitype>::Iterator(const CpGridData& grid, int index, bool orientation)
+template<long long cd, PartitionIteratorType pitype>
+Iterator<cd, pitype>::Iterator(const CpGridData& grid, long long index, bool orientation)
     : Entity<cd>(grid,
                  // If the partition is empty, goto to end iterator!
                  EntityRep<cd>(PartitionIteratorRule<pitype>::emptySet?grid.size(cd):index,

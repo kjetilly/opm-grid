@@ -59,15 +59,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -91,7 +91,7 @@ void createEclGridCpGrid_and_checkEclCentroid(const std::string& deckString)
         const auto& elemEclCentroid = ecl_grid.getCellCenter(gridCartMapper.cartesianIndex(element.index()));
         const auto& elemCpGridEclCentroid_Entity = grid.getEclCentroid(element);
         const auto& elemCpGridEclCentroid_Index = grid.getEclCentroid(element.index());
-        for (int coord = 0; coord < 3; ++coord)
+        for (long long coord = 0; coord < 3; ++coord)
         {
             BOOST_CHECK_CLOSE(elemEclCentroid[coord],elemCpGridEclCentroid_Entity[coord] , 1e-6);
             BOOST_CHECK_CLOSE(elemEclCentroid[coord],elemCpGridEclCentroid_Index[coord] , 1e-6);

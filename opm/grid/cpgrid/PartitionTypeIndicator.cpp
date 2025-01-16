@@ -29,7 +29,7 @@ PartitionType PartitionTypeIndicator::getPartitionType(const EntityRep<3>& point
 {
     return getPointPartitionType(point_entity.index());
 }
-PartitionType PartitionTypeIndicator::getPointPartitionType(int index) const
+PartitionType PartitionTypeIndicator::getPointPartitionType(long long index) const
 {
     if(point_indicator_.size())
         return PartitionType(point_indicator_[index]);
@@ -41,7 +41,7 @@ PartitionType getProcessorBoundaryPartitionType(PartitionType)
     return FrontEntity;
 }
 
-PartitionType PartitionTypeIndicator::getFacePartitionType(int i) const
+PartitionType PartitionTypeIndicator::getFacePartitionType(long long i) const
 {
     if((cell_indicator_.size()) || (grid_data_->level_ > 0))
     {
@@ -55,7 +55,7 @@ PartitionType PartitionTypeIndicator::getFacePartitionType(int i) const
             grid_data_->face_to_cell_[Entity<1>(*grid_data_,i,true)];
         if(cells_of_face.size()==1)
         {
-            int cell_index = cells_of_face[0].index();
+            long long cell_index = cells_of_face[0].index();
             Entity<0> cell0(*grid_data_, cell_index, true);
             PartitionType cell_part = getPartitionType(cell0);
             if(cell_part!=OverlapEntity)
@@ -67,7 +67,7 @@ PartitionType PartitionTypeIndicator::getFacePartitionType(int i) const
                 // we are at the boundary.
                 OrientedEntityTable<0,1>::row_type cell_to_face=grid_data_->cell_to_face_[cell0];
                 Entity<0>::LeafIntersectionIterator intersection=cell0.ilevelbegin();
-                for(int subindex=0; subindex<cell_to_face.size(); ++subindex, ++intersection)
+                for(long long subindex=0; subindex<cell_to_face.size(); ++subindex, ++intersection)
                     if(cell_to_face[subindex].index()==i)
                         break;
                 assert(intersection!=cell0.ilevelend());
@@ -81,15 +81,15 @@ PartitionType PartitionTypeIndicator::getFacePartitionType(int i) const
         {
             Entity<0> cell0(*grid_data_, cells_of_face[0].index(), true);
             Entity<0> cell1(*grid_data_, cells_of_face[1].index(), true);
-            if(cells_of_face[0].index()==std::numeric_limits<int>::max())
+            if(cells_of_face[0].index()==std::numeric_limits<long long>::max())
             {
-                assert(cells_of_face[1].index()!=std::numeric_limits<int>::max());
+                assert(cells_of_face[1].index()!=std::numeric_limits<long long>::max());
                 // At the boder of the processor's but not the global domain
                 return getProcessorBoundaryPartitionType(getPartitionType(cell1));
             }
-            if(cells_of_face[1].index()==std::numeric_limits<int>::max())
+            if(cells_of_face[1].index()==std::numeric_limits<long long>::max())
             {
-                assert(cells_of_face[0].index()!=std::numeric_limits<int>::max());
+                assert(cells_of_face[0].index()!=std::numeric_limits<long long>::max());
                 // At the boder of the processor's but not the global domain
                 return getProcessorBoundaryPartitionType(getPartitionType(cell0));
             }

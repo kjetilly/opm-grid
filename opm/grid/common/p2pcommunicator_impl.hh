@@ -56,25 +56,25 @@ namespace Dune
   template <class MsgBuffer>
   inline void
   Point2PointCommunicator< MsgBuffer >::
-  insertRequest( const std::set< int >& sendLinks, const std::set< int >& recvLinks )
+  insertRequest( const std::set< long long >& sendLinks, const std::set< long long >& recvLinks )
   {
     // remove old linkage
     removeLinkage();
 
-    const int me_rank = rank ();
+    const long long me_rank = rank ();
 
     {
-      typedef std::map< int, int >::iterator iterator ;
-      typedef std::set< int >::const_iterator const_iterator;
+      typedef std::map< long long, long long >::iterator iterator ;
+      typedef std::set< long long >::const_iterator const_iterator;
 
       const iterator sendEnd = sendLinkage_.end ();
       const iterator recvEnd = recvLinkage_.end ();
       const const_iterator sendLinksEnd = sendLinks.end ();
-      int sendLink = 0 ;
-      int recvLink = 0 ;
+      long long sendLink = 0 ;
+      long long recvLink = 0 ;
       for (const_iterator i = sendLinks.begin (); i != sendLinksEnd; ++i )
       {
-        const int rank = (*i);
+        const long long rank = (*i);
         // if rank was not inserted, insert with current link number
         if( rank != me_rank && (sendLinkage_.find ( rank ) == sendEnd ) )
         {
@@ -85,7 +85,7 @@ namespace Dune
       const const_iterator recvLinksEnd = recvLinks.end ();
       for (const_iterator i = recvLinks.begin (); i != recvLinksEnd; ++i )
       {
-        const int rank = (*i);
+        const long long rank = (*i);
         // if rank was not inserted, insert with current link number
         if( rank != me_rank && (recvLinkage_.find ( rank ) == recvEnd ) )
         {
@@ -110,7 +110,7 @@ namespace Dune
 
 #ifndef NDEBUG
 // this is simply to avoid warning of unused variables
-#define MY_INT_TEST int test =
+#define MY_INT_TEST long long test =
 #else
 #define MY_INT_TEST
 #endif
@@ -121,9 +121,9 @@ namespace Dune
     typedef P2PCommunicator  P2PCommunicatorType ;
     const P2PCommunicatorType& _p2pCommunicator;
 
-    const int _sendLinks;
-    const int _recvLinks;
-    const int _tag;
+    const long long _sendLinks;
+    const long long _recvLinks;
+    const long long _tag;
 
     MPI_Request* _sendRequest;
     MPI_Request* _recvRequest;
@@ -155,7 +155,7 @@ namespace Dune
     typedef typename P2PCommunicatorType :: MessageBufferType   MessageBufferType;
 
     NonBlockingExchangeImplementation( const P2PCommunicatorType& p2pComm,
-                                       const int tag,
+                                       const long long tag,
                                        const bool recvBufferSizesKnown = false )
       : _p2pCommunicator( p2pComm ),
         _sendLinks( _p2pCommunicator.sendLinks() ),
@@ -168,13 +168,13 @@ namespace Dune
     {
       // make sure every process has the same tag
 #ifndef NDEBUG
-      int mytag = tag ;
+      long long mytag = tag ;
       assert ( mytag == _p2pCommunicator.max( mytag ) );
 #endif
     }
 
     NonBlockingExchangeImplementation( const P2PCommunicatorType& p2pComm,
-                                       const int tag,
+                                       const long long tag,
                                        const std::vector< MessageBufferType > & sendBuffers )
       : _p2pCommunicator( p2pComm ),
         _sendLinks( _p2pCommunicator.sendLinks() ),
@@ -187,11 +187,11 @@ namespace Dune
     {
       // make sure every process has the same tag
 #ifndef NDEBUG
-      int mytag = tag ;
+      long long mytag = tag ;
       assert ( mytag == _p2pCommunicator.max( mytag ) );
 #endif
 
-      assert ( _sendLinks == int( sendBuffers.size() ) );
+      assert ( _sendLinks == (long long)( sendBuffers.size() ) );
       sendImpl( sendBuffers );
     }
 
@@ -228,10 +228,10 @@ namespace Dune
       MPI_Comm comm = mpiCommunicator();
 
       // get vector with destinations
-      const std::vector< int >& sendDest = _p2pCommunicator.sendDest();
+      const std::vector< long long >& sendDest = _p2pCommunicator.sendDest();
 
       // send data
-      for (int link = 0; link < _sendLinks; ++link)
+      for (long long link = 0; link < _sendLinks; ++link)
       {
         sendLink( sendDest[ link ], _tag, sendBuffers[ link ], _sendRequest[ link ], comm );
       }
@@ -259,7 +259,7 @@ namespace Dune
       MPI_Comm comm = mpiCommunicator();
 
       // get vector with destinations
-      const std::vector< int >& recvSource = _p2pCommunicator.recvSource();
+      const std::vector< long long >& recvSource = _p2pCommunicator.recvSource();
 
       // check whether out vector has more than one stream
       const bool useFirstStreamOnly = (recvBuffers.size() == 1) ;
@@ -268,11 +268,11 @@ namespace Dune
       std::vector< bool > linkNotReceived( _recvLinks, true );
 
       // count noumber of received messages
-      int numReceived = 0;
+      long long numReceived = 0;
       while( numReceived < _recvLinks )
       {
         // check for all links messages
-        for (int link = 0; link < _recvLinks; ++link )
+        for (long long link = 0; link < _recvLinks; ++link )
         {
           // if message was not received yet, check again
           if( linkNotReceived[ link ] )
@@ -316,11 +316,11 @@ namespace Dune
       std::vector< bool > linkNotReceived( _recvLinks, true );
 
       // count noumber of received messages
-      int numReceived = 0;
+      long long numReceived = 0;
       while( numReceived < _recvLinks )
       {
         // check for all links messages
-        for (int link = 0; link < _recvLinks; ++link )
+        for (long long link = 0; link < _recvLinks; ++link )
         {
           // if message was not received yet, check again
           if( linkNotReceived[ link ] )
@@ -369,10 +369,10 @@ namespace Dune
         MPI_Comm comm = mpiCommunicator();
 
         // get vector with destinations
-        const std::vector< int >& sendDest = _p2pCommunicator.sendDest();
+        const std::vector< long long >& sendDest = _p2pCommunicator.sendDest();
 
         // send data
-        for (int link = 0; link < _sendLinks; ++link)
+        for (long long link = 0; link < _sendLinks; ++link)
         {
           // pack data
           dataHandle.pack( link, sendBuffer[ link ] );
@@ -394,14 +394,14 @@ namespace Dune
         recvBuffer.resize( _recvLinks );
 
         // get vector with destinations
-        const std::vector< int >& recvSource = _p2pCommunicator.recvSource();
-        const std::vector< int >& recvBufferSizes = _p2pCommunicator.recvBufferSizes();
+        const std::vector< long long >& recvSource = _p2pCommunicator.recvSource();
+        const std::vector< long long >& recvBufferSizes = _p2pCommunicator.recvBufferSizes();
 
         // send data
-        for (int link = 0; link < _recvLinks; ++link)
+        for (long long link = 0; link < _recvLinks; ++link)
         {
           // send data
-          const int bufferSize = recvBufferSizes[ link ];
+          const long long bufferSize = recvBufferSizes[ link ];
 
           // post receive if in symmetric mode
           assert( _recvRequest );
@@ -426,7 +426,7 @@ namespace Dune
     // receive data implementation with given buffers
     void exchange( DataHandleInterface& dataHandle )
     {
-      const int recvLinks = _p2pCommunicator.recvLinks();
+      const long long recvLinks = _p2pCommunicator.recvLinks();
       // do nothing if number of links is zero
       if( (recvLinks + _sendLinks) == 0 ) return;
 
@@ -454,11 +454,11 @@ namespace Dune
     }
 
   protected:
-    int sendLink( const int dest, const int tag,
+    long long sendLink( const long long dest, const long long tag,
                   const MessageBufferType& msgBuffer, MPI_Request& request, MPI_Comm& comm )
     {
       // buffer = point to mem and size
-      std::pair< char*, int > buffer = msgBuffer.buffer();
+      std::pair< char*, long long > buffer = msgBuffer.buffer();
 
       MY_INT_TEST MPI_Isend ( buffer.first, buffer.second, MPI_BYTE, dest, tag, comm, &request );
       assert (test == MPI_SUCCESS);
@@ -466,7 +466,7 @@ namespace Dune
       return buffer.second;
     }
 
-    void postReceive( const int source, const int tag, const int bufferSize,
+    void postReceive( const long long source, const long long tag, const long long bufferSize,
                       MessageBufferType& msgBuffer, MPI_Request& request, MPI_Comm& comm )
     {
       // reserve memory for receive buffer
@@ -475,7 +475,7 @@ namespace Dune
       msgBuffer.resetReadPosition();
 
       // get buffer and size
-      std::pair< char*, int > buffer = msgBuffer.buffer();
+      std::pair< char*, long long > buffer = msgBuffer.buffer();
 
       // MPI receive (non-blocking)
       {
@@ -496,7 +496,7 @@ namespace Dune
       MPI_Status status ;
 #endif
       // msg received, 0 or 1
-      int received = 0;
+      long long received = 0;
 
       // if receive of message is finished, unpack
       MPI_Test( &request, &received,
@@ -510,11 +510,11 @@ namespace Dune
 #ifndef NDEBUG
       if( received )
       {
-        int checkBufferSize = -1;
+        long long checkBufferSize = -1;
         MPI_Get_count ( & status, MPI_BYTE, &checkBufferSize );
-        if( checkBufferSize != int(buffer.size()) )
+        if( checkBufferSize != (long long)(buffer.size()) )
           std::cout << "Buffer sizes don't match: "  << checkBufferSize << " " << buffer.size() << std::endl;
-        assert( checkBufferSize == int(buffer.size()) );
+        assert( checkBufferSize == (long long)(buffer.size()) );
       }
 #endif
       return bool(received);
@@ -522,8 +522,8 @@ namespace Dune
 
     // does receive operation for one link
     bool probeAndReceive( MPI_Comm& comm,
-                          const int source,
-                          const int tag,
+                          const long long source,
+                          const long long tag,
                           MessageBufferType& recvBuffer )
     {
       // corresponding MPI status
@@ -531,7 +531,7 @@ namespace Dune
 
       // msg available, 0 or 1
       // available does not mean already received
-      int available = 0;
+      long long available = 0;
 
       // check for any message with tag (nonblocking)
       MPI_Iprobe( source, tag, comm, &available, &status );
@@ -543,7 +543,7 @@ namespace Dune
         assert ( source == status.MPI_SOURCE );
 
         // length of message
-        int bufferSize = -1;
+        long long bufferSize = -1;
 
         // get length of message
         {
@@ -557,7 +557,7 @@ namespace Dune
         recvBuffer.resetReadPosition();
 
         // get buffer
-        std::pair< char*, int > buffer = recvBuffer.buffer();
+        std::pair< char*, long long > buffer = recvBuffer.buffer();
 
         // MPI receive (blocking)
         {
@@ -622,24 +622,24 @@ namespace Dune
 #if HAVE_MPI
     if( ! _recvBufferSizesComputed )
     {
-      const int nSendLinks = sendLinks();
+      const long long nSendLinks = sendLinks();
       std::vector< MsgBuffer > buffers( nSendLinks );
       // pack all data
-      for( int link=0; link<nSendLinks; ++link )
+      for( long long link=0; link<nSendLinks; ++link )
       {
         handle.pack( link, buffers[ link ] );
       }
       // exchange data
       buffers = exchange( buffers );
-      const int nRecvLinks = recvLinks();
+      const long long nRecvLinks = recvLinks();
       // unpack all data
-      for( int link=0; link<nRecvLinks; ++link )
+      for( long long link=0; link<nRecvLinks; ++link )
       {
         handle.unpack( link, buffers[ link ] );
       }
       // store receive buffer sizes
       _recvBufferSizes.resize( nRecvLinks );
-      for( int link=0; link<nRecvLinks; ++link )
+      for( long long link=0; link<nRecvLinks; ++link )
       {
         _recvBufferSizes[ link ] = buffers[ link ].size();
       }

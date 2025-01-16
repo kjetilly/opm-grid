@@ -16,7 +16,7 @@ namespace Dune
     {
     public:
         /** \brief dimension of the grid */
-        static const int dimension = Grid :: dimension ;
+        static const long long dimension = Grid :: dimension ;
 
         /** \brief constructor taking grid */
         explicit CartesianIndexMapper( const Grid& )
@@ -25,32 +25,32 @@ namespace Dune
         }
 
         /** \brief return Cartesian dimensions, i.e. number of cells in each direction  */
-        const std::array<int, dimension>& cartesianDimensions() const
+        const std::array<long long, dimension>& cartesianDimensions() const
         {
-            static std::array<int, dimension> a;
+            static std::array<long long, dimension> a;
             return a;
         }
 
         /** \brief return total number of cells in the logical Cartesian grid */
-        int cartesianSize() const
+        long long cartesianSize() const
         {
             return 0;
         }
 
         /** \brief return number of cells in the active grid */
-        int compressedSize() const
+        long long compressedSize() const
         {
             return 0;
         }
 
         /** \brief return index of the cells in the logical Cartesian grid */
-        int cartesianIndex( const int /* compressedElementIndex */) const
+        long long cartesianIndex( const long long /* compressedElementIndex */) const
         {
             return 0;
         }
 
         /** \brief return Cartesian coordinate, i.e. IJK, for a given cell */
-        void cartesianCoordinate(const int /* compressedElementIndex */, std::array<int,dimension>& /* coords */) const
+        void cartesianCoordinate(const long long /* compressedElementIndex */, std::array<long long,dimension>& /* coords */) const
         {
         }
     };

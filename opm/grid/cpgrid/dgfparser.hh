@@ -36,7 +36,7 @@ namespace Dune
 
     typedef MPIHelper::MPICommunicator MPICommunicatorType;
 
-    static const int dimension = Grid::dimension;
+    static const long long dimension = Grid::dimension;
     typedef Grid::Codim< 0 >::Entity Element;
     typedef Grid::Codim< dimension >::Entity Vertex;
 
@@ -58,13 +58,13 @@ namespace Dune
     }
 
     template< class Intersection >
-    int boundaryId ( const Intersection &intersection ) const
+    long long boundaryId ( const Intersection &intersection ) const
     {
       return intersection.boundaryId();
     }
 
-    template< int codim >
-    int numParameters () const
+    template< long long codim >
+    long long numParameters () const
     {
       return 0;
     }
@@ -142,10 +142,10 @@ namespace Dune
 
     std::vector< double > coord;
     coord.reserve( 6*(interval.n[ 0 ] + 1)*(interval.n[ 1 ] + 1) );
-    for( int j = 0; j <= interval.n[ 1 ]; ++j )
+    for( long long j = 0; j <= interval.n[ 1 ]; ++j )
     {
       const double y = j*dy;
-      for( int i = 0; i <= interval.n[ 0 ]; ++i )
+      for( long long i = 0; i <= interval.n[ 0 ]; ++i )
       {
         const double x = i*dx;
         const double pillar[ 6 ] = { x, y, bottom, x, y, top };
@@ -154,10 +154,10 @@ namespace Dune
     }
 
     // create cubes
-    const int num_per_layer = 4*interval.n[ 0 ]*interval.n[ 1 ];
+    const long long num_per_layer = 4*interval.n[ 0 ]*interval.n[ 1 ];
     std::vector< double > zcorn( 2*num_per_layer*interval.n[ 2 ] );
     double *offset = &zcorn[ 0 ];
-    for( int k = 0; k < interval.n[ 2 ]; ++k )
+    for( long long k = 0; k < interval.n[ 2 ]; ++k )
     {
       const double zlow = k*dz;
       std::fill( offset, offset + num_per_layer, zlow );
@@ -168,7 +168,7 @@ namespace Dune
     }
 
     // ???
-    std::vector< int > actnum( interval.n[ 0 ]*interval.n[ 1 ]*interval.n[ 2 ], 1 );
+    std::vector< long long > actnum( interval.n[ 0 ]*interval.n[ 1 ]*interval.n[ 2 ], 1 );
 
     // create eclipse format description
     grdecl g;
@@ -194,7 +194,7 @@ namespace Dune
   {
     typedef CpGrid Grid;
 
-    static int refineStepsForHalf ()
+    static long long refineStepsForHalf ()
     {
       return 1;
     }

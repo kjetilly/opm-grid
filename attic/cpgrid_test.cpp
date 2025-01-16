@@ -50,17 +50,17 @@ void check_cpgrid(bool do_check)
 {
     if (!do_check) return;
 
-    const int dim = 3;
+    const long long dim = 3;
     std::cout << "\nCpGrid\n" << std::endl;
 
-    //typedef Dune::FieldVector<int,dim> iTuple;
+    //typedef Dune::FieldVector<long long,dim> iTuple;
     //typedef Dune::FieldVector<double,dim> fTuple;
     //typedef Dune::FieldVector<bool,dim> bTuple;
     //    fTuple cell_sz(1.0);
     //    iTuple dims(3);
     //     bTuple p(false);
     //     p[0] = p0;
-    //     int overlap = 1;
+    //     long long overlap = 1;
     // Dune::YaspGrid<dim> grid(Len,s,p,overlap);
     // grid.globalRefine(2);
 
@@ -68,7 +68,7 @@ void check_cpgrid(bool do_check)
 //     Dune::CpGrid &grid = *gridPtr;
 
     Dune::CpGrid grid;
-    std::array<int, dim> dims = {{ 1, 1, 1 }};
+    std::array<long long, dim> dims = {{ 1, 1, 1 }};
     std::array<double, dim> cell_sz = {{ 1.0, 1.0, 1.0 }};
     grid.createCartesian(dims, cell_sz);
 
@@ -76,7 +76,7 @@ void check_cpgrid(bool do_check)
 
     // check communication interface
 //     checkCommunication(grid,-1,Dune::dvverb);
-//     for (int l=0; l<=grid.maxLevel(); ++l)
+//     for (long long l=0; l<=grid.maxLevel(); ++l)
 //         checkCommunication(grid,l,Dune::dvverb);
 
     // check the method geometryInFather()
@@ -86,7 +86,7 @@ void check_cpgrid(bool do_check)
 }
 
 
-int main(int argc , char** argv)
+long long main(long long argc , char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     check_cpgrid(false); // Until we get in some changes to the grid interface.

@@ -55,7 +55,7 @@ struct ParentToChildCellToPointGlobalIdHandle {
     //     i.e., the other non-selected candidates get rewritten with the values from the smallest (winner) rank.
     //   - In the scatter method, the "winner" rank and the 8 point global ids of each number of children) get rewritten.
 
-    using DataType = int;
+    using DataType = long long;
 
     /// \param comm                    Communication
     /// \param parent_to_children      Map from parent index to all children, and the level they are stored.
@@ -65,8 +65,8 @@ struct ParentToChildCellToPointGlobalIdHandle {
     /// \param level_winning_ranks
     /// \param level_point_global_ids
     ParentToChildCellToPointGlobalIdHandle(const Dune::CpGrid::Communication& comm,
-                                           const std::vector<std::tuple<int, std::vector<int>>>& parent_to_children,
-                                           const std::vector<std::vector<std::array<int,8>>>& level_cell_to_point,
+                                           const std::vector<std::tuple<long long, std::vector<long long>>>& parent_to_children,
+                                           const std::vector<std::vector<std::array<long long,8>>>& level_cell_to_point,
                                            std::vector<std::vector<DataType>>& level_winning_ranks,
                                            std::vector<std::vector<DataType>>& level_point_global_ids)
     : comm_(comm)
@@ -167,8 +167,8 @@ struct ParentToChildCellToPointGlobalIdHandle {
 
 private:
     const Dune::CpGrid::Communication& comm_;
-    const std::vector<std::tuple<int, std::vector<int>>>& parent_to_children_;
-    const std::vector<std::vector<std::array<int,8>>>& level_cell_to_point_;
+    const std::vector<std::tuple<long long, std::vector<long long>>>& parent_to_children_;
+    const std::vector<std::vector<std::array<long long,8>>>& level_cell_to_point_;
     std::vector<std::vector<DataType>>& level_winning_ranks_;
     std::vector<std::vector<DataType>>& level_point_global_ids_;
 };

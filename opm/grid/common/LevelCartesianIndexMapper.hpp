@@ -45,41 +45,41 @@ class LevelCartesianIndexMapper
 {
 public:
     // Dimension of the grid.
-    static constexpr int dimension = Grid :: dimension ;
+    static constexpr long long dimension = Grid :: dimension ;
 
     // Constructor taking a grid.
     explicit LevelCartesianIndexMapper( const Grid& )
     {}
 
     // Return the number of cells in each direction (Cartesian dimensions) of a local Cartesian grid with level "level"
-    const std::array<int, dimension>& cartesianDimensions(int /*level*/) const
+    const std::array<long long, dimension>& cartesianDimensions(long long /*level*/) const
     {
-        static std::array<int, dimension> a;
+        static std::array<long long, dimension> a;
         return a;
     }
 
     // Return total number of cells in a local Cartesian grid with level "level".
-    int cartesianSize(int /*level*/) const
+    long long cartesianSize(long long /*level*/) const
     {
         return 0;
     }
 
     // Return number of cells in the active local Cartesian grid with level "level".
-    int compressedSize(int /*level*/) const
+    long long compressedSize(long long /*level*/) const
     {
         return 0;
     }
 
     // Return index of a cell in the local Cartesian grid with level "level".
-    int cartesianIndex( const int /* compressedElementIndex */ , const int /*level*/) const
+    long long cartesianIndex( const long long /* compressedElementIndex */ , const long long /*level*/) const
     {
         return 0;
     }
 
     // Compute Cartesian coordinate, i.e. IJK, for a given cell, on a given local Cartesian grid with level "level".
-    void cartesianCoordinate(const int /* compressedElementIndexOnLevel */,
-                             std::array<int,dimension>& /* coordsOnLevel */,
-                             int /*level*/) const
+    void cartesianCoordinate(const long long /* compressedElementIndexOnLevel */,
+                             std::array<long long,dimension>& /* coordsOnLevel */,
+                             long long /*level*/) const
     {
     }
 };

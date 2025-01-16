@@ -58,15 +58,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -78,19 +78,19 @@ void lookup_check(const Dune::CpGrid& grid)
 {
     const auto& data = grid.currentData();
 
-    std::vector<int> fake_feature(data[0]->size(0), 0);
+    std::vector<long long> fake_feature(data[0]->size(0), 0);
     std::iota(fake_feature.begin(), fake_feature.end(), 3);
 
     std::vector<double> fake_feature_double(data[0]->size(0), 0.);
     std::iota(fake_feature_double.begin(), fake_feature_double.end(), .5);
 
-    std::vector<std::vector<int>> fakeLgrFeatures;
+    std::vector<std::vector<long long>> fakeLgrFeatures;
     fakeLgrFeatures.resize(data.size()-1);
     // Creating fake field properties for each LGR
     if (grid.maxLevel()>0) {
-        for (int lgr = 1; lgr < grid.maxLevel() +1; ++lgr)
+        for (long long lgr = 1; lgr < grid.maxLevel() +1; ++lgr)
         {
-            std::vector<int> fake_feature_lgr(data[lgr]->size(0), lgr);
+            std::vector<long long> fake_feature_lgr(data[lgr]->size(0), lgr);
             fakeLgrFeatures[lgr-1] = fake_feature_lgr;
         }
     }
@@ -145,13 +145,13 @@ void lookup_check(const Dune::CpGrid& grid)
         BOOST_CHECK(cartIdx == lookUpCartesianData.getFieldPropCartesianIdx(elem));
         BOOST_CHECK(cartIdx == lookUpCartesianData.getFieldPropCartesianIdx(elem.index()));
         // Extra checks related to Cartesian Coordinate
-        std::array<int,3> ijk;
+        std::array<long long,3> ijk;
         cartMapper.cartesianCoordinate(elem.index(), ijk); // this ijk corresponds to the parent/equivalent cell in level 0.
-        std::array<int,3> ijkLevel0;
+        std::array<long long,3> ijkLevel0;
         levelCartMapp.cartesianCoordinate(elem.getOrigin().index(), ijkLevel0, 0);
         BOOST_CHECK(ijk == ijkLevel0);
         // Throw for level < 0 or level > maxLevel()
-        std::array<int,3> ijkThrow;
+        std::array<long long,3> ijkThrow;
         BOOST_CHECK_THROW(levelCartMapp.cartesianCoordinate(elem.index(), ijkThrow, -3), std::invalid_argument);
         BOOST_CHECK_THROW(levelCartMapp.cartesianCoordinate(elem.index(), ijkThrow, grid.maxLevel() + 1), std::invalid_argument);
         // Checks related to LGR field properties
@@ -167,9 +167,9 @@ void lookup_check(const Dune::CpGrid& grid)
             BOOST_CHECK(featureInLGR == featureInLGR_Cartesian_FromIdx);
             // Checks for CartesianCoordinateLevel
             const auto idxOnLevel = elem.getLevelElem().index(); // getLevelElemt throws when entity does not belong to the leafGridView
-            std::array<int,3> ijkLevelGrid;
+            std::array<long long,3> ijkLevelGrid;
             (*data[elem.level()]).getIJK(idxOnLevel, ijkLevelGrid);
-            std::array<int,3> ijkLevel;
+            std::array<long long,3> ijkLevel;
             levelCartMapp.cartesianCoordinate(idxOnLevel, ijkLevel, elem.level());
             BOOST_CHECK( ijkLevelGrid == ijkLevel);
         }
@@ -191,12 +191,12 @@ BOOST_AUTO_TEST_CASE(one_lgr_grid)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
     // Add LGRs and update LeafGridView
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    const std::array<int, 3> startIJK = {1,0,1};
-    const std::array<int, 3> endIJK = {3,2,3};  // patch_dim = {3-1, 2-0, 3-1} ={2,2,2}
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> startIJK = {1,0,1};
+    const std::array<long long, 3> endIJK = {3,2,3};  // patch_dim = {3-1, 2-0, 3-1} ={2,2,2}
     // Cells to be refined {13,14,17,18, 25,26,29,30}
     const std::string lgr_name = {"LGR1"};
     grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
@@ -209,12 +209,12 @@ BOOST_AUTO_TEST_CASE(single_cell_lgr_grid)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
     // Add LGRs and update LeafGridView
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    const std::array<int, 3> startIJK = {1,0,1};
-    const std::array<int, 3> endIJK = {2,1,2};  // patch_dim = {2-1, 1-0, 2-1} ={1,1,1} -> Single Cell!
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> startIJK = {1,0,1};
+    const std::array<long long, 3> endIJK = {2,1,2};  // patch_dim = {2-1, 1-0, 2-1} ={1,1,1} -> Single Cell!
     const std::string lgr_name = {"LGR1"};
     grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
@@ -226,12 +226,12 @@ BOOST_AUTO_TEST_CASE(lgrs_grid_A)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
     // Add LGRs and update LeafGridView
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {3,2,2}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,1,1}, {1,1,3}, {4,3,3}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {3,2,2}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,1}, {1,1,3}, {4,3,3}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
     grid.addLgrsUpdateLeafView(cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
 
@@ -243,12 +243,12 @@ BOOST_AUTO_TEST_CASE(lgrs_grid_B)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
     // Add LGRs and update LeafGridView
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {3,2,0}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{2,2,1}, {4,3,3}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {3,2,0}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{2,2,1}, {4,3,3}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     grid.addLgrsUpdateLeafView(cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
 
@@ -261,12 +261,12 @@ BOOST_AUTO_TEST_CASE(lgrs_grid_C)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {5,4,4};
+    const std::array<long long, 3> grid_dim = {5,4,4};
     grid.createCartesian(grid_dim, cell_sizes);
     // Add LGRs and update LeafGridView
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,3,4}, {3,2,4}, {4,3,2}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {4,0,0}, {4,3,3}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{3,2,2}, {5,2,1}, {5,4,4}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,3,4}, {3,2,4}, {4,3,2}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {4,0,0}, {4,3,3}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{3,2,2}, {5,2,1}, {5,4,4}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
     grid.addLgrsUpdateLeafView(cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
 
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(no_lgrs_grid)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
     lookup_check(grid);
 }
@@ -306,8 +306,8 @@ void fieldProp_check(const Dune::CpGrid& grid, Opm::EclipseGrid eclGrid, const s
     const auto& poroOnLeaf = lookUpData.assignFieldPropsDoubleOnLeaf(fpm, "PORO");
     const auto& poroOnLeafCart = lookUpCartesianData.assignFieldPropsDoubleOnLeaf(fpm, "PORO");
 
-    const auto& eqlnumOnLeaf = lookUpData.assignFieldPropsIntOnLeaf<int>(fpm, "EQLNUM", true);
-    const auto& eqlnumOnLeafCart = lookUpCartesianData.assignFieldPropsIntOnLeaf<int>(fpm, "EQLNUM", true);
+    const auto& eqlnumOnLeaf = lookUpData.assignFieldPropsIntOnLeaf<long long>(fpm, "EQLNUM", true);
+    const auto& eqlnumOnLeafCart = lookUpCartesianData.assignFieldPropsIntOnLeaf<long long>(fpm, "EQLNUM", true);
 
     const auto& porvOnLeaf = lookUpData.assignFieldPropsDoubleOnLeaf(fpm, "PORV");
 
@@ -317,14 +317,14 @@ void fieldProp_check(const Dune::CpGrid& grid, Opm::EclipseGrid eclGrid, const s
         const auto elemOriginIdx = elem.getOrigin().index();
         // PORO
         BOOST_CHECK_EQUAL(poro[elemOriginIdx], lookUpData.fieldPropDouble<Dune::cpgrid::Entity<0>>(fpm, "PORO", elem));
-        BOOST_CHECK_EQUAL(poro[elemOriginIdx], lookUpData.fieldPropDouble<int>(fpm, "PORO", elemIdx));
+        BOOST_CHECK_EQUAL(poro[elemOriginIdx], lookUpData.fieldPropDouble<long long>(fpm, "PORO", elemIdx));
         BOOST_CHECK_EQUAL(poro[elemOriginIdx], lookUpCartesianData.fieldPropDouble<Dune::cpgrid::Entity<0>>(fpm, "PORO", elem));
         BOOST_CHECK_EQUAL(poro[elemOriginIdx], lookUpCartesianData.fieldPropDouble(fpm, "PORO", elemIdx));
         BOOST_CHECK_EQUAL(poro[elemOriginIdx], poroOnLeaf[elemIdx]);
         BOOST_CHECK_EQUAL(poro[elemOriginIdx], poroOnLeafCart[elemIdx]);
         // EQLNUM
         BOOST_CHECK_EQUAL(eqlnum[elemOriginIdx], lookUpData.fieldPropInt<Dune::cpgrid::Entity<0>>(fpm, "EQLNUM", elem));
-        BOOST_CHECK_EQUAL(eqlnum[elemOriginIdx], lookUpData.fieldPropInt<int>(fpm, "EQLNUM", elemIdx));
+        BOOST_CHECK_EQUAL(eqlnum[elemOriginIdx], lookUpData.fieldPropInt<long long>(fpm, "EQLNUM", elemIdx));
         BOOST_CHECK_EQUAL(eqlnum[elemOriginIdx], lookUpCartesianData.fieldPropInt<Dune::cpgrid::Entity<0>>(fpm, "EQLNUM", elem));
         BOOST_CHECK_EQUAL(eqlnum[elemOriginIdx], lookUpCartesianData.fieldPropInt(fpm, "EQLNUM", elemIdx));
         BOOST_CHECK_EQUAL(eqlnum[elemOriginIdx]-true, eqlnumOnLeaf[elemIdx]);
@@ -348,7 +348,7 @@ void fieldProp_check(const Dune::CpGrid& grid, Opm::EclipseGrid eclGrid, const s
         }
         else {
             BOOST_CHECK_EQUAL(porv[elemOriginIdx], lookUpData.fieldPropDouble<Dune::cpgrid::Entity<0>>(fpm, "PORV", elem));
-            BOOST_CHECK_EQUAL(porv[elemOriginIdx], lookUpData.fieldPropDouble<int>(fpm, "PORV", elemIdx));
+            BOOST_CHECK_EQUAL(porv[elemOriginIdx], lookUpData.fieldPropDouble<long long>(fpm, "PORV", elemIdx));
             BOOST_CHECK_EQUAL(porv[elemOriginIdx], porvOnLeaf[elemIdx]);
         }
     }
@@ -452,9 +452,9 @@ EQLNUM
     grid.processEclipseFormat(&eclGrid, nullptr, false, false, false);
 
     // Add LGRs and update LeafGridView
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {2,2,2}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,3}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,1}, {1,1,4}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {2,2,2}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,3}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,1}, {1,1,4}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     grid.addLgrsUpdateLeafView(cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
 

@@ -21,14 +21,14 @@ BOOST_AUTO_TEST_CASE(SingleColumnTest)
 {
     using namespace Opm;
 
-    const int size_x = 1, size_y = 1, size_z = 10;
+    const long long size_x = 1, size_y = 1, size_z = 10;
     GridManager manager(size_x, size_y, size_z);
 
-    std::vector<std::vector<int> > columns;
+    std::vector<std::vector<long long> > columns;
     extractColumn(*manager.c_grid(), columns);
 
-    std::vector<int> correct_answer;
-    for (int i = 0; i < 10; ++i) {
+    std::vector<long long> correct_answer;
+    for (long long i = 0; i < 10; ++i) {
         correct_answer.push_back(i);
     }
 
@@ -39,22 +39,22 @@ BOOST_AUTO_TEST_CASE(SingleColumnTest)
 
 BOOST_AUTO_TEST_CASE(FourByFourColumnTest)
 {
-    const int size_x = 4, size_y = 4, size_z = 10;
+    const long long size_x = 4, size_y = 4, size_z = 10;
     using namespace Opm;
     GridManager manager(size_x, size_y, size_z);
 
-    std::vector<std::vector<int> > columns;
+    std::vector<std::vector<long long> > columns;
     extractColumn(*manager.c_grid(), columns);
 
-    std::vector<std::vector<int> > correct_answer;
+    std::vector<std::vector<long long> > correct_answer;
     correct_answer.resize(size_x * size_y);
-    for(int i = 0; i < size_x * size_y; i++) {
-        for(int j = 0; j < 10; j++) {
+    for(long long i = 0; i < size_x * size_y; i++) {
+        for(long long j = 0; j < 10; j++) {
             correct_answer[i].push_back( i + j*size_x*size_y);
         }
     }
 
-    for(int i = 0; i < size_x * size_y; i++) {
+    for(long long i = 0; i < size_x * size_y; i++) {
         BOOST_CHECK_EQUAL_COLLECTIONS(correct_answer[i].begin(), correct_answer[i].end(),
                                       columns[i].begin(), columns[i].end());
     }
@@ -105,9 +105,9 @@ BOOST_AUTO_TEST_CASE(DisjointColumn)
 "/                                               \n"
 "\n";
 
-    typedef std::vector< std::vector<int> > VVI;
+    typedef std::vector< std::vector<long long> > VVI;
 
-    const int correct[][3] = { {  0,   9,  17 }  ,  // 0
+    const long long correct[][3] = { {  0,   9,  17 }  ,  // 0
                                {  1,  10,  18 }  ,  // 1
                                {  2,  11,  19 }  ,  // 2
                                {  3,  12,  20 }  ,  // 3
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(DisjointColumn)
     Opm::Parser parser;
     Opm::Deck deck = parser.parseString(grdecl);
     Opm::EclipseGrid ep = Opm::EclipseGrid(deck);
-    std::vector<int> actnum;
+    std::vector<long long> actnum;
     for (size_t i = 1; i <= (3 * 3 * 3); i++)
         actnum.push_back(i != 14); // ACTNUM 13*1 0 13* 1
     ep.resetACTNUM(actnum);

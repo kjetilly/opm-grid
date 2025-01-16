@@ -41,12 +41,12 @@ namespace Opm
 ///         the last entry is the size of the first array.
 template<class T, class A, class C>
 std::pair<std::vector<T, A>,
-          std::vector<int>>
+          std::vector<long long>>
 allGatherv(const std::vector<T,A>& input, const C& comm)
 {
-    std::vector<int> sizes(comm.size());
-    std::vector<int> displ(comm.size() + 1, 0);
-    int mySize = input.size();
+    std::vector<long long> sizes(comm.size());
+    std::vector<long long> displ(comm.size() + 1, 0);
+    long long mySize = input.size();
     comm.allgather(&mySize, 1, sizes.data());
     std::partial_sum(sizes.begin(), sizes.end(), displ.begin()+1);
     std::vector<T,A> output(displ.back());
@@ -71,12 +71,12 @@ allGatherv(const std::vector<T,A>& input, const C& comm)
 
 template<class T, class A, class C>
 std::pair<std::vector<T, A>,
-          std::vector<int>>
-gatherv(const std::vector<T,A>& input, const C& comm, int root)
+          std::vector<long long>>
+gatherv(const std::vector<T,A>& input, const C& comm, long long root)
 {
     bool isRoot = (comm.rank() == root);
-    std::vector<int> sizes;
-    std::vector<int> displ;
+    std::vector<long long> sizes;
+    std::vector<long long> displ;
     std::vector<T,A> output;
 
     if (isRoot)
@@ -84,7 +84,7 @@ gatherv(const std::vector<T,A>& input, const C& comm, int root)
         sizes.resize(comm.size());
         displ.resize(comm.size() + 1);
     }
-    int mySize = input.size();
+    long long mySize = input.size();
     comm.gather(&mySize, sizes.data(), 1, root);
 
     if (isRoot)

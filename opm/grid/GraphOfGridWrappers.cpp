@@ -30,27 +30,27 @@
 namespace Opm {
 
 #if HAVE_MPI
-int getGraphOfGridNumVertices(void* pGraph, int *err)
+long long getGraphOfGridNumVertices(void* pGraph, long long *err)
 {
     const GraphOfGrid<Dune::CpGrid>&  gog = *static_cast<const GraphOfGrid<Dune::CpGrid>*>(pGraph);
-    int size = gog.size();
+    long long size = gog.size();
     *err = ZOLTAN_OK;
     return size;
 }
 
 void getGraphOfGridVerticesList(void* pGraph,
-               [[maybe_unused]] int dimGlobalID,
-               [[maybe_unused]] int dimLocalID,
+               [[maybe_unused]] long long dimGlobalID,
+               [[maybe_unused]] long long dimLocalID,
                                 ZOLTAN_ID_PTR gIDs,
                [[maybe_unused]] ZOLTAN_ID_PTR lIDs,
-                                int weightDim,
+                                long long weightDim,
                                 float *objWeights,
-                                int *err)
+                                long long *err)
 {
-    assert(dimGlobalID==1); // ID is a single int
+    assert(dimGlobalID==1); // ID is a single long long
     assert(weightDim==1); // vertex weight is a single float
     const GraphOfGrid<Dune::CpGrid>& gog = *static_cast<const GraphOfGrid<Dune::CpGrid>*>(pGraph);
-    int i=0;
+    long long i=0;
     for (const auto& v : gog)
     {
         gIDs[i] = v.first;
@@ -62,19 +62,19 @@ void getGraphOfGridVerticesList(void* pGraph,
 }
 
 void getGraphOfGridNumEdges(void *pGraph,
-           [[maybe_unused]] int dimGlobalID,
-           [[maybe_unused]] int dimLocalID,
-                            int numCells,
+           [[maybe_unused]] long long dimGlobalID,
+           [[maybe_unused]] long long dimLocalID,
+                            long long numCells,
                             ZOLTAN_ID_PTR gIDs,
            [[maybe_unused]] ZOLTAN_ID_PTR lIDs,
-                            int *numEdges,
-                            int *err)
+                            long long *numEdges,
+                            long long *err)
 {
-    assert(dimGlobalID==1); // ID is a single int
+    assert(dimGlobalID==1); // ID is a single long long
     const GraphOfGrid<Dune::CpGrid>& gog = *static_cast<const GraphOfGrid<Dune::CpGrid>*>(pGraph);
-    for (int i=0; i<numCells; ++i)
+    for (long long i=0; i<numCells; ++i)
     {
-        int nE = gog.numEdges(gIDs[i]);
+        long long nE = gog.numEdges(gIDs[i]);
         if (nE== -1)
         {
             std::ostringstream ostr;
@@ -89,26 +89,26 @@ void getGraphOfGridNumEdges(void *pGraph,
 }
 
 void getGraphOfGridEdgeList(void *pGraph,
-           [[maybe_unused]] int dimGlobalID,
-           [[maybe_unused]] int dimLocalID,
-                            int numCells,
+           [[maybe_unused]] long long dimGlobalID,
+           [[maybe_unused]] long long dimLocalID,
+                            long long numCells,
                             ZOLTAN_ID_PTR gIDs,
            [[maybe_unused]] ZOLTAN_ID_PTR lIDs,
-                            int *numEdges,
+                            long long *numEdges,
                             ZOLTAN_ID_PTR nborGIDs,
-                            int *nborProc,
-                            int weightDim,
+                            long long *nborProc,
+                            long long weightDim,
                             float *edgeWeights,
-                            int *err)
+                            long long *err)
 {
-    assert(dimGlobalID==1); // ID is a single int
+    assert(dimGlobalID==1); // ID is a single long long
     assert(weightDim==1); // edge weight is a single float
     const GraphOfGrid<Dune::CpGrid>&  gog = *static_cast<const GraphOfGrid<Dune::CpGrid>*>(pGraph);
-    int id=0;
-    for (int i=0; i<numCells; ++i)
+    long long id=0;
+    for (long long i=0; i<numCells; ++i)
     {
         const auto& eList = gog.edgeList(gIDs[i]);
-        if ((int)eList.size()!=numEdges[i])
+        if ((long long)eList.size()!=numEdges[i])
         {
             std::ostringstream ostr;
             ostr << "getGraphOfGridEdgeList error: Edge number disagreement"
@@ -153,24 +153,24 @@ void setGraphOfGridZoltanGraphFunctions(Zoltan_Struct *zz,
 #endif // HAVE_MPI
 
 void addFutureConnectionWells(GraphOfGrid<Dune::CpGrid>& gog,
-                              const std::unordered_map<std::string, std::set<int>>& wells,
+                              const std::unordered_map<std::string, std::set<long long>>& wells,
                               bool checkWellIntersections)
 {
     // create compressed lookup from cartesian.
     const auto& grid = gog.getGrid();
     const auto& cpgdim = grid.logicalCartesianSize();
-    std::vector<int> cartesian_to_compressed(cpgdim[0]*cpgdim[1]*cpgdim[2], -1);
-    for( int i=0; i < grid.numCells(); ++i )
+    std::vector<long long> cartesian_to_compressed(cpgdim[0]*cpgdim[1]*cpgdim[2], -1);
+    for( long long i=0; i < grid.numCells(); ++i )
     {
         cartesian_to_compressed[grid.globalCell()[i]] = i;
     }
 
     for (const auto& w: wells)
     {
-        std::set<int> wellsgID;
-        for (const int& cell : w.second)
+        std::set<long long> wellsgID;
+        for (const long long& cell : w.second)
         {
-            int gID = cartesian_to_compressed[cell];
+            long long gID = cartesian_to_compressed[cell];
             assert(gID!=-1); // well should be an active cell
             wellsgID.insert(gID);
         }
@@ -189,8 +189,8 @@ void addWellConnections(GraphOfGrid<Dune::CpGrid>& gog,
 }
 
 void extendGIDtoRank(const GraphOfGrid<Dune::CpGrid>& gog,
-                     std::vector<int>& gIDtoRank,
-                     const int& root)
+                     std::vector<long long>& gIDtoRank,
+                     const long long& root)
 {
     for (const auto& w : gog.getWells())
     {
@@ -208,24 +208,24 @@ void extendGIDtoRank(const GraphOfGrid<Dune::CpGrid>& gog,
 #if HAVE_MPI
 namespace Impl{
 
-std::vector<std::vector<std::vector<int>>>
+std::vector<std::vector<std::vector<long long>>>
 extendRootExportList(const GraphOfGrid<Dune::CpGrid>& gog,
-                     std::vector<std::tuple<int,int,char>>& exportList,
-                     int root,
-                     const std::vector<int>& gIDtoRank)
+                     std::vector<std::tuple<long long,long long,char>>& exportList,
+                     long long root,
+                     const std::vector<long long>& gIDtoRank)
 {
     const auto& cc = gog.getGrid().comm();
     // non-root ranks have empty export lists.
-    std::vector<std::vector<std::vector<int>>> exportedWells;
+    std::vector<std::vector<std::vector<long long>>> exportedWells;
     if (cc.rank()!=root)
     {
         return exportedWells;
     }
     exportedWells.resize(cc.size());
-    using ExportList = std::vector<std::tuple<int,int,char>>;
+    using ExportList = std::vector<std::tuple<long long,long long,char>>;
     // make a list of wells for easy identification. Contains ID, begin, end
-    using iter = std::set<int>::const_iterator;
-    std::unordered_map<int, std::tuple<iter,iter,int>> wellMap;
+    using iter = std::set<long long>::const_iterator;
+    std::unordered_map<long long, std::tuple<iter,iter,long long>> wellMap;
     for (const auto& well : gog.getWells())
     {
         if (gIDtoRank.size()>0)
@@ -250,11 +250,11 @@ extendRootExportList(const GraphOfGrid<Dune::CpGrid>& gog,
         auto pWell = wellMap.find(std::get<0>(cellProperties));
         if (pWell!=wellMap.end())
         {
-            int rankToExport = std::get<1>(cellProperties);
+            long long rankToExport = std::get<1>(cellProperties);
             if (rankToExport!=root)
             {
                 const auto& [begin, end, wSize] = pWell->second;
-                std::vector<int> wellToExport;
+                std::vector<long long> wellToExport;
                 wellToExport.reserve(wSize);
                 wellToExport.push_back(*begin);
                 // well ID is its cell of lowest index and is already in the exportList
@@ -262,7 +262,7 @@ extendRootExportList(const GraphOfGrid<Dune::CpGrid>& gog,
                 for (auto pgID = begin; ++pgID!=end; )
                 {
                     // cells in one well have the same attributes (except ID)
-                    std::tuple<int,int,char> wellCell = cellProperties;
+                    std::tuple<long long,long long,char> wellCell = cellProperties;
                     std::get<0>(wellCell) = *pgID;
                     addToList.push_back(wellCell);
 
@@ -289,27 +289,27 @@ extendRootExportList(const GraphOfGrid<Dune::CpGrid>& gog,
     return exportedWells;
 }
 
-std::vector<std::vector<int>> communicateExportedWells(
-    const std::vector<std::vector<std::vector<int>>>& exportedWells,
+std::vector<std::vector<long long>> communicateExportedWells(
+    const std::vector<std::vector<std::vector<long long>>>& exportedWells,
     const Dune::cpgrid::CpGridDataTraits::Communication& cc,
-    int root)
+    long long root)
 {
     // send data from root
-    std::vector<std::vector<int>> result;
+    std::vector<std::vector<long long>> result;
     if (cc.rank()==root)
     {
-        for (int i=0; i<cc.size(); ++i)
+        for (long long i=0; i<cc.size(); ++i)
         {
             if (i!=root)
             {
-                int numWells = exportedWells[i].size();
-                int totsize = numWells+1;
+                long long numWells = exportedWells[i].size();
+                long long totsize = numWells+1;
                 for (const auto& well : exportedWells[i])
                 {
                     totsize += well.size();
                 }
                 // data: {N, size0, data0, size1, data1,... size(N-1), data(N-1)},
-                std::vector<int> commData;
+                std::vector<long long> commData;
                 commData.reserve(totsize);
                 commData.push_back(numWells);
                 for (const auto& well : exportedWells[i])
@@ -320,8 +320,8 @@ std::vector<std::vector<int>> communicateExportedWells(
                         commData.push_back(gID);
                     }
                 }
-                assert(totsize==(int)commData.size());
-                int tag = 37; // a random number
+                assert(totsize==(long long)commData.size());
+                long long tag = 37; // a random number
                 MPI_Send(&totsize, 1, MPI_INT, i, tag++, cc);
                 MPI_Send(commData.data(), totsize, MPI_INT, i, tag, cc);
             }
@@ -329,33 +329,33 @@ std::vector<std::vector<int>> communicateExportedWells(
     }
     else // receive data from root
     {
-        int tag = 37; // a random number
-        int totsize;
+        long long tag = 37; // a random number
+        long long totsize;
         MPI_Recv(&totsize, 1, MPI_INT, root, tag++, cc, MPI_STATUS_IGNORE);
-        std::vector<int> receivedData(totsize);
+        std::vector<long long> receivedData(totsize);
         MPI_Recv(receivedData.data(), totsize, MPI_INT, root, tag, cc, MPI_STATUS_IGNORE);
 
-        int numWells = receivedData[0];
+        long long numWells = receivedData[0];
         result.resize(numWells);
-        int index = 1;
-        for (int i=0; i<numWells; ++i)
+        long long index = 1;
+        for (long long i=0; i<numWells; ++i)
         {
-            int wellSize = receivedData[index++];
+            long long wellSize = receivedData[index++];
             assert(index+wellSize<=totsize);
             const auto dataBegin = receivedData.begin()+index;
-            result[i] = std::vector<int>(dataBegin, dataBegin+wellSize);
+            result[i] = std::vector<long long>(dataBegin, dataBegin+wellSize);
             index+=wellSize;
         }
     }
     return result;
 }
 
-void extendImportList(std::vector<std::tuple<int,int,char,int>>& importList,
-                      const std::vector<std::vector<int>>& extraWells)
+void extendImportList(std::vector<std::tuple<long long,long long,char,long long>>& importList,
+                      const std::vector<std::vector<long long>>& extraWells)
 {
-    using ImportList = std::vector<std::tuple<int,int,char,int>>;
+    using ImportList = std::vector<std::tuple<long long,long long,char,long long>>;
     // make a list of wells for easy identification
-    std::unordered_map<int, std::size_t> wellMap;
+    std::unordered_map<long long, std::size_t> wellMap;
     for (std::size_t i=0; i<extraWells.size(); ++i)
     {
         if (extraWells[i].size()>1)
@@ -378,7 +378,7 @@ void extendImportList(std::vector<std::tuple<int,int,char,int>>& importList,
             for (std::size_t j=1; j<wellVector.size(); ++j)
             {
                 // cells in one well have the same attributes (except ID)
-                std::tuple<int,int,char,int> wellCell = cellProperties;
+                std::tuple<long long,long long,char,long long> wellCell = cellProperties;
                 std::get<0>(wellCell) = wellVector[j];
                 addToList.push_back(wellCell);
             }
@@ -404,10 +404,10 @@ void extendImportList(std::vector<std::tuple<int,int,char,int>>& importList,
 
 void extendExportAndImportLists(const GraphOfGrid<Dune::CpGrid>& gog,
                                 const Dune::cpgrid::CpGridDataTraits::Communication& cc,
-                                int root,
-                                std::vector<std::tuple<int,int,char>>& exportList,
-                                std::vector<std::tuple<int,int,char,int>>& importList,
-                                const std::vector<int>& gIDtoRank)
+                                long long root,
+                                std::vector<std::tuple<long long,long long,char>>& exportList,
+                                std::vector<std::tuple<long long,long long,char,long long>>& importList,
+                                const std::vector<long long>& gIDtoRank)
 {
     // extend root's export list and get sets of well cells for other ranks
     auto expListToComm = Impl::extendRootExportList(gog, exportList, root, gIDtoRank);
@@ -421,13 +421,13 @@ void extendExportAndImportLists(const GraphOfGrid<Dune::CpGrid>& gog,
 }
 #endif // HAVE_MPI
 
-std::vector<int> getWellRanks(const std::vector<int>& gIDtoRank,
+std::vector<long long> getWellRanks(const std::vector<long long>& gIDtoRank,
                               const Dune::cpgrid::WellConnections& wellConnections)
 {
-    std::vector<int> wellIndices(wellConnections.size());
+    std::vector<long long> wellIndices(wellConnections.size());
     for (std::size_t wellIndex = 0; wellIndex < wellConnections.size(); ++wellIndex)
     {
-        int wellID = *(wellConnections[wellIndex].begin());
+        long long wellID = *(wellConnections[wellIndex].begin());
         wellIndices[wellIndex] = gIDtoRank[wellID];
     }
     return wellIndices;
@@ -436,12 +436,12 @@ std::vector<int> getWellRanks(const std::vector<int>& gIDtoRank,
 #if HAVE_MPI
 std::vector<std::pair<std::string, bool>>
 wellsOnThisRank(const std::vector<Dune::cpgrid::OpmWellType>& wells,
-                const std::vector<int>& wellRanks,
+                const std::vector<long long>& wellRanks,
                 const Dune::cpgrid::CpGridDataTraits::Communication& cc,
-                int root)
+                long long root)
 {
     auto numProcs = cc.size();
-    std::vector<std::vector<int>> wells_on_proc(numProcs);
+    std::vector<std::vector<long long>> wells_on_proc(numProcs);
     for (std::size_t i=0; i<wellRanks.size(); ++i)
     {
         wells_on_proc[wellRanks[i]].push_back(i);
@@ -450,32 +450,32 @@ wellsOnThisRank(const std::vector<Dune::cpgrid::OpmWellType>& wells,
 }
 
 template<class Id>
-std::tuple<std::vector<int>,
+std::tuple<std::vector<long long>,
            std::vector<std::pair<std::string, bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> > >
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> > >
 makeImportAndExportLists(const GraphOfGrid<Dune::CpGrid>& gog,
                          const Dune::Communication<MPI_Comm>& cc,
                          const std::vector<Dune::cpgrid::OpmWellType> * wells,
                          const Dune::cpgrid::WellConnections& wellConnections,
-                         int root,
-                         int numExport,
-                         int numImport,
+                         long long root,
+                         long long numExport,
+                         long long numImport,
         [[maybe_unused]] const Id* exportLocalGids,
                          const Id* exportGlobalGids,
-                         const int* exportToPart,
+                         const long long* exportToPart,
                          const Id* importGlobalGids)
 {
     const auto& cpgrid = gog.getGrid();
-    int size = cpgrid.numCells();
-    int rank  = cc.rank();
-    std::vector<int> gIDtoRank(size, rank);
-    std::vector<std::vector<int> > wellsOnProc;
+    long long size = cpgrid.numCells();
+    long long rank  = cc.rank();
+    std::vector<long long> gIDtoRank(size, rank);
+    std::vector<std::vector<long long> > wellsOnProc;
 
     // List entry: process to export to, (global) index, process rank, attribute there (not needed?)
-    std::vector<std::tuple<int,int,char>> myExportList;
+    std::vector<std::tuple<long long,long long,char>> myExportList;
     // List entry: process to import from, global index, process rank, attribute here, local index (determined later)
-    std::vector<std::tuple<int,int,char,int>> myImportList;
+    std::vector<std::tuple<long long,long long,char,long long>> myImportList;
     float buffer = 1.05; // to allocate extra space for wells in myExportList and myImportList
     assert(rank==root || numExport==0);
     assert(rank!=root || numImport==0);
@@ -486,14 +486,14 @@ makeImportAndExportLists(const GraphOfGrid<Dune::CpGrid>& gog,
     myImportList.reserve(reserveIm);
     using AttributeSet = Dune::cpgrid::CpGridData::AttributeSet;
 
-    for ( int i=0; i < numImport; ++i )
+    for ( long long i=0; i < numImport; ++i )
     {
         myImportList.emplace_back(importGlobalGids[i], root, static_cast<char>(AttributeSet::owner), -1);
     }
     assert(rank==root || numExport==0);
     if (rank==root)
     {
-        for ( int i=0; i < numExport; ++i )
+        for ( long long i=0; i < numExport; ++i )
         {
             gIDtoRank[exportGlobalGids[i]] = exportToPart[i];
             myExportList.emplace_back(exportGlobalGids[i], exportToPart[i], static_cast<char>(AttributeSet::owner));
@@ -553,27 +553,27 @@ void setDefaultZoltanParameters(Zoltan_Struct* zz)
 
 } // anon namespace
 
-std::tuple<std::vector<int>, std::vector<std::pair<std::string, bool>>,
-           std::vector<std::tuple<int,int,char> >,
-           std::vector<std::tuple<int,int,char,int> >,
+std::tuple<std::vector<long long>, std::vector<std::pair<std::string, bool>>,
+           std::vector<std::tuple<long long,long long,char> >,
+           std::vector<std::tuple<long long,long long,char,long long> >,
            Dune::cpgrid::WellConnections>
 zoltanPartitioningWithGraphOfGrid(const Dune::CpGrid& grid,
                                   const std::vector<Dune::cpgrid::OpmWellType> * wells,
-                                  const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                                  const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                  [[maybe_unused]] const double* transmissibilities,
                                   const Dune::cpgrid::CpGridDataTraits::Communication& cc,
                  [[maybe_unused]] Dune::EdgeWeightMethod edgeWeightsMethod,
-                                  int root,
+                                  long long root,
                                   const double zoltanImbalanceTol,
                                   const std::map<std::string, std::string>& params)
 {
-    int rc = ZOLTAN_OK - 1;
+    long long rc = ZOLTAN_OK - 1;
     float ver = 0;
     struct Zoltan_Struct *zz;
-    int changes, numGidEntries, numLidEntries, numImport, numExport;
+    long long changes, numGidEntries, numLidEntries, numImport, numExport;
     ZOLTAN_ID_PTR importGlobalGids, importLocalGids, exportGlobalGids, exportLocalGids;
-    int *importProcs, *importToPart, *exportProcs, *exportToPart;
-    int argc=0;
+    long long *importProcs, *importToPart, *exportProcs, *exportToPart;
+    long long argc=0;
     char** argv = 0 ;
     rc = Zoltan_Initialize(argc, argv, &ver);
     zz = Zoltan_Create(cc);

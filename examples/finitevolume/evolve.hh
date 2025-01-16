@@ -5,8 +5,8 @@ template<class G, class M, class V>
 void evolve(const G& grid, const M& mapper, V& c, double t, double& dt)
 {
     // first we extract the dimensions of the grid
-    const int dim = G::dimension;
-    const int dimworld = G::dimensionworld;
+    const long long dim = G::dimension;
+    const long long dimworld = G::dimensionworld;
 
     // type used for coordinates in the grid
     typedef typename G::ctype ct;
@@ -51,7 +51,7 @@ void evolve(const G& grid, const M& mapper, V& c, double t, double& dt)
         // double volume = it->geometry().volume();
 
         // cell index
-        int indexi = mapper.index(*it);
+        long long indexi = mapper.index(*it);
 
         // variable to compute sum of positive factors
         double sumfactor = 0.0;
@@ -92,7 +92,7 @@ void evolve(const G& grid, const M& mapper, V& c, double t, double& dt)
             {
                 // access neighbor
                 const auto& outside = is->outside();
-                int indexj = mapper.index(outside);
+                long long indexj = mapper.index(outside);
 
                 // compute flux from one side only
                 // this should become easier with the new IntersectionIterator functionality!
@@ -138,7 +138,7 @@ void evolve(const G& grid, const M& mapper, V& c, double t, double& dt)
     dt *= 0.99;                                          /*@\label{evh:.99}@*/
 
     // update the concentration vector
-    for (unsigned int i=0; i<c.size(); ++i)
+    for (size_t i=0; i<c.size(); ++i)
         c[i] += dt*update[i];                          /*@\label{evh:updc}@*/
 
     return;

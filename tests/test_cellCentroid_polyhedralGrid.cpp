@@ -62,15 +62,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -98,10 +98,10 @@ void createEclGridPolyhedralGrid_and_checkCentroid(const std::string& deckString
     const Dune::MultipleCodimMultipleGeomTypeMapper<GridView> mapper(leafGridView, Dune::mcmgElementLayout());
 
     for (const auto& element: Dune::elements(leafGridView)){
-        const int idx = mapper.index(element);
+        const long long idx = mapper.index(element);
         const auto& elemEclCentroid = eclGrid.getCellCenter(gridCartMapper.cartesianIndex(idx));
         const auto& centroid = lookUpCellCentroid(idx);
-        for (int coord = 0; coord < 3; ++coord)
+        for (long long coord = 0; coord < 3; ++coord)
         {
             BOOST_CHECK_EQUAL(elemEclCentroid[coord], centroid[coord]);
         }

@@ -38,13 +38,13 @@ void GraphOfGrid<Grid>::createGraph (const double* transmissibilities)
         VertexProperties vertex;
         vertex.nproc = rank;
         // get vertex's global ID
-        int gID = grid.globalIdSet().id(*it);
+        long long gID = grid.globalIdSet().id(*it);
 
         // iterate over vertex's faces and store neighbors' IDs
-        for (int face_lID=0; face_lID<grid.numCellFaces(gID); ++face_lID)
+        for (long long face_lID=0; face_lID<grid.numCellFaces(gID); ++face_lID)
         {
-            const int face  = grid.cellFace(gID, face_lID);
-            int otherCell   = grid.faceCell(face, 0);
+            const long long face  = grid.cellFace(gID, face_lID);
+            long long otherCell   = grid.faceCell(face, 0);
             if (otherCell == -1) // -1 means no cell, face is at boundary
             {
                 continue;
@@ -67,7 +67,7 @@ void GraphOfGrid<Grid>::createGraph (const double* transmissibilities)
 }
 
 template<typename Grid>
-int GraphOfGrid<Grid>::contractVertices (int gID1, int gID2)
+long long GraphOfGrid<Grid>::contractVertices (long long gID1, long long gID2)
 {
     // check if the gIDs are in the graph or a well
     // do nothing if the vertex is not there
@@ -124,7 +124,7 @@ int GraphOfGrid<Grid>::contractVertices (int gID1, int gID2)
 }
 
 template<typename Grid>
-int GraphOfGrid<Grid>::wellID (int gID) const
+long long GraphOfGrid<Grid>::wellID (long long gID) const
 {
     for (const auto& w : wells)
     {
@@ -138,16 +138,16 @@ int GraphOfGrid<Grid>::wellID (int gID) const
 }
 
 template<typename Grid>
-void GraphOfGrid<Grid>::addWell (const std::set<int>& well, bool checkIntersection)
+void GraphOfGrid<Grid>::addWell (const std::set<long long>& well, bool checkIntersection)
 {
     if (well.size()<2)
         return;
-    int wID = *(well.begin());
+    long long wID = *(well.begin());
 
     if (checkIntersection)
     {
-        std::set<int> newWell;
-        for (int gID : well)
+        std::set<long long> newWell;
+        for (long long gID : well)
         {
             // check if the cell is already in some well
             if (newWell.find(gID)!=newWell.end())
@@ -177,7 +177,7 @@ void GraphOfGrid<Grid>::addWell (const std::set<int>& well, bool checkIntersecti
     }
     else
     {
-        for (int gID : well)
+        for (long long gID : well)
         {
             wID = contractVertices(wID, gID);
         }
@@ -190,8 +190,8 @@ void GraphOfGrid<Grid>::addNeighboringCellsToWells ()
 {
     // mark all cells that will be added to wells (addding them one
     // by one would require recursive checks for neighboring wells)
-    std::vector<std::set<int>> buffer(wells.size());
-    int i=0;
+    std::vector<std::set<long long>> buffer(wells.size());
+    long long i=0;
     for (auto& w : wells)
     {
         buffer[i].insert(*w.begin()); // intersects with its well

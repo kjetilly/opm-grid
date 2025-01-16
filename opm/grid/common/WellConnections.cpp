@@ -44,12 +44,12 @@ struct Less
         return std::get<0>(t1) < std::get<0>(t2);
     }
     template<typename T>
-    bool operator()(const T& t, int i)
+    bool operator()(const T& t, long long i)
     {
         return std::get<0>(t) < i;
     }
     template<typename T>
-    bool operator()(int i, const T& t)
+    bool operator()(long long i, const T& t)
     {
         return i < std::get<0>(t);
     }
@@ -71,22 +71,22 @@ namespace Dune
 namespace cpgrid
 {
 WellConnections::WellConnections(const std::vector<OpmWellType>& wells,
-                                 const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
-                                 const std::array<int, 3>& cartesianSize,
-                                 const std::vector<int>& cartesian_to_compressed)
+                                 const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
+                                 const std::array<long long, 3>& cartesianSize,
+                                 const std::vector<long long>& cartesian_to_compressed)
 {
     init(wells, possibleFutureConnections, cartesianSize, cartesian_to_compressed);
 }
 
 WellConnections::WellConnections(const std::vector<OpmWellType>& wells,
-                                 const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                                 const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                  const Dune::CpGrid& cpGrid)
 {
     const auto& cpgdim = cpGrid.logicalCartesianSize();
     // create compressed lookup from cartesian.
-    std::vector<int> cartesian_to_compressed(cpgdim[0]*cpgdim[1]*cpgdim[2], -1);
+    std::vector<long long> cartesian_to_compressed(cpgdim[0]*cpgdim[1]*cpgdim[2], -1);
 
-    for( int i=0; i < cpGrid.numCells(); ++i )
+    for( long long i=0; i < cpGrid.numCells(); ++i )
     {
         cartesian_to_compressed[cpGrid.globalCell()[i]] = i;
     }
@@ -94,25 +94,25 @@ WellConnections::WellConnections(const std::vector<OpmWellType>& wells,
 }
 
 void WellConnections::init([[maybe_unused]] const std::vector<OpmWellType>& wells,
-                           [[maybe_unused]] const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
-                           [[maybe_unused]] const std::array<int, 3>& cartesianSize,
-                           [[maybe_unused]] const std::vector<int>& cartesian_to_compressed)
+                           [[maybe_unused]] const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
+                           [[maybe_unused]] const std::array<long long, 3>& cartesianSize,
+                           [[maybe_unused]] const std::vector<long long>& cartesian_to_compressed)
 {
 #if HAVE_ECL_INPUT
     well_indices_.resize(wells.size());
 
     // We assume that we know all the wells.
-    int index=0;
+    long long index=0;
     for (const auto& well : wells) {
-        std::set<int>& well_indices = well_indices_[index];
+        std::set<long long>& well_indices = well_indices_[index];
         const auto& connectionSet = well.getConnections( );
         for (size_t c=0; c<connectionSet.size(); c++) {
             const auto& connection = connectionSet.get(c);
-            int i = connection.getI();
-            int j = connection.getJ();
-            int k = connection.getK();
-            int cart_grid_idx = i + cartesianSize[0]*(j + cartesianSize[1]*k);
-            int compressed_idx = cartesian_to_compressed[cart_grid_idx];
+            long long i = connection.getI();
+            long long j = connection.getJ();
+            long long k = connection.getK();
+            long long cart_grid_idx = i + cartesianSize[0]*(j + cartesianSize[1]*k);
+            long long compressed_idx = cartesian_to_compressed[cart_grid_idx];
             if ( compressed_idx >= 0 ) // Ignore connections in inactive cells.
             {
                 well_indices.insert(compressed_idx);
@@ -121,7 +121,7 @@ void WellConnections::init([[maybe_unused]] const std::vector<OpmWellType>& well
         const auto possibleFutureConnectionSetIt = possibleFutureConnections.find(well.name());
         if (possibleFutureConnectionSetIt != possibleFutureConnections.end()) {
             for (auto& cart_grid_idx : possibleFutureConnectionSetIt->second) {
-                int compressed_idx = cartesian_to_compressed[cart_grid_idx];
+                long long compressed_idx = cartesian_to_compressed[cart_grid_idx];
                 if ( compressed_idx >= 0 ) // Ignore connections in inactive cells.
                 {
                     well_indices.insert(compressed_idx);
@@ -134,14 +134,14 @@ void WellConnections::init([[maybe_unused]] const std::vector<OpmWellType>& well
 }
 
 #ifdef HAVE_MPI
-std::vector<std::vector<int> >
-perforatingWellIndicesOnProc(const std::vector<int>& parts,
+std::vector<std::vector<long long> >
+perforatingWellIndicesOnProc(const std::vector<long long>& parts,
                              const std::vector<Dune::cpgrid::OpmWellType>& wells,
-                             const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                             const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                              const CpGrid& cpGrid)
 {
     auto numProcs = cpGrid.comm().size();
-    std::vector<std::vector<int> > wellIndices(numProcs);
+    std::vector<std::vector<long long> > wellIndices(numProcs);
 
     if (cpGrid.numCells())
     {
@@ -158,7 +158,7 @@ perforatingWellIndicesOnProc(const std::vector<int>& parts,
 
         for (std::size_t wellIndex = 0; wellIndex < wells.size(); ++wellIndex) {
             const auto &connections = wellConnections[wellIndex];
-            std::map<int, std::size_t> connectionsOnProc;
+            std::map<long long, std::size_t> connectionsOnProc;
             for (const auto& connection_index : connections) {
                 ++connectionsOnProc[parts[connection_index]];
             }
@@ -174,14 +174,14 @@ perforatingWellIndicesOnProc(const std::vector<int>& parts,
     }
     return wellIndices;
 }
-std::vector<std::vector<int> >
-postProcessPartitioningForWells(std::vector<int>& parts,
-                                [[maybe_unused]] std::function<int(int)> gid,
+std::vector<std::vector<long long> >
+postProcessPartitioningForWells(std::vector<long long>& parts,
+                                [[maybe_unused]] std::function<(long long)(long long)> gid,
                                 [[maybe_unused]] const std::vector<OpmWellType>& wells,
                                 [[maybe_unused]] const WellConnections& well_connections,
-                                [[maybe_unused]] const std::vector<std::set<int> >& wellGraph,
-                                [[maybe_unused]] std::vector<std::tuple<int,int,char>>& exportList,
-                                [[maybe_unused]] std::vector<std::tuple<int,int,char,int>>& importList,
+                                [[maybe_unused]] const std::vector<std::set<long long> >& wellGraph,
+                                [[maybe_unused]] std::vector<std::tuple<long long,long long,char>>& exportList,
+                                [[maybe_unused]] std::vector<std::tuple<long long,long long,char,long long>>& importList,
                                 const Communication<MPI_Comm>& cc)
 {
     auto no_procs = cc.size();
@@ -190,16 +190,16 @@ postProcessPartitioningForWells(std::vector<int>& parts,
     cc.allgather(&noCells, 1, cellsPerProc.data());
 
     // Contains for each process the indices of the wells assigned to it.
-    std::vector<std::vector<int> > well_indices_on_proc(no_procs);
+    std::vector<std::vector<long long> > well_indices_on_proc(no_procs);
 
 #if HAVE_ECL_INPUT
     const auto& mpiType =  MPITraits<std::size_t>::getType();
-    std::map<int, std::vector<int>> addCells, removeCells;
-    std::vector<int> visited(noCells, false);
+    std::map<long long, std::vector<long long>> addCells, removeCells;
+    std::vector<long long> visited(noCells, false);
     using AttributeSet = CpGridData::AttributeSet;
 
     if (noCells && well_connections.size()) {
-        std::vector<std::unordered_set<int>> old_owners(wells.size());
+        std::vector<std::unordered_set<long long>> old_owners(wells.size());
 
         for (std::size_t well_index = 0; well_index < wells.size(); ++well_index) {
             const auto& connections = well_connections[well_index];
@@ -229,22 +229,22 @@ postProcessPartitioningForWells(std::vector<int>& parts,
             // We need to process not just the perforated cells of this well,
             // but any perforated well reachable by a path via wells from the
             // cells of this well. Classic breadth first search.
-            std::forward_list<int> visited_cells;
-            std::map<int, std::size_t> num_connections_on_proc;
-            auto visitor = [&num_connections_on_proc, &parts](int cell) { ++num_connections_on_proc[parts[cell]]; };
+            std::forward_list<long long> visited_cells;
+            std::map<long long, std::size_t> num_connections_on_proc;
+            auto visitor = [&num_connections_on_proc, &parts](long long cell) { ++num_connections_on_proc[parts[cell]]; };
             visited_cells.push_front(*connections.begin());
 
             auto current = visited_cells.begin();
             auto last = current;
             auto end = visited_cells.end();
-            int last_size = 1;
-            int idx = 0;
+            long long last_size = 1;
+            long long idx = 0;
 
             visitor(*current);
             visited[*current] = true;
 
             while (current != end) {
-                int new_size = last_size;
+                long long new_size = last_size;
                 for (; idx < last_size; ++current, ++idx) {
                     for (auto neighbor : wellGraph[*current]) {
                         if (!visited[neighbor]) {
@@ -261,7 +261,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
 
             if (num_connections_on_proc.size() > 1) {
                 // partition with the most connections on it becomes new owner
-                int new_owner = std::max_element(num_connections_on_proc.begin(),
+                long long new_owner = std::max_element(num_connections_on_proc.begin(),
                                                  num_connections_on_proc.end(),
                                                  [](const auto& p1, const auto& p2)
                                                  { return (p1.second < p2.second); })
@@ -294,7 +294,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
                 }
             }
         }
-        auto sorter = [](std::pair<const int, std::vector<int>> &pair) {
+        auto sorter = [](std::pair<const long long, std::vector<long long>> &pair) {
                           auto &vec = pair.second;
                           std::sort(vec.begin(), vec.end());
                       };
@@ -318,7 +318,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
                 ++well_index;
                 continue;
             } else {
-                int new_owner = parts[*connections.begin()];
+                long long new_owner = parts[*connections.begin()];
                 well_indices_on_proc[new_owner].push_back(well_index);
                 const auto& old_owners_well = old_owners[well_index];
                 if (old_owners_well.size() > 1 || old_owners_well.find(new_owner) == old_owners_well.end()) {
@@ -337,7 +337,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
     std::vector<std::vector<std::size_t>> sizeBuffers(cc.size());
     auto begin = cellsPerProc.begin();
     auto req = requests.begin();
-    int tag = 7823;
+    long long tag = 7823;
 
     for (auto it = begin, end = cellsPerProc.end(); it != end; ++it) {
         auto otherRank = it - begin;
@@ -350,7 +350,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
 
     // Send the sizes
     if (!parts.empty()) {
-        for (int otherRank = 0; otherRank < cc.size(); ++otherRank)
+        for (long long otherRank = 0; otherRank < cc.size(); ++otherRank)
         {
             std::size_t sizes[2] = {0, 0};
             auto candidate = addCells.find(otherRank);
@@ -391,7 +391,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
 
     // Send data if we have cells.
     if (!parts.empty()) {
-        for (int otherRank = 0; otherRank < cc.size(); ++otherRank)
+        for (long long otherRank = 0; otherRank < cc.size(); ++otherRank)
         {
             std::vector<std::size_t> buffer;
             auto candidate = addCells.find(otherRank);
@@ -416,13 +416,13 @@ postProcessPartitioningForWells(std::vector<int>& parts,
     // unpack data
     auto status = statuses.begin();
     for (const auto &cellIndexBuffer : cellIndexBuffers) {
-        int otherRank = status->MPI_SOURCE;
+        long long otherRank = status->MPI_SOURCE;
         if (!cellIndexBuffer.empty()) {
             // add cells that moved here
             auto noAdded = sizeBuffers[otherRank][0];
             importList.reserve(importList.size() + noAdded);
             auto middle = importList.end();
-            std::vector<std::tuple<int, int, char>> addToImport;
+            std::vector<std::tuple<long long, long long, char>> addToImport;
             std::size_t offset = 0;
             for (; offset != noAdded; ++offset)
                 importList.emplace_back(cellIndexBuffer[offset], otherRank,
@@ -433,7 +433,7 @@ postProcessPartitioningForWells(std::vector<int>& parts,
             // remove cells that moved to another process
             auto noRemoved = sizeBuffers[otherRank][1];
             if (noRemoved) {
-                std::vector<std::tuple<int, int, char, int>> tmp(importList.size());
+                std::vector<std::tuple<long long, long long, char, long long>> tmp(importList.size());
                 auto newEnd =
                     std::set_difference(importList.begin(), importList.end(),
                                         cellIndexBuffer.begin() + noAdded,
@@ -451,30 +451,30 @@ postProcessPartitioningForWells(std::vector<int>& parts,
 }
 
 std::vector<std::pair<std::string,bool>>
-computeParallelWells([[maybe_unused]] const std::vector<std::vector<int> >& wells_on_proc,
+computeParallelWells([[maybe_unused]] const std::vector<std::vector<long long> >& wells_on_proc,
                      [[maybe_unused]] const std::vector<OpmWellType>& wells,
                      [[maybe_unused]] const Communication<MPI_Comm>& cc,
-                     [[maybe_unused]] int root)
+                     [[maybe_unused]] long long root)
 {
     // We need to use well names as only they are consistent.
     std::vector<std::pair<std::string,bool>> parallel_wells;
 
 #if HAVE_ECL_INPUT
-    std::vector<int> my_well_indices;
+    std::vector<long long> my_well_indices;
     std::vector<std::string> globalWellNames;
-    const int well_information_tag = 267553;
+    const long long well_information_tag = 267553;
 
     if( root == cc.rank() )
     {
         std::vector<MPI_Request> reqs(cc.size(), MPI_REQUEST_NULL);
         my_well_indices = wells_on_proc[root];
-        for ( int i=0; i < cc.size(); ++i )
+        for ( long long i=0; i < cc.size(); ++i )
         {
             if(i==root)
             {
                 continue;
             }
-            MPI_Isend(const_cast<int*>(wells_on_proc[i].data()),
+            MPI_Isend(const_cast<long long*>(wells_on_proc[i].data()),
                       wells_on_proc[i].size(),
                       MPI_INT, i, well_information_tag, cc, &reqs[i]);
         }
@@ -483,11 +483,11 @@ computeParallelWells([[maybe_unused]] const std::vector<std::vector<int> >& well
         // Broadcast well names
         // 1. Compute packed size and broadcast
         std::size_t sizes[2] = {wells.size(),0};
-        int wellMessageSize = 0;
+        long long wellMessageSize = 0;
         MPI_Pack_size(2, MPITraits<std::size_t>::getType(), cc, &wellMessageSize);
         for(const auto& well: wells)
         {
-            int size;
+            long long size;
             MPI_Pack_size(well.name().size() + 1, MPI_CHAR, cc, &size); // +1 for '\0' delimiter
             sizes[1] += well.name().size() + 1;
             wellMessageSize += size;
@@ -496,7 +496,7 @@ computeParallelWells([[maybe_unused]] const std::vector<std::vector<int> >& well
         // 2. Send number of wells and their names in one message
         globalWellNames.reserve(wells.size());
         std::vector<char> buffer(wellMessageSize);
-        int pos = 0;
+        long long pos = 0;
         MPI_Pack(&sizes, 2, MPITraits<std::size_t>::getType(), buffer.data(), wellMessageSize, &pos, cc);
         for(const auto& well: wells)
         {
@@ -510,14 +510,14 @@ computeParallelWells([[maybe_unused]] const std::vector<std::vector<int> >& well
     {
         MPI_Status stat;
         MPI_Probe(root, well_information_tag, cc, &stat);
-        int msg_size;
+        long long msg_size;
         MPI_Get_count(&stat, MPI_INT, &msg_size);
         my_well_indices.resize(msg_size);
         MPI_Recv(my_well_indices.data(), msg_size, MPI_INT, root,
                  well_information_tag, cc, &stat);
 
         // 1. receive broadcasted message Size
-        int wellMessageSize;
+        long long wellMessageSize;
         MPI_Bcast(&wellMessageSize, 1, MPI_INT, root, cc);
 
         // 2. Receive number of wells and their names in one message
@@ -525,7 +525,7 @@ computeParallelWells([[maybe_unused]] const std::vector<std::vector<int> >& well
         std::vector<char> buffer(wellMessageSize);
         MPI_Bcast(buffer.data(), wellMessageSize, MPI_PACKED, root, cc);
         std::size_t sizes[2];
-        int pos = 0;
+        long long pos = 0;
         MPI_Unpack(buffer.data(), wellMessageSize, &pos, &sizes, 2, MPITraits<std::size_t>::getType(), cc);
         // unpack all string at once
         std::vector<char> cstr(sizes[1]);

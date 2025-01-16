@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE (RegionMapping)
 
 BOOST_AUTO_TEST_CASE (Forward)
 {
-    std::vector<int> regions = { 2, 5, 2, 4, 2, 7, 6, 3, 6 };
+    std::vector<long long> regions = { 2, 5, 2, 4, 2, 7, 6, 3, 6 };
 
     Opm::RegionMapping<> rm(regions);
 
@@ -52,13 +52,13 @@ BOOST_AUTO_TEST_CASE (Forward)
 BOOST_AUTO_TEST_CASE (ActiveRegions)
 {
     //                           0  1  2  3  4  5  6  7  8
-    std::vector<int> regions = { 2, 5, 2, 4, 2, 7, 6, 3, 6 };
+    std::vector<long long> regions = { 2, 5, 2, 4, 2, 7, 6, 3, 6 };
 
     Opm::RegionMapping<> rm(regions);
 
-    std::vector<int> region_ids = { 2, 3, 4, 5, 6, 7 };
+    std::vector<long long> region_ids = { 2, 3, 4, 5, 6, 7 };
 
-    auto active = [&region_ids](const int reg)
+    auto active = [&region_ids](const long long reg)
         {
             auto b = region_ids.begin();
             auto e = region_ids.end();
@@ -76,14 +76,14 @@ BOOST_AUTO_TEST_CASE (ActiveRegions)
 
 BOOST_AUTO_TEST_CASE (Consecutive)
 {
-    using RegionCells = std::map<int, std::vector<int>>;
+    using RegionCells = std::map<long long, std::vector<long long>>;
 
     //                           0  1  2  3  4  5  6  7  8
-    std::vector<int> regions = { 2, 5, 2, 4, 2, 7, 6, 3, 6 };
+    std::vector<long long> regions = { 2, 5, 2, 4, 2, 7, 6, 3, 6 };
 
     Opm::RegionMapping<> rm(regions);
 
-    std::vector<int> region_ids = { 2, 3, 4, 5, 6, 7 };
+    std::vector<long long> region_ids = { 2, 3, 4, 5, 6, 7 };
     RegionCells      region_cells;
     {
         using VT = RegionCells::value_type;
@@ -113,14 +113,14 @@ BOOST_AUTO_TEST_CASE (Consecutive)
 
 BOOST_AUTO_TEST_CASE (NonConsecutive)
 {
-    using RegionCells = std::map<int, std::vector<int>>;
+    using RegionCells = std::map<long long, std::vector<long long>>;
 
     //                           0  1  2  3  4  5  6  7  8
-    std::vector<int> regions = { 2, 4, 2, 4, 2, 7, 6, 3, 6 };
+    std::vector<long long> regions = { 2, 4, 2, 4, 2, 7, 6, 3, 6 };
 
     Opm::RegionMapping<> rm(regions);
 
-    std::vector<int> region_ids = { 2, 3, 4, 6, 7 };
+    std::vector<long long> region_ids = { 2, 3, 4, 6, 7 };
     RegionCells      region_cells;
     {
         using VT = RegionCells::value_type;

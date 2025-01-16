@@ -67,11 +67,11 @@ namespace Dune
     namespace cpgrid
     {
     class CpGridData;
-    template <int> class Entity;
-    template<int,int> class Geometry;
+    template <long long> class Entity;
+    template<long long,long long> class Geometry;
     class HierarchicIterator;
     class IntersectionIterator;
-    template<int, PartitionIteratorType> class Iterator;
+    template<long long, PartitionIteratorType> class Iterator;
     class LevelGlobalIdSet;
     class GlobalIdSet;
     class Intersection;
@@ -110,7 +110,7 @@ namespace Dune
 
         /// \brief Traits associated with a specific codim.
         /// \tparam cd The codimension.
-        template <int cd>
+        template <long long cd>
         struct Codim
         {
             /// \brief The type of the geometry associated with the entity.
@@ -201,8 +201,8 @@ namespace Dune
         friend class cpgrid::Entity<1>;
         friend class cpgrid::Entity<2>;
         friend class cpgrid::Entity<3>;
-        template<int dim>
-        friend cpgrid::Entity<dim> createEntity(const CpGrid&,int,bool);
+        template<long long dim>
+        friend cpgrid::Entity<dim> createEntity(const CpGrid&,long long,bool);
 
     public:
 
@@ -292,14 +292,14 @@ namespace Dune
         ///              the left, bottom, and top face of that cell intersect, is at the coordinate
         ///              origin per default. This parameter shifts that corner to lie at
         ///              (shift[0]*cellsize[0], ..., shift[2]*cellsize[2]).
-        void createCartesian(const std::array<int, 3>& dims,
+        void createCartesian(const std::array<long long, 3>& dims,
                              const std::array<double, 3>& cellsize,
-                             const std::array<int, 3>& shift = {0,0,0});
+                             const std::array<long long, 3>& shift = {0,0,0});
 
         /// The logical cartesian size of the global grid.
         /// This function is not part of the Dune grid interface,
         /// and should be used with caution.
-        const std::array<int, 3>& logicalCartesianSize() const;
+        const std::array<long long, 3>& logicalCartesianSize() const;
 
         /// Retrieve mapping from internal ("compressed") active grid
         /// cells to external ("uncompressed") cells.  Specifically,
@@ -308,7 +308,7 @@ namespace Dune
         /// only be used by classes which really need it, such as
         /// those dealing with permeability fields from the input deck
         /// from whence the current CpGrid was constructed.
-        const std::vector<int>& globalCell() const;
+        const std::vector<long long>& globalCell() const;
 
         /// @brief Returns either data_ or distributed_data_(if non empty).
         const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& currentData() const;
@@ -323,7 +323,7 @@ namespace Dune
         ///    Active cell index.
         ///
         /// @param [out] ijk  Cartesian index triplet
-        void getIJK(const int c, std::array<int,3>& ijk) const;
+        void getIJK(const long long c, std::array<long long,3>& ijk) const;
         //@}
 
         /// Is the grid currently using unique boundary ids?
@@ -347,47 +347,47 @@ namespace Dune
         std::string name() const;
         
         /// Return maximum level defined in this grid. Levels are 0 and 1,  maxlevel = 1 (not counting leafview), 0 = the coarsest level.
-        int maxLevel() const;
+        long long maxLevel() const;
 
         /// Iterator to first entity of given codim on level
-        template<int codim>
-        typename Traits::template Codim<codim>::LevelIterator lbegin (int level) const;
+        template<long long codim>
+        typename Traits::template Codim<codim>::LevelIterator lbegin (long long level) const;
         /// one past the end on this level
-        template<int codim>
-        typename Traits::template Codim<codim>::LevelIterator lend (int level) const;
+        template<long long codim>
+        typename Traits::template Codim<codim>::LevelIterator lend (long long level) const;
         
         /// Iterator to first entity of given codim on level and PartitionIteratorType
-        template<int codim, PartitionIteratorType PiType>
-        typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin (int level) const;
+        template<long long codim, PartitionIteratorType PiType>
+        typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin (long long level) const;
         /// one past the end on this level
-        template<int codim, PartitionIteratorType PiType>
-        typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend (int level) const;
+        template<long long codim, PartitionIteratorType PiType>
+        typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend (long long level) const;
 
         /// Iterator to first leaf entity of given codim
-        template<int codim>
+        template<long long codim>
         typename Traits::template Codim<codim>::LeafIterator leafbegin() const;
         /// one past the end of the sequence of leaf entities
-        template<int codim>
+        template<long long codim>
         typename Traits::template Codim<codim>::LeafIterator leafend() const;
 
         /// Iterator to first leaf entity of given codim and PartitionIteratorType
-        template<int codim, PartitionIteratorType PiType>
+        template<long long codim, PartitionIteratorType PiType>
         typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const;
         /// one past the end of the sequence of leaf entities
-        template<int codim, PartitionIteratorType PiType>
+        template<long long codim, PartitionIteratorType PiType>
         typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const;
 
         /// \brief Number of grid entities per level and codim
-        int size (int level, int codim) const;
+        long long size (long long level, long long codim) const;
 
         /// number of leaf entities per codim in this process
-        int size (int codim) const;
+        long long size (long long codim) const;
 
         /// number of entities per level and geometry type in this process
-        int size (int level, GeometryType type) const;
+        long long size (long long level, GeometryType type) const;
 
         /// number of leaf entities per geometry type in this process
-        int size (GeometryType type) const;
+        long long size (GeometryType type) const;
 
         /// \brief Access to the GlobalIdSet
         const Traits::GlobalIdSet& globalIdSet() const;
@@ -396,7 +396,7 @@ namespace Dune
         const Traits::LocalIdSet& localIdSet() const;
         
         /// \brief Access to the LevelIndexSets
-        const Traits::LevelIndexSet& levelIndexSet(int level) const;
+        const Traits::LevelIndexSet& levelIndexSet(long long level) const;
 
         /// \brief Access to the LeafIndexSet
         const Traits::LeafIndexSet& leafIndexSet() const;
@@ -404,12 +404,12 @@ namespace Dune
         /// \brief  Refine the grid refCount times using the default refinement rule.
         ///         This behaves like marking all elements for refinement and then calling preAdapt, adapt and postAdapt.
         ///         The state after globalRefine is comparable to the state after postAdapt.
-        void globalRefine (int refCount);
+        void globalRefine (long long refCount);
 
-        const std::vector<Dune::GeometryType>& geomTypes(const int) const;
+        const std::vector<Dune::GeometryType>& geomTypes(const long long) const;
 
         /// given an EntitySeed (or EntityPointer) return an entity object
-        template <int codim>
+        template <long long codim>
         cpgrid::Entity<codim> entity(const cpgrid::Entity<codim>& seed) const;
 
         /// @brief Create a grid out of a coarse one and (at most) 2 refinements(LGRs) of selected block-shaped disjoint patches
@@ -428,21 +428,21 @@ namespace Dune
         ///                                    Last cell part of each patch(lgr) will be
         ///                                    {endIJK_vec[<patch-number>][0]-1, ..., endIJK_vec[<patch-number>][2]-1}.
         /// @param [in] lgr_name_vec           Names (std::string) for the LGRs/levels.
-        void addLgrsUpdateLeafView(const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                                   const std::vector<std::array<int,3>>& startIJK_vec,
-                                   const std::vector<std::array<int,3>>& endIJK_vec,
+        void addLgrsUpdateLeafView(const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                                   const std::vector<std::array<long long,3>>& startIJK_vec,
+                                   const std::vector<std::array<long long,3>>& endIJK_vec,
                                    const std::vector<std::string>& lgr_name_vec);
 
         // @brief TO BE DONE
-        const std::map<std::string,int>& getLgrNameToLevel() const;
+        const std::map<std::string,long long>& getLgrNameToLevel() const;
 
         // @breif Compute center of an entity/element/cell in the Eclipse way:
         //        - Average of the 4 corners of the bottom face.
         //        - Average of the 4 corners of the top face.
         //        Return average of the previous computations.
-        // @param [in]   int   Index of a cell.
+        // @param [in]   long long   Index of a cell.
         // @return            'eclipse centroid'
-        std::array<double,3> getEclCentroid(const int& idx) const;
+        std::array<double,3> getEclCentroid(const long long& idx) const;
 
         // @breif Compute center of an entity/element/cell in the Eclipse way:
         //        - Average of the 4 corners of the bottom face.
@@ -473,12 +473,12 @@ namespace Dune
         /// @param [in] element    Entity<0>. Currently, an element from the GLOBAL grid (level zero).
         /// @return true, if marking was succesfull.
         ///         false, if marking was not possible.
-        bool mark(int refCount, const cpgrid::Entity<0>& element);
+        bool mark(long long refCount, const cpgrid::Entity<0>& element);
 
         /// @brief Return refinement mark for entity.
         ///
         /// @return refinement mark (1,0,-1)  Currently, only 1 (refinement), or 0 (doing nothing).
-        int getMark(const cpgrid::Entity<0>& element) const;
+        long long getMark(const cpgrid::Entity<0>& element) const;
 
         /// @brief Set mightVanish flags for elements that will be refined in the next adapt() call
         ///        Need to be called after elements have been marked for refinement.
@@ -504,12 +504,12 @@ namespace Dune
         ///                                  block of cells to be refined.
         /// @param [in] endIJK_vec           Default empty vector. When isCARFIN, the final ijk Cartesian index of each
         ///                                  block of cells to be refined.
-        bool adapt(const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                   const std::vector<int>& assignRefinedLevel,
+        bool adapt(const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                   const std::vector<long long>& assignRefinedLevel,
                    const std::vector<std::string>& lgr_name_vec,
                    bool isCARFIN = false,
-                   const std::vector<std::array<int,3>>& startIJK_vec = std::vector<std::array<int,3>>{},
-                   const std::vector<std::array<int,3>>& endIJK_vec = std::vector<std::array<int,3>>{});
+                   const std::vector<std::array<long long,3>>& startIJK_vec = std::vector<std::array<long long,3>>{},
+                   const std::vector<std::array<long long,3>>& endIJK_vec = std::vector<std::array<long long,3>>{});
 
         /// @brief Clean up refinement markers - set every element to the mark 0 which represents 'doing nothing'
         void postAdapt();
@@ -579,23 +579,23 @@ namespace Dune
         ///                                                                   parent cell should be refined to.
         void refineAndProvideMarkedRefinedRelations(/* Marked elements parameters */
                                                     std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                                    int& markedElem_count,
-                                                    std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                                    std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner,
-                                                    std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
+                                                    long long& markedElem_count,
+                                                    std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                                    std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner,
+                                                    std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
                                                     /* Refined cells parameters */
-                                                    std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCell_to_refinedLevelAdRefinedCell,
-                                                    std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
-                                                    std::vector<int>& refined_cell_count_vec,
-                                                    const std::vector<int>& assignRefinedLevel,
-                                                    std::vector<std::vector<std::tuple<int,std::vector<int>>>>& preAdapt_parent_to_children_cells_vec,
+                                                    std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCell_to_refinedLevelAdRefinedCell,
+                                                    std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
+                                                    std::vector<long long>& refined_cell_count_vec,
+                                                    const std::vector<long long>& assignRefinedLevel,
+                                                    std::vector<std::vector<std::tuple<long long,std::vector<long long>>>>& preAdapt_parent_to_children_cells_vec,
                                                     /* Adapted cells parameters */
-                                                    std::map<std::array<int,2>,int>& elemLgrAndElemLgrCell_to_adaptedCell,
-                                                    std::unordered_map<int,std::array<int,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
-                                                    int& cell_count,
-                                                    std::vector<std::vector<int>>& preAdapt_level_to_leaf_cells_vec,
+                                                    std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrCell_to_adaptedCell,
+                                                    std::unordered_map<long long,std::array<long long,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
+                                                    long long& cell_count,
+                                                    std::vector<std::vector<long long>>& preAdapt_level_to_leaf_cells_vec,
                                                     /* Additional parameters */
-                                                    const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+                                                    const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief  Define child-parent relations from the new refined cells of the new refined level grids to its parent cells (belonging to pre-existing grid,
         ///         before adapting the grid/before updating the leaf grid view). Define the index in parent cell (-1 when cell has no parent).
@@ -618,13 +618,13 @@ namespace Dune
         ///         adapted_child_to_parent_cell:        Refined child cells and their parents. Entry is {-1,-1} when cell has no father. Otherwise,
         ///                                              {level parent cell, parent cell index}
         ///         adapted_cell_to_idxInParentCell:     Each refined child cell has a unique index in its parent cell, to be used to build geometryInFather(). -1 when has no father.
-        std::tuple< std::vector<std::vector<std::array<int,2>>>,
-                    std::vector<std::vector<int>>,
-                    std::vector<std::array<int,2>>,
-                    std::vector<int>> defineChildToParentAndIdxInParentCell( const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
-                                                                             const std::vector<int>& refined_cell_count_vec,
-                                                                             const std::unordered_map<int,std::array<int,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
-                                                                             const int& cell_count) const;
+        std::tuple< std::vector<std::vector<std::array<long long,2>>>,
+                    std::vector<std::vector<long long>>,
+                    std::vector<std::array<long long,2>>,
+                    std::vector<long long>> defineChildToParentAndIdxInParentCell( const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
+                                                                             const std::vector<long long>& refined_cell_count_vec,
+                                                                             const std::unordered_map<long long,std::array<long long,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
+                                                                             const long long& cell_count) const;
 
         /// @brief Define refined level grid cells indices and leaf grid view (or adapted grid) cells indices relations. Namely, level_to_leaf_cells_ for each new
         ///        refined level grid, and leaf_to_level_cells_ for the updated leaf grid view. 
@@ -652,13 +652,13 @@ namespace Dune
         ///
         /// @return refined_level_to_leaf_cells_vec:                         refined_level_to_leaf_cells_vec[ levelGridIdx ] [ cell idx in that level grid ] = equivalent leaf cell idx
         ///         leaf_to_level_cells:                                     leaf_to_level_cells[ leaf cell idx ] = {level where cell was born, cell idx on that level}
-        std::pair<std::vector<std::vector<int>>, std::vector<std::array<int,2>>>
-        defineLevelToLeafAndLeafToLevelCells(const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCell_to_refinedLevelAndRefinedCell,
-                                             const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
-                                             const std::vector<int>& refined_cell_count_vec,
-                                             const std::map<std::array<int,2>,int>& elemLgrAndElemLgrCell_to_adaptedCell,
-                                             const std::unordered_map<int,std::array<int,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
-                                             const int& cell_count) const;
+        std::pair<std::vector<std::vector<long long>>, std::vector<std::array<long long,2>>>
+        defineLevelToLeafAndLeafToLevelCells(const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCell_to_refinedLevelAndRefinedCell,
+                                             const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
+                                             const std::vector<long long>& refined_cell_count_vec,
+                                             const std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrCell_to_adaptedCell,
+                                             const std::unordered_map<long long,std::array<long long,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
+                                             const long long& cell_count) const;
 
         /// @brief Define various corner relations. 1. refined corners from auxiliary single marked element refinement to its corresponding refined level grid, and vice versa.
         ///                                         2. refined corners from single-cell-refinements that vanish in the "storing only once each entity process". To avoid repetition,
@@ -686,15 +686,15 @@ namespace Dune
         /// @param [in] cornerInMarkedElemWithEquivRefinedCorner
         /// @param [in] faceInMarkedElemAndRefinedFaces
         /// @param [in] cells_per_dim_vec
-        void identifyRefinedCornersPerLevel(std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
-                                            std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCorner_to_elemLgrAndElemLgrCorner,
-                                            std::vector<int>& refined_corner_count_vec,
-                                            std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+        void identifyRefinedCornersPerLevel(std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
+                                            std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCorner_to_elemLgrAndElemLgrCorner,
+                                            std::vector<long long>& refined_corner_count_vec,
+                                            std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                             const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                            const std::vector<int>& assignRefinedLevel,
-                                            const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                            const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
-                                            const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+                                            const std::vector<long long>& assignRefinedLevel,
+                                            const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                            const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
+                                            const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief Define relations between single-cell-refinement faces and refined level faces.
         ///
@@ -713,13 +713,13 @@ namespace Dune
         /// @param [in] assignRefinedLevel
         /// @param [in] faceInMarkedElemAndRefinedFaces
         /// @param [in] cells_per_dim_vec
-        void identifyRefinedFacesPerLevel(std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrFace_to_refinedLevelAndRefinedFace,
-                                          std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedFace_to_elemLgrAndElemLgrFace,
-                                          std::vector<int>& refined_face_count_vec,
+        void identifyRefinedFacesPerLevel(std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrFace_to_refinedLevelAndRefinedFace,
+                                          std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedFace_to_elemLgrAndElemLgrFace,
+                                          std::vector<long long>& refined_face_count_vec,
                                           const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                          const std::vector<int>& assignRefinedLevel,
-                                          const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
-                                          const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+                                          const std::vector<long long>& assignRefinedLevel,
+                                          const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
+                                          const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief Identify corners that appear on the leaf grid view.
         ///        Define various corner relations. preAdapt or refined corners from auxiliary single marked element refinement to the leaf grid view (or adapted grid), and vice versa.
@@ -741,15 +741,15 @@ namespace Dune
         /// @param [in] vanishedRefinedCorner_to_itsLastAppearance
         /// @param [in] faceInMarkedElemAndRefinedFaces
         /// @param [in] cells_per_dim_vec
-        void identifyLeafGridCorners(std::map<std::array<int,2>,int>& elemLgrAndElemLgrCorner_to_adaptedCorner,
-                                     std::unordered_map<int,std::array<int,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner,
-                                     int& corner_count,
+        void identifyLeafGridCorners(std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrCorner_to_adaptedCorner,
+                                     std::unordered_map<long long,std::array<long long,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner,
+                                     long long& corner_count,
                                      const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                     const std::vector<int>& assignRefinedLevel,
-                                     const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                     std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
-                                     const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
-                                     const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+                                     const std::vector<long long>& assignRefinedLevel,
+                                     const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                     std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                     const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
+                                     const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief Identify faces that appear on the leaf grid view.
         ///        Define various face relations. preAdapt or refined faces from auxiliary single marked element refinement to the leaf grid view (or adapted grid), and vice versa.
@@ -768,168 +768,168 @@ namespace Dune
         /// @param [in] assignRefinedLevel
         /// @param [in] faceInMarkedElemAndRefinedFaces
         /// @param [in] cells_per_dim_vec
-        void identifyLeafGridFaces(std::map<std::array<int,2>,int>& elemLgrAndElemLgrFace_to_adaptedFace,
-                                   std::unordered_map<int,std::array<int,2>>& adaptedFace_to_elemLgrAndElemLgrFace,
-                                   int& face_count,
+        void identifyLeafGridFaces(std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrFace_to_adaptedFace,
+                                   std::unordered_map<long long,std::array<long long,2>>& adaptedFace_to_elemLgrAndElemLgrFace,
+                                   long long& face_count,
                                    const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                   const std::vector<int>& assignRefinedLevel,
-                                   const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
-                                   const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+                                   const std::vector<long long>& assignRefinedLevel,
+                                   const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
+                                   const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief Define the corners (gemotry) for each refined level grid.
         void populateRefinedCorners(std::vector<Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<0,3>>>& refined_corners_vec,
-                                    const std::vector<int>& refined_corner_count_vec,
+                                    const std::vector<long long>& refined_corner_count_vec,
                                     const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                    const int& preAdaptMaxLevel,
-                                    const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCorner_to_elemLgrAndElemLgrCorner) const;
+                                    const long long& preAdaptMaxLevel,
+                                    const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCorner_to_elemLgrAndElemLgrCorner) const;
 
         /// @brief Define the faces, face tags, face normarls, and face_to_point_, for each refined level grid.
         void populateRefinedFaces(std::vector<Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<2,3>>>& refined_faces_vec,
                                   std::vector<Dune::cpgrid::EntityVariableBase<enum face_tag>>& mutable_refined_face_tags_vec,
                                   std::vector<Dune::cpgrid::EntityVariableBase<Dune::FieldVector<double,3>>>& mutable_refine_face_normals_vec,
-                                  std::vector<Opm::SparseTable<int>>& refined_face_to_point_vec,
-                                  const std::vector<int>& refined_face_count_vec,
-                                  const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedFace_to_elemLgrAndElemLgrFace,
-                                  const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
-                                  const std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                  std::vector<Opm::SparseTable<long long>>& refined_face_to_point_vec,
+                                  const std::vector<long long>& refined_face_count_vec,
+                                  const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedFace_to_elemLgrAndElemLgrFace,
+                                  const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
+                                  const std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                   const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                  const int& preAdaptMaxLevel,
-                                  const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                  const std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner) const;
+                                  const long long& preAdaptMaxLevel,
+                                  const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                  const std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner) const;
 
         /// @brief Define the cells, cell_to_point_, global_cell_, cell_to_face_, face_to_cell_, for each refined level grid.
         void populateRefinedCells(std::vector<Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<3,3>>>& refined_cells_vec,
-                                  std::vector<std::vector<std::array<int,8>>>& refined_cell_to_point_vec,
-                                  std::vector<std::vector<int>>& refined_global_cell_vec,
-                                  const std::vector<int>& refined_cell_count_vec,
+                                  std::vector<std::vector<std::array<long long,8>>>& refined_cell_to_point_vec,
+                                  std::vector<std::vector<long long>>& refined_global_cell_vec,
+                                  const std::vector<long long>& refined_cell_count_vec,
                                   std::vector<cpgrid::OrientedEntityTable<0,1>>& refined_cell_to_face_vec,
                                   std::vector<cpgrid::OrientedEntityTable<1,0>>& refined_face_to_cell_vec,
-                                  const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
-                                  const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrFace_to_refinedLevelAndRefinedFace,
-                                  const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
+                                  const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
+                                  const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrFace_to_refinedLevelAndRefinedFace,
+                                  const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
                                   const std::vector<Dune::cpgrid::DefaultGeometryPolicy>& refined_geometries_vec,
-                                  const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
-                                  const std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                  const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
+                                  const std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                   const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                  const std::vector<int>& assignRefinedLevel,
-                                  const int& preAdaptMaxLevel,
-                                  const std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner,
-                                  const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                  const std::vector<std::array<int,3>>&  cells_per_dim_vec) const;
+                                  const std::vector<long long>& assignRefinedLevel,
+                                  const long long& preAdaptMaxLevel,
+                                  const std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner,
+                                  const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                  const std::vector<std::array<long long,3>>&  cells_per_dim_vec) const;
 
         /// @brief Set geometrical and topological attributes for each refined level grid.
         void setRefinedLevelGridsGeometries( /* Refined corner arguments */
                                              std::vector<Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<0,3>>>& refined_corners_vec,
-                                             const std::vector<int>& refined_corner_count_vec,
+                                             const std::vector<long long>& refined_corner_count_vec,
                                              /* Refined face arguments */
                                              std::vector<Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<2,3>>>& refined_faces_vec,
                                              std::vector<Dune::cpgrid::EntityVariableBase<enum face_tag>>& mutable_refined_face_tags_vec,
                                              std::vector<Dune::cpgrid::EntityVariableBase<Dune::FieldVector<double,3>>>& mutable_refine_face_normals_vec,
-                                             std::vector<Opm::SparseTable<int>>& refined_face_to_point_vec,
-                                             const std::vector<int>& refined_face_count_vec,
+                                             std::vector<Opm::SparseTable<long long>>& refined_face_to_point_vec,
+                                             const std::vector<long long>& refined_face_count_vec,
                                              /* Refined cell argumets */
                                              std::vector<Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<3,3>>>& refined_cells_vec,
-                                             std::vector<std::vector<std::array<int,8>>>& refined_cell_to_point_vec,
-                                             std::vector<std::vector<int>>& refined_global_cell_vec,
-                                             std::vector<int>& refined_cell_count_vec,
+                                             std::vector<std::vector<std::array<long long,8>>>& refined_cell_to_point_vec,
+                                             std::vector<std::vector<long long>>& refined_global_cell_vec,
+                                             std::vector<long long>& refined_cell_count_vec,
                                              std::vector<cpgrid::OrientedEntityTable<0,1>>& refined_cell_to_face_vec,
                                              std::vector<cpgrid::OrientedEntityTable<1,0>>& refined_face_to_cell_vec,
                                              /* Auxiliary arguments */
-                                             const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
-                                             const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedFace_to_elemLgrAndElemLgrFace,
-                                             const std::map<std::array<int,2>,std::array<int,2>>& refinedLevelAndRefinedCorner_to_elemLgrAndElemLgrCorner,
-                                             const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
-                                             const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrFace_to_refinedLevelAndRefinedFace,
-                                             const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
+                                             const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCell_to_elemLgrAndElemLgrCell,
+                                             const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedFace_to_elemLgrAndElemLgrFace,
+                                             const std::map<std::array<long long,2>,std::array<long long,2>>& refinedLevelAndRefinedCorner_to_elemLgrAndElemLgrCorner,
+                                             const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
+                                             const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrFace_to_refinedLevelAndRefinedFace,
+                                             const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
                                              const std::vector<Dune::cpgrid::DefaultGeometryPolicy>& refined_geometries_vec,
-                                             const std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                             const std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                              const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                             const std::vector<int>& assignRefinedLevel,
-                                             const int& preAdaptMaxLevel,
-                                             const std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner,
-                                             const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                             const std::vector<std::array<int,3>>&  cells_per_dim_vec) const;
+                                             const std::vector<long long>& assignRefinedLevel,
+                                             const long long& preAdaptMaxLevel,
+                                             const std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner,
+                                             const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                             const std::vector<std::array<long long,3>>&  cells_per_dim_vec) const;
 
         /// @brief Define the corners (gemotry) for the leaf grid view (or adapted grid).
         void populateLeafGridCorners(Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<0,3>>& adapted_corners,
-                                     const int& corners_count,
+                                     const long long& corners_count,
                                      const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                     const std::unordered_map<int,std::array<int,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner) const;
+                                     const std::unordered_map<long long,std::array<long long,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner) const;
 
         /// @brief Define the faces, face tags, face normarls, and face_to_point_, for the leaf grid view.
         void populateLeafGridFaces(Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<2,3>>& adapted_faces,
                                    Dune::cpgrid::EntityVariableBase<enum face_tag>& mutable_face_tags,
                                    Dune::cpgrid::EntityVariableBase<Dune::FieldVector<double,3>>& mutable_face_normals,
-                                   Opm::SparseTable<int>& adapted_face_to_point,
-                                   const int& face_count,
-                                   const std::unordered_map<int,std::array<int,2>>& adaptedFace_to_elemLgrAndElemLgrFace,
-                                   const std::map<std::array<int,2>,int>& elemLgrAndElemLgrCorner_to_adaptedCorner,
-                                   const std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                   Opm::SparseTable<long long>& adapted_face_to_point,
+                                   const long long& face_count,
+                                   const std::unordered_map<long long,std::array<long long,2>>& adaptedFace_to_elemLgrAndElemLgrFace,
+                                   const std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrCorner_to_adaptedCorner,
+                                   const std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                    const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                   const std::vector<int>& assignRefinedLevel,
-                                   const std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner,
-                                   const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                   const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                                   const int& preAdaptMaxLevel) const;
+                                   const std::vector<long long>& assignRefinedLevel,
+                                   const std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner,
+                                   const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                   const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                                   const long long& preAdaptMaxLevel) const;
 
         /// @brief Define the cells, cell_to_point_, cell_to_face_, face_to_cell_, for the leaf grid view (or adapted grid).
         void populateLeafGridCells(Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<3,3>>& adapted_cells,
-                                   std::vector<std::array<int,8>>& adapted_cell_to_point,
-                                   const int& cell_count,
+                                   std::vector<std::array<long long,8>>& adapted_cell_to_point,
+                                   const long long& cell_count,
                                    cpgrid::OrientedEntityTable<0,1>& adapted_cell_to_face,
                                    cpgrid::OrientedEntityTable<1,0>& adapted_face_to_cell,
-                                   const std::unordered_map<int,std::array<int,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
-                                   const std::map<std::array<int,2>,int>& elemLgrAndElemLgrFace_to_adaptedFace,
-                                   const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
+                                   const std::unordered_map<long long,std::array<long long,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
+                                   const std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrFace_to_adaptedFace,
+                                   const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
                                    const Dune::cpgrid::DefaultGeometryPolicy& adapted_geometries,
-                                   const std::map<std::array<int,2>,int>& elemLgrAndElemLgrCorner_to_adaptedCorner,
-                                   const std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                   const std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrCorner_to_adaptedCorner,
+                                   const std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                    const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                   const std::vector<int>& assignRefinedLevel,
-                                   const std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner,
-                                   const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                   const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                                   const int& preAdaptMaxLevel) const;
+                                   const std::vector<long long>& assignRefinedLevel,
+                                   const std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner,
+                                   const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                   const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                                   const long long& preAdaptMaxLevel) const;
 
         /// @brief Define geometrical and topological attributes for the leaf grid view (or adapted grid).
         void updateLeafGridViewGeometries( /* Leaf grid View Corners arguments */
                                            Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<0,3>>& adapted_corners,
-                                           const int& corner_count,
+                                           const long long& corner_count,
                                            /* Leaf grid View Faces arguments */
                                            Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<2,3>>& adapted_faces,
                                            Dune::cpgrid::EntityVariableBase<enum face_tag>& mutable_face_tags,
                                            Dune::cpgrid::EntityVariableBase<Dune::FieldVector<double,3>>& mutable_face_normals,
-                                           Opm::SparseTable<int>& adapted_face_to_point,
-                                           const int& face_count,
+                                           Opm::SparseTable<long long>& adapted_face_to_point,
+                                           const long long& face_count,
                                            /* Leaf grid View Cells argumemts  */
                                            Dune::cpgrid::EntityVariableBase<cpgrid::Geometry<3,3>>& adapted_cells,
-                                           std::vector<std::array<int,8>>& adapted_cell_to_point,
-                                           const int& cell_count,
+                                           std::vector<std::array<long long,8>>& adapted_cell_to_point,
+                                           const long long& cell_count,
                                            cpgrid::OrientedEntityTable<0,1>& adapted_cell_to_face,
                                            cpgrid::OrientedEntityTable<1,0>& adapted_face_to_cell,
                                            /* Auxiliary arguments */
-                                           const std::unordered_map<int,std::array<int,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner,
-                                           const std::unordered_map<int,std::array<int,2>>& adaptedFace_to_elemLgrAndElemLgrFace,
-                                           const std::unordered_map<int,std::array<int,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
-                                           const std::map<std::array<int,2>,int>& elemLgrAndElemLgrFace_to_adaptedFace,
-                                           const std::vector<std::vector<std::pair<int, std::vector<int>>>>& faceInMarkedElemAndRefinedFaces,
+                                           const std::unordered_map<long long,std::array<long long,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner,
+                                           const std::unordered_map<long long,std::array<long long,2>>& adaptedFace_to_elemLgrAndElemLgrFace,
+                                           const std::unordered_map<long long,std::array<long long,2>>& adaptedCell_to_elemLgrAndElemLgrCell,
+                                           const std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrFace_to_adaptedFace,
+                                           const std::vector<std::vector<std::pair<long long, std::vector<long long>>>>& faceInMarkedElemAndRefinedFaces,
                                            const Dune::cpgrid::DefaultGeometryPolicy& adapted_geometries,
-                                           const std::map<std::array<int,2>,int>& elemLgrAndElemLgrCorner_to_adaptedCorner,
-                                           const std::map<std::array<int,2>, std::array<int,2>>& vanishedRefinedCorner_to_itsLastAppearance,
+                                           const std::map<std::array<long long,2>,long long>& elemLgrAndElemLgrCorner_to_adaptedCorner,
+                                           const std::map<std::array<long long,2>, std::array<long long,2>>& vanishedRefinedCorner_to_itsLastAppearance,
                                            const std::vector<std::shared_ptr<Dune::cpgrid::CpGridData>>& markedElem_to_itsLgr,
-                                           const std::vector<int>& assignRefinedLevel,
-                                           const std::map<std::array<int,2>,int>& markedElemAndEquivRefinedCorn_to_corner,
-                                           const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                           const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                                           const int& preAdaptMaxLevel) const;
+                                           const std::vector<long long>& assignRefinedLevel,
+                                           const std::map<std::array<long long,2>,long long>& markedElemAndEquivRefinedCorn_to_corner,
+                                           const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                           const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                                           const long long& preAdaptMaxLevel) const;
 
-        void updateCornerHistoryLevels(const std::vector<std::vector<std::array<int,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
-                                       const std::map<std::array<int,2>,std::array<int,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
-                                       const std::unordered_map<int,std::array<int,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner,
-                                       const int& corner_count,
-                                       const std::vector<std::array<int,2>>& preAdaptGrid_corner_history,
-                                       const int& preAdaptMaxLevel,
-                                       const int& newLevels);
+        void updateCornerHistoryLevels(const std::vector<std::vector<std::array<long long,2>>>& cornerInMarkedElemWithEquivRefinedCorner,
+                                       const std::map<std::array<long long,2>,std::array<long long,2>>& elemLgrAndElemLgrCorner_to_refinedLevelAndRefinedCorner,
+                                       const std::unordered_map<long long,std::array<long long,2>>& adaptedCorner_to_elemLgrAndElemLgrCorner,
+                                       const long long& corner_count,
+                                       const std::vector<std::array<long long,2>>& preAdaptGrid_corner_history,
+                                       const long long& preAdaptMaxLevel,
+                                       const long long& newLevels);
 
 
         /// @brief For refined level grids created based on startIJK and endIJK values, compute the "local ijk/Cartesian index" within the LGR.
@@ -944,12 +944,12 @@ namespace Dune
         ///
         /// @param [in] level    Grid index where LGR is stored
         /// @param [out] global_cell_lgr
-        void computeGlobalCellLgr(const int& level, const std::array<int,3>& startIJK, std::vector<int>& global_cell_lgr);
+        void computeGlobalCellLgr(const long long& level, const std::array<long long,3>& startIJK, std::vector<long long>& global_cell_lgr);
 
         /// @brief For a leaf grid with with LGRs, we assign the global_cell_ values of either the parent cell or the equivalent cell from
         ///        level zero.
         ///        For nested refinement, we lookup the oldest ancestor, from level zero.
-        void computeGlobalCellLeafGridViewWithLgrs(std::vector<int>& global_cell_leaf);
+        void computeGlobalCellLeafGridViewWithLgrs(std::vector<long long>& global_cell_leaf);
 
         /// @brief Get the ijk index of a refined corner, given its corner index of a single-cell-refinement.
         ///
@@ -960,7 +960,7 @@ namespace Dune
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] cornerIdxInLgr:   Corner index in the single-cell-refinement.
-        std::array<int,3> getRefinedCornerIJK(const std::array<int,3>& cells_per_dim, int cornerIdxInLgr) const;
+        std::array<long long,3> getRefinedCornerIJK(const std::array<long long,3>& cells_per_dim, long long cornerIdxInLgr) const;
 
         /// @brief Get the ijk index of a reined face, given its corner index of a single-cell-refinement.
         ///
@@ -976,21 +976,21 @@ namespace Dune
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] faceIdxInLgr:     Face index in the single-cell-refinement.
         /// @param [in] elemLgr_ptr:      Pointer to the single-cell-refinement grid.
-        std::array<int,3> getRefinedFaceIJK(const std::array<int,3>& cells_per_dim, int faceIdxInLgr,
+        std::array<long long,3> getRefinedFaceIJK(const std::array<long long,3>& cells_per_dim, long long faceIdxInLgr,
                                             const std::shared_ptr<cpgrid::CpGridData>& elemLgr_ptr) const;
 
         /// @brief Determine if a refined corner is located in the interior of the single-cell-refinement.
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] cornerIdxInLgr:   Corner index in the single-cell-refinement.
-        bool isRefinedCornerInInteriorLgr(const std::array<int,3>& cells_per_dim, int cornerIdxInLgr) const;
+        bool isRefinedCornerInInteriorLgr(const std::array<long long,3>& cells_per_dim, long long cornerIdxInLgr) const;
 
         /// @brief Determine if a refined face is located in the interior of the single-cell-refinement.
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] faceIdxInLgr:     Face index in the single-cell-refinement.
         /// @param [in] elemLgr_ptr:      Pointer to the single-cell-refinement grid.
-        bool isRefinedFaceInInteriorLgr(const std::array<int,3>& cells_per_dim, int faceIdxInLgr,
+        bool isRefinedFaceInInteriorLgr(const std::array<long long,3>& cells_per_dim, long long faceIdxInLgr,
                                         const std::shared_ptr<cpgrid::CpGridData>& elemLgr_ptr) const;
 
         /// @brief Determine if a refined corner is located on the boundary of the single-cell-refinement, and does not coincide with
@@ -998,21 +998,21 @@ namespace Dune
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,-, and z-direction) of the single-cell-refinement.
         /// @param [in] cornerIdxInLgr:   Corner index in the single-cell-refinement.
-        bool isRefinedNewBornCornerOnLgrBoundary(const std::array<int,3>& cells_per_dim, int cornerIdxInLgr) const;
+        bool isRefinedNewBornCornerOnLgrBoundary(const std::array<long long,3>& cells_per_dim, long long cornerIdxInLgr) const;
 
         /// @brief Determine if a new refined corner is located on an edge of the parent cell. In particular, it's on the boundary of
         ///        the single-cell-refinement, and does not coincide with  a preAdapt-existing corner.
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] cornerIdxInLgr:   Corner index in the single-cell-refinement.
-        bool newRefinedCornerLiesOnEdge(const std::array<int,3>& cells_per_dim, int cornerIdxInLgr) const;
+        bool newRefinedCornerLiesOnEdge(const std::array<long long,3>& cells_per_dim, long long cornerIdxInLgr) const;
 
         /// @brief Determine if a refined face is located on the boundary of the single-cell-refinement.
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] faceIdxInLgr:     Face index in the single-cell-refinement.
         /// @param [in] elemLgr_ptr:      Pointer to the single-cell-refinement grid.
-        bool isRefinedFaceOnLgrBoundary(const std::array<int,3>& cells_per_dim, int faceIdxInLgr,
+        bool isRefinedFaceOnLgrBoundary(const std::array<long long,3>& cells_per_dim, long long faceIdxInLgr,
                                         const std::shared_ptr<cpgrid::CpGridData>& elemLgr_ptr) const;
 
         /// @brief Get the parent face where the new refined corner lays on.
@@ -1020,14 +1020,14 @@ namespace Dune
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] cornerIdxInLgr:   Corner index in the single-cell-refinement.
         /// @param [in] elemLgr:          Cell index from starting grid, that has been refined into a single-cell-refinement.
-        int getParentFaceWhereNewRefinedCornerLiesOn(const std::array<int,3>& cells_per_dim, int cornerIdxInLgr, int elemLgr) const;
+        long long getParentFaceWhereNewRefinedCornerLiesOn(const std::array<long long,3>& cells_per_dim, long long cornerIdxInLgr, long long elemLgr) const;
 
         /// @brief Get the parent faces that containes the edge where the new refined corner lies on.
         ///
         /// @param [in] cells_per_dim:    Total children cells in each direction (x-,y-, and z-direction) of the single-cell-refinement.
         /// @param [in] cornerIdxInLgr:   Corner index in the single-cell-refinement.
         /// @param [in] elemLgr:          Cell index from starting grid, that has been refined into a single-cell-refinement.
-        std::array<int,2> getParentFacesAssocWithNewRefinedCornLyingOnEdge(const std::array<int,3>& cells_per_dim, int cornerIdxInLgr, int elemLgr) const;
+        std::array<long long,2> getParentFacesAssocWithNewRefinedCornLyingOnEdge(const std::array<long long,3>& cells_per_dim, long long cornerIdxInLgr, long long elemLgr) const;
 
         /// @brief A refined corner appears in two single-cell-refinements. Given the corner index in the first single-cell-refinement, compute the
         ///         corner index in the neighboring single-cell-refinement.
@@ -1035,7 +1035,7 @@ namespace Dune
         /// @param [in] cells_per_dim_lgr1:    Total children cells in each direction (x-,y-, and z-direction) of the elemLgr1 single-cell-refinement.
         /// @param [in] cornerIdxInLgr1:       Corner index in the elemLgr1 single-cell-refinement.
         /// @param [in] cells_per_dim_lgr2:    Total children cells in each direction (x-,y-, and z-direction) of the elemLgr2 single-cell-refinement.
-        int replaceLgr1CornerIdxByLgr2CornerIdx(const std::array<int,3>& cells_per_dim_lgr1, int cornerIdxLgr1, const std::array<int,3>& cells_per_dim_lgr2) const;
+        long long replaceLgr1CornerIdxByLgr2CornerIdx(const std::array<long long,3>& cells_per_dim_lgr1, long long cornerIdxLgr1, const std::array<long long,3>& cells_per_dim_lgr2) const;
 
         /// @brief A new refined corner lays on an edge and appears in at least two single-cell-refinements. Given the corner index in one single-cell-refinement, compute the
         ///        corner index in a neighboring single-cell-refinement.
@@ -1044,8 +1044,8 @@ namespace Dune
         /// @param [in] cornerIdxInLgr1:       Corner index in the elemLgr1 single-cell-refinement.
         /// @param [in] parentFaceLastAppearanceIdx: Parent face index where the refined corner appears for last time.
         /// @param [in] cells_per_dim_lgr2:    Total children cells in each direction (x-,y-, and z-direction) of the elemLgr2 single-cell-refinement.
-        int replaceLgr1CornerIdxByLgr2CornerIdx(const std::array<int,3>& cells_per_dim_lgr1, int cornerIdxLgr1, int elemLgr1, int parentFaceLastAppearanceIdx,
-                                                const std::array<int,3>& cells_per_dim_lgr2) const;
+        long long replaceLgr1CornerIdxByLgr2CornerIdx(const std::array<long long,3>& cells_per_dim_lgr1, long long cornerIdxLgr1, long long elemLgr1, long long parentFaceLastAppearanceIdx,
+                                                const std::array<long long,3>& cells_per_dim_lgr2) const;
 
         /// @brief A new refined face lays on the boudndary of a single-cell-refinement appears in at most two single-cell-refinements. Given the face index in one
         ///        single-cell-refinement, compute the face index in a neighboring single-cell-refinement.
@@ -1054,9 +1054,9 @@ namespace Dune
         /// @param [in] faceIdxInLgr1:         Face index in the elemLgr1 single-cell-refinement.
         /// @param [in] elemLgr1_ptr:          Pointer to the elemLgr1 single-cell-refinement grid.
         /// @param [in] cells_per_dim_lgr2:    Total children cells in each direction (x-,y-, and z-direction) of the elemLgr2 single-cell-refinement.
-        int replaceLgr1FaceIdxByLgr2FaceIdx(const std::array<int,3>& cells_per_dim_lgr1, int faceIdxInLgr1,
+        long long replaceLgr1FaceIdxByLgr2FaceIdx(const std::array<long long,3>& cells_per_dim_lgr1, long long faceIdxInLgr1,
                                             const std::shared_ptr<cpgrid::CpGridData>& elemLgr1_ptr,
-                                            const std::array<int,3>& cells_per_dim_lgr2) const;
+                                            const std::array<long long,3>& cells_per_dim_lgr2) const;
 
         /// @brief Get the parent face index where the new refined face lays on.
         ///
@@ -1064,9 +1064,9 @@ namespace Dune
         /// @param [in] faceIdxInLgr:     Face index in the single-cell-refinement.
         /// @param [in] elemLgr_ptr:      Pointer to the elemLgr single-cell-refinement grid.
         /// @param [in] elemLgr:          Cell index from starting grid, that has been refined into a single-cell-refinement.
-        int getParentFaceWhereNewRefinedFaceLiesOn(const std::array<int,3>& cells_per_dim, int faceIdxInLgr,
+        long long getParentFaceWhereNewRefinedFaceLiesOn(const std::array<long long,3>& cells_per_dim, long long faceIdxInLgr,
                                                    const std::shared_ptr<cpgrid::CpGridData>& elemLgr_ptr,
-                                                   int elemLgr)  const;
+                                                   long long elemLgr)  const;
         
         /// --------------- Auxiliary methods to support Adaptivity (end) ---------------
 
@@ -1077,8 +1077,8 @@ namespace Dune
         ///
         /// @return True if all blocks of cells do not contain any NNCs (non-neighboring-connection).
         ///         False if there is a block with at least one cell with a NNC.
-        bool nonNNCsSelectedCellsLGR( const std::vector<std::array<int,3>>& startIJK_vec,
-                                      const std::vector<std::array<int,3>>& endIJK_vec) const;
+        bool nonNNCsSelectedCellsLGR( const std::vector<std::array<long long,3>>& startIJK_vec,
+                                      const std::vector<std::array<long long,3>>& endIJK_vec) const;
 
         /// @brief Detect active LGRs in each process.
         ///
@@ -1090,9 +1090,9 @@ namespace Dune
         /// @param [out] lgr_with_at_least_one_active_cell Determine if an LGR is not empty in a given process, we set
         ///                                                lgr_with_at_least_one_active_cell[in that level] to 1 if it contains
         ///                                                at least one active cell, and to 0 otherwise.
-        void detectActiveLgrs(const std::vector<std::array<int,3>>& startIJK_vec,
-                              const std::vector<std::array<int,3>>& endIJK_vec,
-                              std::vector<int>& lgr_with_at_least_one_active_cell);
+        void detectActiveLgrs(const std::vector<std::array<long long,3>>& startIJK_vec,
+                              const std::vector<std::array<long long,3>>& endIJK_vec,
+                              std::vector<long long>& lgr_with_at_least_one_active_cell);
 
         /// @brief Mark selected elements, assign them their corresponding level, and detect active LGRs.
         ///
@@ -1107,10 +1107,10 @@ namespace Dune
         /// @param [out] lgr_with_at_least_one_active_cell Determine if an LGR is not empty in a given process, we set
         ///                                                lgr_with_at_least_one_active_cell[in that level] to 1 if it contains
         ///                                                at least one active cell, and to 0 otherwise.
-        void markElemAssignLevelDetectActiveLgrs(const std::vector<std::array<int,3>>& startIJK_vec,
-                                                 const std::vector<std::array<int,3>>& endIJK_vec,
-                                                 std::vector<int>& assignRefinedLevel,
-                                                 std::vector<int>& lgr_with_at_least_one_active_cell);
+        void markElemAssignLevelDetectActiveLgrs(const std::vector<std::array<long long,3>>& startIJK_vec,
+                                                 const std::vector<std::array<long long,3>>& endIJK_vec,
+                                                 std::vector<long long>& assignRefinedLevel,
+                                                 std::vector<long long>& lgr_with_at_least_one_active_cell);
 
         /// @brief Auxilliary function to compute one or more properties on selected block of parent cells.
         ///
@@ -1118,8 +1118,8 @@ namespace Dune
         /// @param [in] endIJK_vec      Vector of ijk values denoting the end of each block of cells selected for refinement.
         /// @param [in] function        Lambda expression/function that computes the desired properties for each parent cell.
         template<class T>
-        void computeOnLgrParents(const std::vector<std::array<int,3>>& startIJK_vec,
-                                 const std::vector<std::array<int,3>>& endIJK_vec,
+        void computeOnLgrParents(const std::vector<std::array<long long,3>>& startIJK_vec,
+                                 const std::vector<std::array<long long,3>>& endIJK_vec,
                                  T func);
 
         /// @brief Predict minimum cell and point global ids per process.
@@ -1135,11 +1135,11 @@ namespace Dune
         ///                                                at least one active cell in the current process, and 0 otherwise.
         /// @param [out] min_globalId_cell_in_proc
         /// @param [out] min_globalId_point_in_proc
-        void predictMinCellAndPointGlobalIdPerProcess(const std::vector<int>& assignRefinedLevel,
-                                                      const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                                                      const std::vector<int>& lgr_with_at_least_one_active_cell,
-                                                      int& min_globalId_cell_in_proc,
-                                                      int& min_globalId_point_in_proc) const;
+        void predictMinCellAndPointGlobalIdPerProcess(const std::vector<long long>& assignRefinedLevel,
+                                                      const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                                                      const std::vector<long long>& lgr_with_at_least_one_active_cell,
+                                                      long long& min_globalId_cell_in_proc,
+                                                      long long& min_globalId_point_in_proc) const;
 
         /// @brief Assign cell global ids of new born cell from refined level grids. Assign 'candidate' point global ids
         ///        for points in refined level grids.
@@ -1149,11 +1149,11 @@ namespace Dune
         /// @param [in] min_globalId_cell_in_proc         Minimum cell global id per process.
         /// @param [in] min_globalId_point_in_proc        Minimum point global id per process.
         /// @param [in] cells_per_dim_vec                 Total child cells in each direction (x-,y-, and z-direction) per block of cells.
-        void assignCellIdsAndCandidatePointIds( std::vector<std::vector<int>>& localToGlobal_cells_per_level,
-                                                std::vector<std::vector<int>>& localToGlobal_points_per_level,
-                                                int min_globalId_cell_in_proc,
-                                                int min_globalId_point_in_proc,
-                                                const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+        void assignCellIdsAndCandidatePointIds( std::vector<std::vector<long long>>& localToGlobal_cells_per_level,
+                                                std::vector<std::vector<long long>>& localToGlobal_points_per_level,
+                                                long long min_globalId_cell_in_proc,
+                                                long long min_globalId_point_in_proc,
+                                                const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief Select and re-write point global ids.
         ///
@@ -1168,12 +1168,12 @@ namespace Dune
         /// @param [out] localToGlobal_points_per_level   Relation local point.index() to assigned 'candidate' global id.
         /// @param [in] parent_to_children                The communication step is based on level zero grid, via the relation parent-children-cells.
         /// @param [in] cells_per_dim_vec                 Total child cells in each direction (x-,y-, and z-direction) per block of cells.
-        void selectWinnerPointIds(std::vector<std::vector<int>>&  localToGlobal_points_per_level,
-                                  const std::vector<std::tuple<int,std::vector<int>>>& parent_to_children,
-                                  const std::vector<std::array<int,3>>& cells_per_dim_vec) const;
+        void selectWinnerPointIds(std::vector<std::vector<long long>>&  localToGlobal_points_per_level,
+                                  const std::vector<std::tuple<long long,std::vector<long long>>>& parent_to_children,
+                                  const std::vector<std::array<long long,3>>& cells_per_dim_vec) const;
 
         /// @brief For a grid whose level zero has been distributed and then locally refined, populate the cell_index_set_ of each refined level grid.
-        void populateCellIndexSetRefinedGrid(int level);
+        void populateCellIndexSetRefinedGrid(long long level);
 
         /// @brief For a grid whose level zero has been distributed and then locally refined, populate the cell_index_set_ of the leaf grid view.
         void populateCellIndexSetLeafGridView();
@@ -1190,23 +1190,23 @@ namespace Dune
         std::vector<std::unordered_map<std::size_t, std::size_t>> mapLocalCartesianIndexSetsToLeafIndexSet() const;
 
         /// @brief Reverse map: from leaf index cell to { level, local/level Cartesian index of the cell }
-        std::vector<std::array<int,2>> mapLeafIndexSetToLocalCartesianIndexSets() const;
+        std::vector<std::array<long long,2>> mapLeafIndexSetToLocalCartesianIndexSets() const;
 
         /// \brief Size of the overlap on the leaf level
-        unsigned int overlapSize(int) const;
+        size_t overlapSize(long long) const;
 
 
         /// \brief Size of the ghost cell layer on the leaf level
-        unsigned int ghostSize(int) const;
+        size_t ghostSize(long long) const;
 
         /// \brief Size of the overlap on a given level
-        unsigned int overlapSize(int, int) const;
+        size_t overlapSize(long long, long long) const;
 
         /// \brief Size of the ghost cell layer on a given level
-        unsigned int ghostSize(int, int) const;
+        size_t ghostSize(long long, long long) const;
 
         /// \brief returns the number of boundary segments within the macro grid
-        unsigned int numBoundarySegments() const;
+        size_t numBoundarySegments() const;
 
         void setPartitioningParams(const std::map<std::string,std::string>& params);
 
@@ -1216,7 +1216,7 @@ namespace Dune
         /// \param overlapLayers The number of layers of cells of the overlap region (default: 1).
         /// \param partitionMethod The method used to partition the grid, one of Dune::PartitionMethod
         /// \warning May only be called once.
-        bool loadBalance(int overlapLayers=1, int partitionMethod = Dune::PartitionMethod::zoltan, double imbalanceTol = 1.1)
+        bool loadBalance(long long overlapLayers=1, long long partitionMethod = Dune::PartitionMethod::zoltan, double imbalanceTol = 1.1)
         {
             using std::get;
             return get<0>(scatterGrid(defaultTransEdgeWgt, false, nullptr, {}, false, nullptr, true, overlapLayers, partitionMethod, imbalanceTol));
@@ -1229,7 +1229,7 @@ namespace Dune
         /// \param partitionMethod The method used to partition the grid, one of Dune::PartitionMethod
         /// \param edgeWeightMethod The edge-weighting method to be used on the graph partitioner.
         /// \warning May only be called once.
-        bool loadBalanceSerial(int overlapLayers=1, int partitionMethod = Dune::PartitionMethod::zoltan, int edgeWeightMethod = Dune::EdgeWeightMethod::defaultTransEdgeWgt, double imbalanceTol = 1.1)
+        bool loadBalanceSerial(long long overlapLayers=1, long long partitionMethod = Dune::PartitionMethod::zoltan, long long edgeWeightMethod = Dune::EdgeWeightMethod::defaultTransEdgeWgt, double imbalanceTol = 1.1)
         {
             using std::get;
             return get<0>(scatterGrid(EdgeWeightMethod(edgeWeightMethod), false, nullptr, {}, true /*serial partitioning*/, nullptr, true, overlapLayers, partitionMethod, imbalanceTol));
@@ -1248,7 +1248,7 @@ namespace Dune
         ///            of each well are stored on one process. This done by
         ///            adding an edge with a very high edge weight for all
         ///            possible pairs of cells in the completion set of a well.
-        /// \param possibleFutureConnections An optional unordered_map<string, set<array<int,3>>>
+        /// \param possibleFutureConnections An optional unordered_map<string, set<array<long long,3>>>
         ///            containing possible future connections that might be opened during an ACTIONX.
         ///            The fist entry is the name of the well and the second entry is a set containing
         ///            the cartesian coordinates of the grid cells that get perforated of a possible
@@ -1264,9 +1264,9 @@ namespace Dune
         ///         perforated cells local to the process, for all wells (sorted by name)
         std::pair<bool,std::vector<std::pair<std::string,bool>>>
         loadBalance(const std::vector<cpgrid::OpmWellType> * wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections = {},
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections = {},
                     const double* transmissibilities = nullptr,
-                    int overlapLayers=1, int partitionMethod=Dune::PartitionMethod::zoltan)
+                    long long overlapLayers=1, long long partitionMethod=Dune::PartitionMethod::zoltan)
         {
             return scatterGrid(defaultTransEdgeWgt, false, wells, possibleFutureConnections, false, transmissibilities, false, overlapLayers, partitionMethod);
         }
@@ -1286,7 +1286,7 @@ namespace Dune
         ///            of each well are stored on one process. This done by
         ///            adding an edge with a very high edge weight for all
         ///            possible pairs of cells in the completion set of a well.
-        /// \param possibleFutureConnections An optional unordered_map<string, set<array<int,3>>>
+        /// \param possibleFutureConnections An optional unordered_map<string, set<array<long long,3>>>
         ///            containing possible future connections that might be opened during an ACTIONX.
         ///            The fist entry is the name of the well and the second entry is a set containing
         ///            the cartesian coordinates of the grid cells that get perforated of a possible
@@ -1304,10 +1304,10 @@ namespace Dune
         ///         perforated cells local to the process, for all wells (sorted by name)
         std::pair<bool,std::vector<std::pair<std::string,bool>>>
         loadBalance(EdgeWeightMethod method, const std::vector<cpgrid::OpmWellType> * wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections = {},
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections = {},
                     const double* transmissibilities = nullptr, bool ownersFirst=false,
-                    bool addCornerCells=false, int overlapLayers=1,
-                    int partitionMethod = Dune::PartitionMethod::zoltan,
+                    bool addCornerCells=false, long long overlapLayers=1,
+                    long long partitionMethod = Dune::PartitionMethod::zoltan,
                     double imbalanceTol = 1.1)
         {
             return scatterGrid(method, ownersFirst, wells, possibleFutureConnections, false, transmissibilities, addCornerCells, overlapLayers, partitionMethod, imbalanceTol);
@@ -1322,7 +1322,7 @@ namespace Dune
         ///            of each well are stored on one process. This done by
         ///            adding an edge with a very high edge weight for all
         ///            possible pairs of cells in the completion set of a well.
-        /// \param possibleFutureConnections An optional unordered_map<string, set<array<int,3>>>
+        /// \param possibleFutureConnections An optional unordered_map<string, set<array<long long,3>>>
         ///            containing possible future connections that might be opened during an ACTIONX.
         ///            The fist entry is the name of the well and the second entry is a set containing
         ///            the cartesian coordinates of the grid cells that get perforated of a possible
@@ -1342,9 +1342,9 @@ namespace Dune
         std::pair<bool, std::vector<std::pair<std::string,bool> > >
         loadBalance(DataHandle& data,
                     const std::vector<cpgrid::OpmWellType> * wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections = {},
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections = {},
                     const double* transmissibilities = nullptr,
-                    int overlapLayers=1, int partitionMethod = 1)
+                    long long overlapLayers=1, long long partitionMethod = 1)
         {
             auto ret = loadBalance(wells, possibleFutureConnections, transmissibilities, overlapLayers, partitionMethod);
             using std::get;
@@ -1368,7 +1368,7 @@ namespace Dune
         ///            of each well are stored on one process. This is done by
         ///            adding an edge with a very high edge weight for all
         ///            possible pairs of cells in the completion set of a well.
-        /// \param possibleFutureConnections An optional unordered_map<string, set<array<int,3>>>
+        /// \param possibleFutureConnections An optional unordered_map<string, set<array<long long,3>>>
         ///            containing possible future connections that might be opened during an ACTIONX.
         ///            The fist entry is the name of the well and the second entry is a set containing
         ///            the cartesian coordinates of the grid cells that get perforated of a possible
@@ -1393,10 +1393,10 @@ namespace Dune
         std::pair<bool, std::vector<std::pair<std::string,bool> > >
         loadBalance(DataHandle& data, EdgeWeightMethod method,
                     const std::vector<cpgrid::OpmWellType> * wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                     bool serialPartitioning,
                     const double* transmissibilities = nullptr, bool ownersFirst=false,
-                    bool addCornerCells=false, int overlapLayers=1, int partitionMethod = Dune::PartitionMethod::zoltan,
+                    bool addCornerCells=false, long long overlapLayers=1, long long partitionMethod = Dune::PartitionMethod::zoltan,
                     double imbalanceTol = 1.1,
                     bool allowDistributedWells = false)
         {
@@ -1428,11 +1428,11 @@ namespace Dune
         ///         perforated cells local to the process, for all wells (sorted by name)
         template<class DataHandle>
         std::pair<bool, std::vector<std::pair<std::string,bool> > >
-        loadBalance(DataHandle& data, const std::vector<int>& parts,
+        loadBalance(DataHandle& data, const std::vector<long long>& parts,
                     const std::vector<cpgrid::OpmWellType> * wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections = {},
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections = {},
                     bool ownersFirst=false,
-                    bool addCornerCells=false, int overlapLayers=1)
+                    bool addCornerCells=false, long long overlapLayers=1)
         {
             using std::get;
             auto ret = scatterGrid(defaultTransEdgeWgt,  ownersFirst, wells,
@@ -1459,7 +1459,7 @@ namespace Dune
         /// \warning May only be called once.
         template<class DataHandle>
         bool loadBalance(DataHandle& data,
-                         decltype(data.fixedSize(0,0)) overlapLayers=1, int partitionMethod = Dune::PartitionMethod::zoltan)
+                         decltype(data.fixedSize(0,0)) overlapLayers=1, long long partitionMethod = Dune::PartitionMethod::zoltan)
         {
             // decltype usage needed to tell the compiler not to use this function if first
             // argument is std::vector but rather loadbalance by parts
@@ -1482,8 +1482,8 @@ namespace Dune
         /// \param addCornerCells Add corner cells to the overlap layer.
         /// \param overlapLayers The number of layers of cells of the overlap region (default: 1).
         /// \warning May only be called once.
-        bool loadBalance(const std::vector<int>& parts, bool ownersFirst=false,
-                         bool addCornerCells=false, int overlapLayers=1)
+        bool loadBalance(const std::vector<long long>& parts, bool ownersFirst=false,
+                         bool addCornerCells=false, long long overlapLayers=1)
         {
             using std::get;
             return get<0>(scatterGrid(defaultTransEdgeWgt,  ownersFirst, /* wells = */ {},
@@ -1508,8 +1508,8 @@ namespace Dune
         /// \param overlapLayers The number of layers of cells of the overlap region (default: 1).
         /// \warning May only be called once.
         template<class DataHandle>
-        bool loadBalance(DataHandle& data, const std::vector<int>& parts, bool ownersFirst=false,
-                         bool addCornerCells=false, int overlapLayers=1)
+        bool loadBalance(DataHandle& data, const std::vector<long long>& parts, bool ownersFirst=false,
+                         bool addCornerCells=false, long long overlapLayers=1)
         {
             bool ret = loadBalance(parts, ownersFirst, addCornerCells, overlapLayers);
             if (ret)
@@ -1521,7 +1521,7 @@ namespace Dune
 
         /// \brief Partitions the grid using Zoltan without decomposing and distributing it among processes.
         /// \param wells The wells of the eclipse.
-        /// \param possibleFutureConnections An optional unordered_map<string, set<array<int,3>>>
+        /// \param possibleFutureConnections An optional unordered_map<string, set<array<long long,3>>>
         ///            containing possible future connections that might be opened during an ACTIONX.
         ///            The fist entry is the name of the well and the second entry is a set containing
         ///            the cartesian coordinates of the grid cells that get perforated of a possible
@@ -1531,11 +1531,11 @@ namespace Dune
          /// \param transmissibilities The transmissibilities used to calculate the edge weights.
          /// \param numParts Number of parts in the partition.
          /// \return An array with the domain index for each cell.
-         std::vector<int>
+         std::vector<long long>
          zoltanPartitionWithoutScatter(const std::vector<cpgrid::OpmWellType>* wells,
-                                       const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                                       const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                                        const double* transmissibilities,
-                                       const int     numParts,
+                                       const long long     numParts,
                                        const double  imbalanceTol) const;
 
         /// The new communication interface.
@@ -1546,7 +1546,7 @@ namespace Dune
         /// \param dir The direction of the communication along the interface (forward or backward).
         /// \param level discarded as CpGrid is not adaptive.
         template<class DataHandle>
-        void communicate (DataHandle& data, InterfaceType iftype, CommunicationDirection dir, int /*level*/) const
+        void communicate (DataHandle& data, InterfaceType iftype, CommunicationDirection dir, long long /*level*/) const
         {
             communicate(data, iftype, dir);
         }
@@ -1583,13 +1583,13 @@ namespace Dune
 
         // Topology
         /// \brief Get the number of cells.
-        int numCells() const;
+        long long numCells() const;
 
         /// \brief Get the number of faces.
-        int numFaces() const;
+        long long numFaces() const;
 
         /// \brief Get The number of vertices.
-        int numVertices() const;
+        long long numVertices() const;
 
 
         /// \brief Get the number of faces of a cell.
@@ -1598,17 +1598,17 @@ namespace Dune
         /// number is quite arbitrary. Its lower bound is 4, but there is
         /// no upper bound.
         /// \parame cell the index identifying the cell.
-        int numCellFaces(int cell) const;
+        long long numCellFaces(long long cell) const;
 
         /// \brief Get a specific face of a cell.
         /// \param cell The index identifying the cell.
         /// \param local_index The local index (in [0,numFaces(cell))) of the face in this cell.
         /// \return The index identifying the face.
-        int cellFace(int cell, int local_index) const;
+        long long cellFace(long long cell, long long local_index) const;
 
         /// \brief Get a list of indices identifying all faces of a cell.
         /// \param cell The index identifying the cell.
-        const cpgrid::OrientedEntityTable<0,1>::row_type cellFaceRow(int cell) const;
+        const cpgrid::OrientedEntityTable<0,1>::row_type cellFaceRow(long long cell) const;
 
         /// \brief Get the index identifying a cell attached to a face.
         ///
@@ -1620,68 +1620,68 @@ namespace Dune
         /// \return The index identifying a cell or -1 if there is no such
         /// cell due the face being part of the grid boundary or the
         /// cell being stored on another process.
-        int faceCell(int face, int local_index) const;
+        long long faceCell(long long face, long long local_index) const;
       
         /// \brief Get the sum of all faces attached to all cells.
         ///
         /// Each face identified by a unique index is counted as often
         /// as there are neigboring cells attached to it.
         /// \f$ numCellFaces()=\sum_{c} numCellFaces(c) \f$
-        /// \see numCellFaces(int)const
-        int numCellFaces() const;
+        /// \see numCellFaces(long long)const
+        long long numCellFaces() const;
 
-        int numFaceVertices(int face) const;
+        long long numFaceVertices(long long face) const;
 
         /// \brief Get the index identifying a vertex of a face.
         /// \param cell The index identifying the face.
         /// \param local_index The local_index (in [0,numFaceVertices(vertex) - 1]])
         ///  of the vertex.
-        int faceVertex(int face, int local_index) const;
+        long long faceVertex(long long face, long long local_index) const;
 
         /// \brief Get vertical position of cell center ("zcorn" average).
         /// \brief cell_index The index of the specific cell.
-        double cellCenterDepth(int cell_index) const;
+        double cellCenterDepth(long long cell_index) const;
 
 
-        const Vector faceCenterEcl(int cell_index, int face, const Dune::cpgrid::Intersection& intersection) const;
+        const Vector faceCenterEcl(long long cell_index, long long face, const Dune::cpgrid::Intersection& intersection) const;
 
-        const Vector faceAreaNormalEcl(int face) const;
+        const Vector faceAreaNormalEcl(long long face) const;
 
 
         // Geometry
         /// \brief Get the Position of a vertex.
         /// \param cell The index identifying the cell.
         /// \return The coordinates of the vertex.
-        const Vector& vertexPosition(int vertex) const;
+        const Vector& vertexPosition(long long vertex) const;
 
         /// \brief Get the area of a face.
         /// \param cell The index identifying the face.
-        double faceArea(int face) const;
+        double faceArea(long long face) const;
 
         /// \brief Get the coordinates of the center of a face.
         /// \param cell The index identifying the face.
-        const Vector& faceCentroid(int face) const;
+        const Vector& faceCentroid(long long face) const;
 
         /// \brief Get the unit normal of a face.
         /// \param cell The index identifying the face.
         /// \see faceCell
-        const Vector& faceNormal(int face) const;
+        const Vector& faceNormal(long long face) const;
 
         /// \brief Get the volume of the cell.
         /// \param cell The index identifying the cell.
-        double cellVolume(int cell) const;
+        double cellVolume(long long cell) const;
 
         /// \brief Get the coordinates of the center of a cell.
         /// \param cell The index identifying the face.
-        const Vector& cellCentroid(int cell) const;
+        const Vector& cellCentroid(long long cell) const;
 
         /// \brief An iterator over the centroids of the geometry of the entities.
         /// \tparam codim The co-dimension of the entities.
-        template<int codim>
+        template<long long codim>
         class CentroidIterator
             : public RandomAccessIteratorFacade<CentroidIterator<codim>,
                                                 FieldVector<double, 3>,
-                                                const FieldVector<double, 3>&, int>
+                                                const FieldVector<double, 3>&, long long>
         {
         public:
             /// \brief The type of the iterator over the codim geometries.
@@ -1701,18 +1701,18 @@ namespace Dune
             {
                 ++iter_;
             }
-            const FieldVector<double,3>& elementAt(int n)
+            const FieldVector<double,3>& elementAt(long long n)
             {
                 return iter_[n]->center();
             }
-            void advance(int n){
+            void advance(long long n){
                 iter_+=n;
             }
             void decrement()
             {
                 --iter_;
             }
-            int distanceTo(const CentroidIterator& o)
+            long long distanceTo(const CentroidIterator& o)
             {
                 return o-iter_;
             }
@@ -1731,7 +1731,7 @@ namespace Dune
         CentroidIterator<1> beginFaceCentroids() const;
 
         // Extra
-        int boundaryId(int face) const;
+        long long boundaryId(long long face) const;
 
         /// \brief Get the cartesian tag associated with a face tag.
         ///
@@ -1740,7 +1740,7 @@ namespace Dune
         /// \param An iterator that points to the face and was obtained
         /// by iterating over Opm::UgGridHelpers::cell2Faces(grid).
         template<class Cell2FacesRowIterator>
-        int
+        long long
         faceTag(const Cell2FacesRowIterator& cell_face) const;
 
         //@}
@@ -1789,13 +1789,13 @@ namespace Dune
         /// Here is a small example that prints the received values when scattering:
         /// \code
         /// struct Handle{
-        ///   typedef int DataType;
-        ///   const std::vector<int>& vals;
+        ///   typedef long long DataType;
+        ///   const std::vector<long long>& vals;
         ///   bool fixedsize() { return true; }
         ///   size_t size(std::size_t) { return 1; }
         ///   void gather(auto& B buf, size_t i)[ buf.write(vals[i]); }
         ///   void scatter(auto& B buf, size_t i, std::size_t) {
-        ///     int val;
+        ///     long long val;
         ///     buf.read(val);
         ///     cout<<i<<": "<<val<<" "; }
         /// };
@@ -1843,7 +1843,7 @@ namespace Dune
 #endif
 
         /// \brief Get sorted active cell indices of numerical aquifer
-        const std::vector<int>& sortedNumAquiferCells() const;
+        const std::vector<long long>& sortedNumAquiferCells() const;
 
     private:
         /// \brief Scatter a global grid to all processors.
@@ -1856,7 +1856,7 @@ namespace Dune
         ///            of each well are stored on one process. This done by
         ///            adding an edge with a very high edge weight for all
         ///            possible pairs of cells in the completion set of a well.
-        /// \param possibleFutureConnections An optional unordered_map<string, set<array<int,3>>>
+        /// \param possibleFutureConnections An optional unordered_map<string, set<array<long long,3>>>
         ///            containing possible future connections that might be opened during an ACTIONX.
         ///            The fist entry is the name of the well and the second entry is a set containing
         ///            the cartesian coordinates of the grid cells that get perforated of a possible
@@ -1881,15 +1881,15 @@ namespace Dune
         scatterGrid(EdgeWeightMethod method,
                     bool ownersFirst,
                     const std::vector<cpgrid::OpmWellType> * wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                     bool serialPartitioning,
                     const double* transmissibilities,
                     bool addCornerCells,
-                    int overlapLayers,
-                    int partitionMethod = Dune::PartitionMethod::zoltan,
+                    long long overlapLayers,
+                    long long partitionMethod = Dune::PartitionMethod::zoltan,
                     double imbalanceTol = 1.1,
                     bool allowDistributedWells = true,
-                    const std::vector<int>& input_cell_part = {});
+                    const std::vector<long long>& input_cell_part = {});
 
         /** @brief The data stored in the grid.
          *
@@ -1903,7 +1903,7 @@ namespace Dune
         /** @brief A pointer to the current data used. */
         std::vector<std::shared_ptr<cpgrid::CpGridData>>* current_data_;
         /** @brief To get the level given the lgr-name. Default, {"GLOBAL", 0}. */
-        std::map<std::string,int> lgr_names_ = {{"GLOBAL", 0}};
+        std::map<std::string,long long> lgr_names_ = {{"GLOBAL", 0}};
         /**
          * @brief Interface for scattering and gathering cell data.
          *
@@ -2012,7 +2012,7 @@ namespace Dune
 
 
     template<class Cell2FacesRowIterator>
-    int
+    long long
     CpGrid::faceTag(const Cell2FacesRowIterator& cell_face) const
     {
         // Note that this relies on the following implementation detail:
@@ -2024,8 +2024,8 @@ namespace Dune
         // the orientation has to be determined by the orientation of the cell.
         // If it is true then in UnstructuredGrid it would be stored at index 0,
         // otherwise at index 1.
-        const int cell = cell_face.getCellIndex();
-        const int face = *cell_face;
+        const long long cell = cell_face.getCellIndex();
+        const long long face = *cell_face;
         assert (0 <= cell);  assert (cell < numCells());
         assert (0 <= face);  assert (face < numFaces());
 
@@ -2037,7 +2037,7 @@ namespace Dune
 
         assert ((f2c.size() == 1) || (f2c.size() == 2));
 
-        int inside_cell = 0;
+        long long inside_cell = 0;
 
         if ( f2c.size() == 2 ) // Two cells => interior
         {
@@ -2067,8 +2067,8 @@ namespace Dune
         }
     }
 
-    template<int dim>
-    cpgrid::Entity<dim> createEntity(const CpGrid&, int, bool);
+    template<long long dim>
+    cpgrid::Entity<dim> createEntity(const CpGrid&, long long, bool);
 
 } // namespace Dune
 

@@ -15,7 +15,7 @@ namespace Dune
   // PolyhedralGridIterator
   // --------------
 
-  template< int codim, class Grid, PartitionIteratorType pitype >
+  template< long long codim, class Grid, PartitionIteratorType pitype >
   class PolyhedralGridIterator
   : public PolyhedralGridEntityPointer< codim, Grid >
   {
@@ -40,7 +40,7 @@ namespace Dune
     /** \brief increment */
     void increment ()
     {
-      int index = entityImpl().seed().index();
+      long long index = entityImpl().seed().index();
       ++index;
 
       if( index >= entityImpl().data()->size( codim ) )

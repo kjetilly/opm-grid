@@ -31,12 +31,12 @@ namespace Dune
   // DGFGridFactory for PolyhedralGrid
   // ---------------------------------
 
-  template< int dim, int dimworld, class coord_t >
+  template< long long dim, long long dimworld, class coord_t >
   struct DGFGridFactory< PolyhedralGrid< dim, dimworld, coord_t > >
   {
     typedef PolyhedralGrid< dim, dimworld, coord_t > Grid;
 
-    const static int dimension = Grid::dimension;
+    const static long long dimension = Grid::dimension;
     typedef MPIHelper::MPICommunicator MPICommunicator;
     typedef typename Grid::template Codim<0>::Entity Element;
     typedef typename Grid::template Codim<dimension>::Entity Vertex;
@@ -94,15 +94,15 @@ namespace Dune
     }
 
     template< class Intersection >
-    int boundaryId ( const Intersection& ) const
+    long long boundaryId ( const Intersection& ) const
     {
       return false;
     }
 
     bool haveBoundaryParameters () const { return false; }
 
-    template< int codim >
-    int numParameters () const
+    template< long long codim >
+    long long numParameters () const
     {
       //return (codim == dimension ? numVtxParams_ : 0);;
       return 0;
@@ -123,9 +123,9 @@ namespace Dune
     }
 
   private:
-    int readVertices ( std::istream &input, std::vector< std::vector< double > > &vertices )
+    long long readVertices ( std::istream &input, std::vector< std::vector< double > > &vertices )
     {
-      int dimWorld = Grid::dimensionworld ;
+      long long dimWorld = Grid::dimensionworld ;
       dgf::VertexBlock vtxBlock( input, dimWorld );
       if( !vtxBlock.isactive() )
         DUNE_THROW( DGFException, "Vertex block not found" );
@@ -134,21 +134,21 @@ namespace Dune
       return vtxBlock.offset();
     }
 
-    std::vector< std::vector< int > > readPolygons ( std::istream &input, int numVtx, int vtxOfs )
+    std::vector< std::vector< long long > > readPolygons ( std::istream &input, long long numVtx, long long vtxOfs )
     {
       dgf::PolygonBlock polygonBlock( input, numVtx, vtxOfs );
       if( !polygonBlock.isactive() )
         DUNE_THROW( DGFException, "Polygon block not found" );
 
-      std::vector< std::vector< int > > polygons;
+      std::vector< std::vector< long long > > polygons;
       polygonBlock.get( polygons );
       return polygons;
     }
 
-    std::vector< std::vector< int > > readPolyhedra ( std::istream &input, int numPolygons )
+    std::vector< std::vector< long long > > readPolyhedra ( std::istream &input, long long numPolygons )
     {
       dgf::PolyhedronBlock polyhedronBlock( input, numPolygons );
-      std::vector< std::vector< int > > polyhedra;
+      std::vector< std::vector< long long > > polyhedra;
       if( polyhedronBlock.isactive() )
       {
         polyhedronBlock.get( polyhedra );
@@ -164,9 +164,9 @@ namespace Dune
     }
 
     template< class Iterator >
-    void copy ( Iterator begin, Iterator end, int *dest, int *offset )
+    void copy ( Iterator begin, Iterator end, long long *dest, long long *offset )
     {
-      int size = 0;
+      long long size = 0;
       for( ; begin != end; ++begin )
       {
         *(offset++) = size;
@@ -190,7 +190,7 @@ namespace Dune
         const dgf::IntervalBlock::Interval &interval = intervalBlock.get( 0 );
 
         std::vector< double > spacing( dimworld );
-        for( int i=0; i<dimworld; ++i )
+        for( long long i=0; i<dimworld; ++i )
           spacing[ i ] = (interval.p[ 1 ][ i ] - interval.p[ 0 ][ i ]) / interval.n[ i ];
 
         gridPtr_.reset( new Grid( interval.n, spacing ) );
@@ -201,11 +201,11 @@ namespace Dune
         typedef std::vector< std::vector< double > > CoordinateVectorType;
         CoordinateVectorType nodes;
 
-        typedef std::vector< std::vector< int > > IndexVectorType;
+        typedef std::vector< std::vector< long long > > IndexVectorType;
         IndexVectorType faces;
         IndexVectorType cells;
 
-        const int vtxOfs = readVertices( input, nodes );
+        const long long vtxOfs = readVertices( input, nodes );
 
         faces = readPolygons ( input, nodes.size(), vtxOfs );
         cells = readPolyhedra( input, faces.size() );
@@ -220,11 +220,11 @@ namespace Dune
 
         GridFactoryType gridFactory;
 
-        const int nNodes = nodes.size();
+        const long long nNodes = nodes.size();
         Coordinate node( 0 );
-        for( int i=0; i<nNodes; ++i )
+        for( long long i=0; i<nNodes; ++i )
         {
-          for( int d=0; d<Coordinate::dimension; ++d )
+          for( long long d=0; d<Coordinate::dimension; ++d )
             node[ d ] = nodes[ i ][ d ];
 
           gridFactory.insertVertex( node );
@@ -234,13 +234,13 @@ namespace Dune
         // insert faces with type none/dim-1
         GeometryType type;
         type = Dune::GeometryTypes::none(Grid::dimension-1);
-        std::vector< unsigned int > numbers;
+        std::vector< size_t > numbers;
 
-        const int nFaces = faces.size();
-        for(int i = 0; i < nFaces; ++ i )
+        const long long nFaces = faces.size();
+        for(long long i = 0; i < nFaces; ++ i )
         {
           // copy values into appropriate data type
-          std::vector<int>& face = faces[ i ];
+          std::vector<long long>& face = faces[ i ];
           numbers.resize( face.size() );
           std::copy( face.begin(), face.end(), numbers.begin() );
           gridFactory.insertElement( type, numbers );
@@ -252,11 +252,11 @@ namespace Dune
         // insert cells with type none/dim
         type = Dune::GeometryTypes::none(Grid::dimension);
 
-        const int nCells = cells.size();
-        for(int i = 0; i < nCells; ++ i )
+        const long long nCells = cells.size();
+        for(long long i = 0; i < nCells; ++ i )
         {
           // copy values into appropriate data type
-          std::vector<int>& cell = cells[ i ];
+          std::vector<long long>& cell = cells[ i ];
           numbers.resize( cell.size() );
           std::copy( cell.begin(), cell.end(), numbers.begin() );
           gridFactory.insertElement( type, numbers );
@@ -281,12 +281,12 @@ namespace Dune
             std::cout << std::endl;
           }
 
-          const unsigned int nVx = dgf.elements[ 0 ].size();
+          const size_t nVx = dgf.elements[ 0 ].size();
 
-          typedef std::vector< int > face_t;
-          std::map< face_t, int > tmpFaces;
+          typedef std::vector< long long > face_t;
+          std::map< face_t, long long > tmpFaces;
 
-          const int nFaces = (nVx == dim+1) ? dim+1 : 2*dim;
+          const long long nFaces = (nVx == dim+1) ? dim+1 : 2*dim;
 
           Dune::GeometryType type( (nVx == dim+1) ?
               Impl :: SimplexTopology< dim > :: type :: id :
@@ -298,24 +298,24 @@ namespace Dune
           cells.resize( dgf.nofelements );
 
           face_t face;
-          int faceNo = 0;
-          for( int n = 0; n < dgf.nofelements; ++n )
+          long long faceNo = 0;
+          for( long long n = 0; n < dgf.nofelements; ++n )
           {
             const auto& elem = dgf.elements[ n ];
             auto& cell = cells[ n ];
             assert( elem.size() == nVx );
             cell.resize( nFaces );
-            for(int f=0; f<nFaces; ++f )
+            for(long long f=0; f<nFaces; ++f )
             {
-              const int nFaceVx = refElem.size(f, 1, dim);
+              const long long nFaceVx = refElem.size(f, 1, dim);
               face.resize( nFaceVx );
-              for( int j=0; j<nFaceVx; ++j )
+              for( long long j=0; j<nFaceVx; ++j )
               {
                 face[ j ] = elem[ refElem.subEntity(f, 1, j , dim) ];
               }
               std::sort( face.begin(), face.end() );
               auto it = tmpFaces.find( face );
-              int myFaceNo = -1;
+              long long myFaceNo = -1;
               if( it == tmpFaces.end() )
               {
                 myFaceNo = faceNo++;
@@ -340,7 +340,7 @@ namespace Dune
 
     mutable std::unique_ptr< Grid > gridPtr_;
     mutable Grid* grid_;
-    int numVtxParams_;
+    long long numVtxParams_;
     std::vector< std::vector< double > > vtxParams_;
   };
 
@@ -349,10 +349,10 @@ namespace Dune
   // DGFGridInfo for PolyhedralGrid
   // ------------------------------
 
-  template< int dim, int dimworld >
+  template< long long dim, long long dimworld >
   struct DGFGridInfo< PolyhedralGrid< dim, dimworld > >
   {
-    static int refineStepsForHalf ()
+    static long long refineStepsForHalf ()
     {
       return 0;
     }

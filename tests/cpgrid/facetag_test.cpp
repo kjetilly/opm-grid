@@ -32,16 +32,16 @@
 
 BOOST_AUTO_TEST_CASE(facetag)
 {
-    int m_argc = boost::unit_test::framework::master_test_suite().argc;
+    long long m_argc = boost::unit_test::framework::master_test_suite().argc;
     char** m_argv = boost::unit_test::framework::master_test_suite().argv;
     Dune::MPIHelper::instance(m_argc, m_argv);
     Dune::CpGrid grid;
-    std::array<int, 3>    dims     = { 3, 3, 3 };
+    std::array<long long, 3>    dims     = { 3, 3, 3 };
     std::array<double, 3> cellsize = { 1., 1., 1. };
     grid.createCartesian(dims, cellsize);
     Dune::cpgrid::Cell2FacesContainer c2f(&grid);
 
-    for( int cell=0; cell < grid.numCells(); ++cell)
+    for( long long cell=0; cell < grid.numCells(); ++cell)
     {
         std::cout<<"cell="<<cell;
         auto cell_faces = c2f[cell];
@@ -54,11 +54,11 @@ BOOST_AUTO_TEST_CASE(facetag)
             if ( c1 < 0 || c0 < 0)
             {
                 // boundary face
-                std::array<int, 3> ijk = {{-1, -1, -1}};
+                std::array<long long, 3> ijk = {{-1, -1, -1}};
                 grid.getIJK(c0<0?c1:c0, ijk);
                 bool valid_tag = false;
                 std::cout<<"      ijk="<<ijk[0]<<" "<<ijk[1]<<" "<<ijk[2]<<" tag="<<tag<<std::endl;
-                for ( int dim = 0; dim < 3; ++dim)
+                for ( long long dim = 0; dim < 3; ++dim)
                 {
                     if ( ijk[dim] == 0 )
                     {
@@ -73,15 +73,15 @@ BOOST_AUTO_TEST_CASE(facetag)
             }
             else
             {
-                std::array<int, 3> ijk0 = {{-1, -1, -1}}, ijk1 = {{-1, -1, -1}};
+                std::array<long long, 3> ijk0 = {{-1, -1, -1}}, ijk1 = {{-1, -1, -1}};
                 grid.getIJK(c0, ijk0);
                 grid.getIJK(c1, ijk1);
                 std::cout<<"      ijk0="<<ijk0[0]<<" "<<ijk0[1]<<" "<<ijk0[2]
                          <<" ijk1="<<ijk1[0]<<" "<<ijk1[1]<<" "<<ijk1[2]<<" tag="<<tag<<std::endl;
                 BOOST_ASSERT( ijk0[0] <= ijk1[0] &&  ijk0[1] <= ijk1[1] &&  ijk0[2] <= ijk1[2]);
-                int firstInside = (cell==c0) ? 1 : 0;
+                long long firstInside = (cell==c0) ? 1 : 0;
 
-                for ( int dim = 0; dim < 3; ++dim)
+                for ( long long dim = 0; dim < 3; ++dim)
                 {
                     if ( ijk0[dim] < ijk1[dim] )
                     {
@@ -99,7 +99,7 @@ init_unit_test_func()
     return true;
 }
 
-int main(int argc, char** argv)
+long long main(long long argc, char** argv)
 {
     Dune::MPIHelper::instance(argc, argv);
     boost::unit_test::unit_test_main(&init_unit_test_func,

@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(GAP_MAXGAP)
                                   3.5, 3.5, 3.5, 3.5};
     std::vector<double> pv = { 2, 0.5, 0.7};
     std::vector<double> minpvv(3, 0.6);
-    std::vector<int> actnum = { 1, 1, 1 };
+    std::vector<long long> actnum = { 1, 1, 1 };
     std::vector<double> thickness = {2, 0.5, 0.7};
     double z_threshold = 0.4;
 
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(GAP_MAXGAP_no_pinched_cells)
                                   3.5, 3.5, 3.5, 3.5};
     std::vector<double> pv = { 2, 0.5, 0.7};
     std::vector<double> minpvv(3, 0.0);
-    std::vector<int> actnum = { 1, 1, 1 };
+    std::vector<long long> actnum = { 1, 1, 1 };
     std::vector<double> thickness = {2, 0.5, 0.7};
     double z_threshold = 0.0;
 
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(GAP_MAXGAP_no_pinched_cells)
 
     // Use options that will create NNCs for vertically unconnected cells with small gaps without cells being pinched.
     auto minpv_result = mp1.process(thickness, z_threshold, max_gap, pv, minpvv, actnum, fill_removed_cells,
-                                    zcorn.data(), pinch_no_gap, false, {}, [](int){ return 1; });
+                                    zcorn.data(), pinch_no_gap, false, {}, [](long long){ return 1; });
     BOOST_CHECK_EQUAL(minpv_result.nnc.size(), 1);
     if (minpv_result.nnc.size() )
       BOOST_CHECK_EQUAL(minpv_result.nnc[1], 2);
@@ -100,10 +100,10 @@ BOOST_AUTO_TEST_CASE(Pinch4ALL)
                                   6, 6, 6, 6 };
 
     std::vector<double> pv = { 2, 0.5, 0.5, 2.5};
-    std::vector<int> actnum = { 1, 1, 1, 1 };
+    std::vector<long long> actnum = { 1, 1, 1, 1 };
     std::vector<double> thickness = {2, 0.5, 0.5, 2.5};
     std::vector<double> permz = {2, 2, 0, 2.5};
-    auto multz = [](int){ return 1.0;};
+    auto multz = [](long long){ return 1.0;};
     double z_threshold = 0.4;
 
     Opm::MinpvProcessor mp1(1, 1, 4);
@@ -124,14 +124,14 @@ BOOST_AUTO_TEST_CASE(Pinch4ALL)
                                fill_removed_cells, z1.data(), pinch_no_gap,
                                option4all, permz, multz);
     BOOST_CHECK_EQUAL(minpv_result.nnc.size(), 1);
-    auto multz2 = [](int i){ if (i==2) return 0.0; else return 1.0;};
+    auto multz2 = [](long long i){ if (i==2) return 0.0; else return 1.0;};
     
     minpv_result = mp1.process(thickness, z_threshold, 1e20, pv, minpvv, actnum,
 			       fill_removed_cells, z1.data(), pinch_no_gap,
 			       option4all, permz, multz2);
     BOOST_CHECK_EQUAL(minpv_result.nnc.size(), 0);
 
-    auto multz3 = [](int i){ if (i==0) return 0.0; else return 1.0;};
+    auto multz3 = [](long long i){ if (i==0) return 0.0; else return 1.0;};
     minpv_result = mp1.process(thickness, z_threshold, 1e20, pv, minpvv, actnum,
 			       fill_removed_cells, z1.data(), pinch_no_gap,
 			       option4all, permz, multz3);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(Pinch)
                                   6, 6, 6, 6 };
 
     std::vector<double> pv = { 2, 0.5, 1, 2.5};
-    std::vector<int> actnum = { 1, 1, 1, 1 };
+    std::vector<long long> actnum = { 1, 1, 1, 1 };
     std::vector<double> thickness = {2, 0.5, 1, 2.5};
     double z_threshold = 0.4;
 
@@ -328,8 +328,8 @@ BOOST_AUTO_TEST_CASE(Processing)
                                         6, 6, 6, 6 };
 
     std::vector<double> pv = { 2, 1, 0, 3};
-    std::vector<int> actnum = { 1, 1, 0, 1 };
-    std::vector<int> actnum_empty;
+    std::vector<long long> actnum = { 1, 1, 0, 1 };
+    std::vector<long long> actnum_empty;
     std::vector<double> thicknes = {2, 1, 0, 3};
     double z_threshold = 0.0;
 

@@ -112,9 +112,9 @@ BOOST_AUTO_TEST_CASE(EqualEclipseGrid) {
         const auto& zcorn  = deck["ZCORN"].back();
         const auto& actnum = deck["ACTNUM"].back();
 
-        g.dims[0] = dimens.getRecord(0).getItem("NX").get< int >(0);
-        g.dims[1] = dimens.getRecord(0).getItem("NY").get< int >(0);
-        g.dims[2] = dimens.getRecord(0).getItem("NZ").get< int >(0);
+        g.dims[0] = dimens.getRecord(0).getItem("NX").get< long long >(0);
+        g.dims[1] = dimens.getRecord(0).getItem("NY").get< long long >(0);
+        g.dims[2] = dimens.getRecord(0).getItem("NZ").get< long long >(0);
 
         g.coord  = coord.getSIDoubleData().data();
         g.zcorn  = zcorn.getSIDoubleData().data();

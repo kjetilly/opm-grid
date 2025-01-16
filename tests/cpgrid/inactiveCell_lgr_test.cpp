@@ -54,24 +54,24 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
 };
 
 void testInactiveCellsLgrs(const std::string& deckString,
-                           const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                           const std::vector<std::array<int,3>>& startIJK_vec,
-                           const std::vector<std::array<int,3>>& endIJK_vec,
+                           const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                           const std::vector<std::array<long long,3>>& startIJK_vec,
+                           const std::vector<std::array<long long,3>>& endIJK_vec,
                            const std::vector<std::string>& lgr_name_vec)
 {
     Opm::Parser parser;
@@ -91,13 +91,13 @@ void testInactiveCellsLgrs(const std::string& deckString,
         BOOST_CHECK( (*data[0]).child_to_parent_cells_.empty());
         BOOST_CHECK(grid.getLgrNameToLevel().at("GLOBAL") == 0);
 
-        for (long unsigned int level = 1; level < startIJK_vec.size() +1; ++level) // only 1 when there is only 1 patch
+        for (long size_t level = 1; level < startIJK_vec.size() +1; ++level) // only 1 when there is only 1 patch
         {
             BOOST_CHECK( (*data[level]).parent_to_children_cells_.empty());
-            BOOST_CHECK(grid.getLgrNameToLevel().at(lgr_name_vec[level-1]) == static_cast<int>(level));
+            BOOST_CHECK(grid.getLgrNameToLevel().at(lgr_name_vec[level-1]) == static_cast<long long>(level));
 
             // GLOBAL grid
-            for (int cell = 0; cell <  data[0]-> size(0); ++cell)
+            for (long long cell = 0; cell <  data[0]-> size(0); ++cell)
             {
                 Dune::cpgrid::Entity<0> entity = Dune::cpgrid::Entity<0>(*data[0], cell, true);
                 BOOST_CHECK( entity.hasFather() == false);
@@ -118,7 +118,7 @@ void testInactiveCellsLgrs(const std::string& deckString,
                 else{
                     BOOST_CHECK(lgr != -1);
                     BOOST_CHECK(childrenList.size() > 1);
-                    // Auxiliary int to check amount of children
+                    // Auxiliary long long to check amount of children
                     double referenceElemOneParent_volume = 0.;
                     std::array<double,3> referenceElem_entity_center = {0.,0.,0.}; // Expected {.5,.5,.5}
                     for (const auto& child : childrenList) {
@@ -130,12 +130,12 @@ void testInactiveCellsLgrs(const std::string& deckString,
                         BOOST_CHECK(childElem.hasFather() == true);
                         BOOST_CHECK(childElem.level() == lgr);
                         referenceElemOneParent_volume += childElem.geometryInFather().volume();
-                        for (int c = 0; c < 3; ++c)  {
+                        for (long long c = 0; c < 3; ++c)  {
                             referenceElem_entity_center[c] += (childElem.geometryInFather().center())[c];
                         }
                     }
                     BOOST_CHECK_EQUAL( entity.isLeaf(), false); // parent cells do not appear in the LeafView
-                    // Auxiliary int to check hierarchic iterator functionality
+                    // Auxiliary long long to check hierarchic iterator functionality
                     double referenceElemOneParent_volume_it = 0.;
                     std::array<double,3> referenceElem_entity_center_it = {0.,0.,0.}; // Expected {.5,.5,.5}
                     // If it != endIt, then entity.isLeaf() false (when dristibuted_data_ is empty)
@@ -146,12 +146,12 @@ void testInactiveCellsLgrs(const std::string& deckString,
                         BOOST_CHECK(it ->hasFather() == true);
                         BOOST_CHECK(it ->level() == lgr);
                         referenceElemOneParent_volume_it += it-> geometryInFather().volume();
-                        for (int c = 0; c < 3; ++c)
+                        for (long long c = 0; c < 3; ++c)
                         {
                             referenceElem_entity_center_it[c] += (it-> geometryInFather().center())[c];
                         }
                     }
-                    for (int c = 0; c < 3; ++c)
+                    for (long long c = 0; c < 3; ++c)
                     {
                         referenceElem_entity_center[c]
                             /= cells_per_dim_vec[lgr-1][0]*cells_per_dim_vec[lgr-1][1]*cells_per_dim_vec[lgr-1][2];
@@ -180,7 +180,7 @@ void testInactiveCellsLgrs(const std::string& deckString,
             }
 
             // LGRs
-            for (int cell = 0; cell <  data[level]-> size(0); ++cell)
+            for (long long cell = 0; cell <  data[level]-> size(0); ++cell)
             {
                 Dune::cpgrid::Entity<0> entity = Dune::cpgrid::Entity<0>(*data[level], cell, true);
                 BOOST_CHECK( entity.hasFather() == true);
@@ -203,7 +203,7 @@ void testInactiveCellsLgrs(const std::string& deckString,
                 // Check amount of children cells of the parent cell
                 BOOST_CHECK_EQUAL(std::get<1>((*data[0]).parent_to_children_cells_[child_to_parent[1]]).size(),
                                   cells_per_dim_vec[level-1][0]*cells_per_dim_vec[level-1][1]*cells_per_dim_vec[level-1][2]);
-                BOOST_CHECK( entity.level() == static_cast<int>(level));
+                BOOST_CHECK( entity.level() == static_cast<long long>(level));
                 BOOST_CHECK( entity.isLeaf() == true);
                 auto it = entity.hbegin(grid.maxLevel());
                 auto endIt = entity.hend(grid.maxLevel());
@@ -212,11 +212,11 @@ void testInactiveCellsLgrs(const std::string& deckString,
             }
 
             // LeafView faces
-            for (int face = 0; face <  data[startIJK_vec.size()+1]-> face_to_cell_.size(); ++face)
+            for (long long face = 0; face <  data[startIJK_vec.size()+1]-> face_to_cell_.size(); ++face)
             {
                 const auto& faceToPoint =  (*data[startIJK_vec.size() +1]).face_to_point_[face];
                 BOOST_CHECK(faceToPoint.size() == 4);
-                for (int i = 0; i < 4; ++i) {
+                for (long long i = 0; i < 4; ++i) {
                     BOOST_CHECK((*data[startIJK_vec.size() +1]).face_to_point_[face][i] != -1);
                 }
 
@@ -225,15 +225,15 @@ void testInactiveCellsLgrs(const std::string& deckString,
             }
 
             // LeafView
-            for (int cell = 0; cell <  data[startIJK_vec.size()+1]-> size(0); ++cell)
+            for (long long cell = 0; cell <  data[startIJK_vec.size()+1]-> size(0); ++cell)
             {
                 BOOST_CHECK( data[startIJK_vec.size()+1] -> cell_to_point_[cell].size() == 8);
-                for (int i = 0; i < 8; ++i)
+                for (long long i = 0; i < 8; ++i)
                 {
                     BOOST_CHECK( data[startIJK_vec.size()+1] -> cell_to_point_[cell][i] != -1);
                 }
                 Dune::cpgrid::Entity<0> entity = Dune::cpgrid::Entity<0>(*data[startIJK_vec.size()+1], cell, true);
-                for (int i = 0; i < data[startIJK_vec.size()+1] -> cell_to_face_[entity].size(); ++i)
+                for (long long i = 0; i < data[startIJK_vec.size()+1] -> cell_to_face_[entity].size(); ++i)
                 {
                     BOOST_CHECK( data[startIJK_vec.size()+1] -> cell_to_face_[entity][i].index() != -1);
                 }
@@ -267,7 +267,7 @@ void testInactiveCellsLgrs(const std::string& deckString,
                                       cells_per_dim_vec[entity.level()-1][0]*
                                       cells_per_dim_vec[entity.level()-1][1]*cells_per_dim_vec[entity.level()-1][2]);
                     BOOST_CHECK( entity.father().isLeaf() == false);
-                    BOOST_CHECK( (entity.level() > 0) || (entity.level() < static_cast<int>(startIJK_vec.size()) +1));
+                    BOOST_CHECK( (entity.level() > 0) || (entity.level() < static_cast<long long>(startIJK_vec.size()) +1));
                     BOOST_CHECK( level_cellIdx[0] == entity.level());
                 }
                 else{
@@ -284,7 +284,7 @@ void testInactiveCellsLgrs(const std::string& deckString,
                     BOOST_CHECK( entity.getOrigin().index() == entityOldIdx);
                     BOOST_CHECK( entity.getOrigin().level() == 0);
                     // Get IJK of the old index
-                    std::array<int,3> entityOldIJK;
+                    std::array<long long,3> entityOldIJK;
                     (*data[0]).getIJK(entityOldIdx, entityOldIJK); // ijk
                 }
             }
@@ -296,10 +296,10 @@ void testInactiveCellsLgrs(const std::string& deckString,
         const auto& maxCartesianIdx = grid.logicalCartesianSize()[0]*grid.logicalCartesianSize()[1]*grid.logicalCartesianSize()[2];
         BOOST_CHECK( *itMax < maxCartesianIdx);
 
-        BOOST_CHECK( static_cast<int>(startIJK_vec.size()) == grid.maxLevel());
+        BOOST_CHECK( static_cast<long long>(startIJK_vec.size()) == grid.maxLevel());
         BOOST_CHECK( (*data[data.size()-1]).parent_to_children_cells_.empty());
 
-        for (long unsigned int l = 0; l < startIJK_vec.size() +1; ++l) // level 0,1,2,... , last patch
+        for (long size_t l = 0; l < startIJK_vec.size() +1; ++l) // level 0,1,2,... , last patch
         {
             const auto& view = grid.levelGridView(l);
             for (const auto& element: elements(view)){
@@ -307,8 +307,8 @@ void testInactiveCellsLgrs(const std::string& deckString,
             }
         }
 
-        std::set<int> allIds_set;
-        std::vector<int> allIds_vec;
+        std::set<long long> allIds_set;
+        std::vector<long long> allIds_vec;
         allIds_vec.reserve(data.back()->size(0) + data.back()->size(3));
         for (const auto& element: elements(grid.leafGridView())){
             const auto& localId = data.back()->localIdSet().id(element);
@@ -335,10 +335,10 @@ void testInactiveCellsLgrs(const std::string& deckString,
         BOOST_CHECK( allIds_set.size() == allIds_vec.size());
 
         // Local/Global id sets for level grids (level 0, 1, ..., maxLevel)
-        for (int level = 0; level < grid.maxLevel() +1; ++level)
+        for (long long level = 0; level < grid.maxLevel() +1; ++level)
         {
-            std::set<int> levelIds_set;
-            std::vector<int> levelIds_vec;
+            std::set<long long> levelIds_set;
+            std::vector<long long> levelIds_vec;
             levelIds_vec.reserve(data[level]->size(0) + data[level]->size(3));
 
             for (const auto& element: elements(grid.levelGridView(level))){
@@ -429,11 +429,11 @@ BOOST_AUTO_TEST_CASE(inactiveCells_in_at_least_one_lgr)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
     // LGR1 cell indices: {0,1}, 0 INACTIVE CELL, 1 ACTIVE CELL
     // LGR2 cell indices: {4} ACTIVE CELL
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
 }
@@ -474,12 +474,12 @@ BOOST_AUTO_TEST_CASE(inactiveCells_outside_lgr)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
     // LGR1 cell indices: {0}
     // LGR2 cell indices: {2}
     // LGR3 cell indices: {4}
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,1}, {1,1,3}, {1,1,5}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,2}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,1}, {1,1,3}, {1,1,5}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
 }
@@ -521,9 +521,9 @@ BOOST_AUTO_TEST_CASE(inactiveCells_in_lgrs)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,3}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,3}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
     // LGR1 cell indices = {0,1}, LGR2 cell indices = {3,4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -568,9 +568,9 @@ BOOST_AUTO_TEST_CASE(inactiveCells_in_and_outside_lgrs)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,3}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,3}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
     // LGR1 cell indices = {0,1}, LGR2 cell indices = {3,4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -613,9 +613,9 @@ BOOST_AUTO_TEST_CASE(inactiveCells_only_outside_lgrs)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
     // LGR1 cell indices = {0,1}, LGR2 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -659,9 +659,9 @@ BOOST_AUTO_TEST_CASE(warning_allInactiveCells_in_lgr)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
     // LGR1 cell indices = {0,1}, LGR2 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -704,9 +704,9 @@ BOOST_AUTO_TEST_CASE(inactiveLgrs)
         5*0.15
         /)";
 
-    const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-    const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-    const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+    const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+    const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+    const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
     // LGR1 cell indices = {0,1}, LGR2 cell indices = {4}.
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     testInactiveCellsLgrs(deckString, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -790,9 +790,9 @@ BOOST_AUTO_TEST_CASE(distribute_inactiveLgrs)
     {
         grid.loadBalance();
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
         // LGR1 cell indices = {0,1}, LGR2 cell indices = {4}.
         const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
         grid.addLgrsUpdateLeafView(cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -877,9 +877,9 @@ BOOST_AUTO_TEST_CASE(distribute_activeAndInactiveLgrs)
     {
         grid.loadBalance();
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,4}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{1,1,2}, {1,1,5}};
         // LGR1 cell indices = {0,1}, LGR2 cell indices = {4}.
         const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
         grid.addLgrsUpdateLeafView(cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);

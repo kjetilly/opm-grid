@@ -52,10 +52,10 @@ void timeloop(const G& grid, double tend)
 
     // now do the time steps
     double t=0,dt;
-    int k=0;
+    long long k=0;
     const double saveInterval = 0.1;
     double saveStep = 0.1;
-    int counter = 1;
+    long long counter = 1;
 
     while (t<tend)                                       /*@\label{fvc:loop0}@*/
     {
@@ -108,16 +108,16 @@ void initGrid(const Dune::ParameterTree &param, GridType& grid)
         Opm::ParseContext parseContext;
         Opm::Parser parser;
         auto deck = parser.parseFile(filename , parseContext);
-        const int* actnum = deck.hasKeyword("ACTNUM") ? deck.getKeyword("ACTNUM").getIntData().data() : nullptr;
+        const long long* actnum = deck.hasKeyword("ACTNUM") ? deck.getKeyword("ACTNUM").getIntData().data() : nullptr;
         Opm::EclipseGrid ecl_grid(deck , actnum);
 
         grid.processEclipseFormat(ecl_grid, periodic_extension, turn_normals);
     }
 #endif
     else if (fileformat == "cartesian") {
-        std::array<int, 3> dims = {{ param.get<int>("nx", 1),
-                                param.get<int>("ny", 1),
-                                param.get<int>("nz", 1) }};
+        std::array<long long, 3> dims = {{ param.get<long long>("nx", 1),
+                                param.get<long long>("ny", 1),
+                                param.get<long long>("nz", 1) }};
         std::array<double, 3> cellsz = {{ param.get<double>("dx", 1.0),
                                      param.get<double>("dy", 1.0),
                                      param.get<double>("dz", 1.0) }};
@@ -132,7 +132,7 @@ void initGrid(const Dune::ParameterTree &param, GridType& grid)
 // The main function creates objects and does the time loop
 //===============================================================
 
-int main(int argc , char ** argv)
+long long main(long long argc , char ** argv)
 {
     // initialize MPI, finalize is done automatically on exit
     Dune::MPIHelper::instance(argc,argv);

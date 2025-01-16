@@ -30,6 +30,6 @@ namespace Opm {
 ///  \param columns will for each (i, j) where (i, j) represents a non-empty column,
 ////        contain the cell indices contained in the column
 ///         centered at (i, j) in the second variable, and i+jN in the first variable.
-void extractColumn(const UnstructuredGrid& grid, std::vector<std::vector<int> >& columns);
+void extractColumn(const UnstructuredGrid& grid, std::vector<std::vector<long long> >& columns);
 
 } // namespace Opm

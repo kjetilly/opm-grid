@@ -56,15 +56,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -73,21 +73,21 @@ struct Fixture
 BOOST_GLOBAL_FIXTURE(Fixture);
 
 #define CHECK_COORDINATES(c1, c2)                                       \
-    for (int c = 0; c < 3; c++) {                                       \
+    for (long long c = 0; c < 3; c++) {                                       \
         BOOST_TEST(c1[c] == c2[c], boost::test_tools::tolerance(1e-12)); \
     }
 
 void markAndAdapt_check(Dune::CpGrid& coarse_grid,
-                        const std::array<int,3>& cells_per_dim,
-                        const std::vector<int>& markedCells,
+                        const std::array<long long,3>& cells_per_dim,
+                        const std::vector<long long>& markedCells,
                         Dune::CpGrid& other_grid,
                         bool isBlockShape,
                         bool hasBeenRefinedAtLeastOnce,
                         bool isGlobalRefinement)
 {
-    const int startingGridIdx = coarse_grid.currentData().size() -1; // size before calling adapt
+    const long long startingGridIdx = coarse_grid.currentData().size() -1; // size before calling adapt
 
-    std::vector<int> assignRefinedLevel(coarse_grid.currentData()[startingGridIdx]->size(0));
+    std::vector<long long> assignRefinedLevel(coarse_grid.currentData()[startingGridIdx]->size(0));
 
     for (const auto& elemIdx : markedCells)
     {
@@ -102,7 +102,7 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
     if(preAdapt) {
         coarse_grid.adapt({cells_per_dim}, assignRefinedLevel, {"LGR"+std::to_string(coarse_grid.maxLevel() +1)});
         coarse_grid.postAdapt();
-        BOOST_CHECK(static_cast<int>(data.size()) == coarse_grid.maxLevel() +2);
+        BOOST_CHECK(static_cast<long long>(data.size()) == coarse_grid.maxLevel() +2);
         const auto& leafGridIdx = coarse_grid.maxLevel() +1;
         const auto& adapted_leaf = *data[leafGridIdx];
 
@@ -190,7 +190,7 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
 
                                 decltype(geom.corner(0)) sum_match{}, sum{};
 
-                                for(int cor = 0; cor < geom.corners(); ++cor) {
+                                for(long long cor = 0; cor < geom.corners(); ++cor) {
                                     sum += geom.corner(cor);
                                     sum_match += geom_match.corner(1);
                                 }
@@ -218,10 +218,10 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
             // postAdapt() has been called, therefore every element gets marked with 0
             BOOST_CHECK( coarse_grid.getMark(element) == 0);
             BOOST_CHECK(  adapted_leaf.cell_to_point_[element.index()].size() == 8);
-            for (int i = 0; i < 8; ++i) {
+            for (long long i = 0; i < 8; ++i) {
                 BOOST_CHECK(  adapted_leaf.cell_to_point_[element.index()][i] != -1);
             }
-            for (int i = 0; i <  adapted_leaf.cell_to_face_[element].size(); ++i) {
+            for (long long i = 0; i <  adapted_leaf.cell_to_face_[element].size(); ++i) {
                 BOOST_CHECK(  adapted_leaf.cell_to_face_[element][i].index() != -1);
             }
             const auto& child_to_parent =  adapted_leaf.child_to_parent_cells_[element.index()];
@@ -319,14 +319,14 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
                 }
                 else{
                     BOOST_CHECK(lgr != -1);
-                    BOOST_CHECK(static_cast<int>(childrenList.size()) == cells_per_dim[0]*cells_per_dim[1]*cells_per_dim[2]);
+                    BOOST_CHECK(static_cast<long long>(childrenList.size()) == cells_per_dim[0]*cells_per_dim[1]*cells_per_dim[2]);
                     // If it != endIt, then entity.isLeaf() false (when dristibuted_data_ is empty)
                     BOOST_CHECK_EQUAL( it == endIt, false);
                     BOOST_CHECK( element.mightVanish() == true);
                     BOOST_CHECK( element.isNew() == false);
                     BOOST_CHECK_EQUAL( element.isLeaf(), false); // parent cells do not appear in the LeafView
 
-                    // Auxiliary int to check amount of children
+                    // Auxiliary long long to check amount of children
                     double referenceElemOneParent_volume = 0.;
                     std::array<double,3> referenceElem_entity_center = {0.,0.,0.}; // Expected {.5,.5,.5}
                     for (const auto& child : childrenList) {
@@ -338,11 +338,11 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
                         BOOST_CHECK(childElem.hasFather() == true);
                         BOOST_CHECK(childElem.level() == lgr);
                         referenceElemOneParent_volume += childElem.geometryInFather().volume();
-                        for (int c = 0; c < 3; ++c)  {
+                        for (long long c = 0; c < 3; ++c)  {
                             referenceElem_entity_center[c] += (childElem.geometryInFather().center())[c];
                         }
                     }
-                    /// Auxiliary int to check amount of children
+                    /// Auxiliary long long to check amount of children
                     double referenceElemOneParent_volume_it = 0.;
                     std::array<double,3> referenceElem_entity_center_it = {0.,0.,0.}; // Expected {.5,.5,.5}
                     for (; it != endIt; ++it)
@@ -350,12 +350,12 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
                         BOOST_CHECK(it ->hasFather() == true);
                         BOOST_CHECK(it ->level() == lgr);
                         referenceElemOneParent_volume_it += it-> geometryInFather().volume();
-                        for (int c = 0; c < 3; ++c)
+                        for (long long c = 0; c < 3; ++c)
                         {
                             referenceElem_entity_center_it[c] += (it-> geometryInFather().center())[c];
                         }
                     }
-                    for (int c = 0; c < 3; ++c) {
+                    for (long long c = 0; c < 3; ++c) {
                         referenceElem_entity_center[c] /= cells_per_dim[0]*cells_per_dim[1]*cells_per_dim[2];
                         referenceElem_entity_center_it[c] /= cells_per_dim[0]*cells_per_dim[1]*cells_per_dim[2];
                     }
@@ -373,7 +373,7 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
             } // end-preAdaptElements-for-loop
         } // end-startingGridIdx==0
 
-        for (int level = 1; level < coarse_grid.maxLevel(); ++level)
+        for (long long level = 1; level < coarse_grid.maxLevel(); ++level)
         {
             auto itMinLevel = std::min_element((data[level] -> global_cell_).begin(),  (data[level] -> global_cell_).end());
             auto itMaxLevel = std::max_element((data[level] -> global_cell_).begin(),  (data[level] -> global_cell_).end());
@@ -382,8 +382,8 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
             BOOST_CHECK_EQUAL( *itMaxLevel, maxCartesianIdxLevel);
         }
 
-        std::set<int> allIds_set;
-        std::vector<int> allIds_vec;
+        std::set<long long> allIds_set;
+        std::vector<long long> allIds_vec;
         allIds_vec.reserve(data.back()->size(0) + data.back()->size(3));
         for (const auto& element: elements(grid_view)){
             const auto& localId = data.back()->localIdSet().id(element);
@@ -409,14 +409,14 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
         BOOST_CHECK( allIds_set.size() == allIds_vec.size());
         // CpGrid supports only elements (cells) and vertices (corners). Total amount of ids for the leaf grid view should coincide
         // with the total amount of cells and corners on the leaf grid view.
-        BOOST_CHECK( static_cast<int>(allIds_set.size()) == (data.back()->size(0) + data.back()->size(3)));
+        BOOST_CHECK( static_cast<long long>(allIds_set.size()) == (data.back()->size(0) + data.back()->size(3)));
         
 
         // Local/Global id sets for level grids (level 0, 1, ..., maxLevel)
-        for (int level = 0; level < coarse_grid.maxLevel() +1; ++level)
+        for (long long level = 0; level < coarse_grid.maxLevel() +1; ++level)
         {
-            std::set<int> levelIds_set;
-            std::vector<int> levelIds_vec;
+            std::set<long long> levelIds_set;
+            std::vector<long long> levelIds_vec;
             levelIds_vec.reserve(data[level]->size(0) + data[level]->size(3));
 
             for (const auto& element: elements(coarse_grid.levelGridView(level))){
@@ -468,7 +468,7 @@ void markAndAdapt_check(Dune::CpGrid& coarse_grid,
             BOOST_CHECK( levelIds_set.size() == levelIds_vec.size());
             // CpGrid supports only elements (cells) and vertices (corners). Total amount of ids for each level grid should coincide
             // with the total amount of cells and corners on that level grid.
-            BOOST_CHECK( static_cast<int>(levelIds_set.size()) == (data[level]->size(0) + data[level]->size(3)));
+            BOOST_CHECK( static_cast<long long>(levelIds_set.size()) == (data[level]->size(0) + data[level]->size(3)));
         }
     } // end-if-preAdapt
 }
@@ -478,9 +478,9 @@ BOOST_AUTO_TEST_CASE(doNothing)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    std::vector<int> markedCells;
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    std::vector<long long> markedCells;
     coarse_grid.createCartesian(grid_dim, cell_sizes);
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, true, false, true);
@@ -491,9 +491,9 @@ BOOST_AUTO_TEST_CASE(globalRefinement)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    std::vector<int> markedCells(36);
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    std::vector<long long> markedCells(36);
     std::iota(markedCells.begin(), markedCells.end(), 0);
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
@@ -501,8 +501,8 @@ BOOST_AUTO_TEST_CASE(globalRefinement)
     Dune::CpGrid other_grid;
     other_grid.createCartesian(grid_dim, cell_sizes);
 
-    const std::array<int, 3> startIJK = {0,0,0};
-    const std::array<int, 3> endIJK = {4,3,3};
+    const std::array<long long, 3> startIJK = {0,0,0};
+    const std::array<long long, 3> endIJK = {4,3,3};
     const std::string lgr_name = {"LGR1"};
     other_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
@@ -517,9 +517,9 @@ BOOST_AUTO_TEST_CASE(doNothing_calling_globalRefine)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    std::vector<int> markedCells;
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    std::vector<long long> markedCells;
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // Create another grid
@@ -537,10 +537,10 @@ BOOST_AUTO_TEST_CASE(globalRefinement_calling_globalRefine)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> markedCells(36);
+    std::vector<long long> markedCells(36);
     std::iota(markedCells.begin(), markedCells.end(), 0);
 
     // Create other grid for comparison
@@ -548,7 +548,7 @@ BOOST_AUTO_TEST_CASE(globalRefinement_calling_globalRefine)
     other_grid.createCartesian(grid_dim, cell_sizes);
     other_grid.globalRefine(1);
 
-    const std::array<int, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
 
     // We set isBlockShape as false, even though global-refinement implies refinement of a block of cells.
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
@@ -560,20 +560,20 @@ BOOST_AUTO_TEST_CASE(calling_globalRefine_with_2)
     // Create a grid
     Dune::CpGrid equiv_fine_grid;
     const std::array<double, 3> cell_sizes = {0.5, 0.5, 0.5};
-    const std::array<int, 3> grid_dim = {8,6,6};
+    const std::array<long long, 3> grid_dim = {8,6,6};
     equiv_fine_grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> markedCells(288);
+    std::vector<long long> markedCells(288);
     std::iota(markedCells.begin(), markedCells.end(), 0);
 
     // Create other grid for comparison
     Dune::CpGrid other_grid;
     const std::array<double, 3> other_cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> other_grid_dim = {4,3,3};
+    const std::array<long long, 3> other_grid_dim = {4,3,3};
     other_grid.createCartesian(other_grid_dim, other_cell_sizes);
     other_grid.globalRefine(2);
 
-    const std::array<int, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
 
     // We set isBlockShape as false, even though global-refinement implies refinement of a block of cells.
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
@@ -585,20 +585,20 @@ BOOST_AUTO_TEST_CASE(calling_globalRefine_with_3)
     // Create a grid
     Dune::CpGrid equiv_fine_grid;
     const std::array<double, 3> cell_sizes = {0.25, 0.25, 0.25};
-    const std::array<int, 3> grid_dim = {16,12,12};
+    const std::array<long long, 3> grid_dim = {16,12,12};
     equiv_fine_grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> markedCells(2304);
+    std::vector<long long> markedCells(2304);
     std::iota(markedCells.begin(), markedCells.end(), 0);
 
     // Create other grid for comparison
     Dune::CpGrid other_grid;
     const std::array<double, 3> other_cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> other_grid_dim = {4,3,3};
+    const std::array<long long, 3> other_grid_dim = {4,3,3};
     other_grid.createCartesian(other_grid_dim, other_cell_sizes);
     other_grid.globalRefine(3);
 
-    const std::array<int, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
 
     // We set isBlockShape as false, even though global-refinement implies refinement of a block of cells.
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
@@ -610,7 +610,7 @@ BOOST_AUTO_TEST_CASE(throw_globalRefine_with_negative_int)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {0.25, 0.25, 0.25};
-    const std::array<int, 3> grid_dim = {16,12,12};
+    const std::array<long long, 3> grid_dim = {16,12,12};
     grid.createCartesian(grid_dim, cell_sizes);
 
     BOOST_CHECK_THROW(grid.globalRefine(-5), std::logic_error);
@@ -621,12 +621,12 @@ BOOST_AUTO_TEST_CASE(throw_globalRefine_of_mixed_grid)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    const std::array<int, 3> startIJK = {2,0,0};
-    const std::array<int, 3> endIJK = {4,1,1};  // -> marked elements 2 and 3
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> startIJK = {2,0,0};
+    const std::array<long long, 3> endIJK = {4,1,1};  // -> marked elements 2 and 3
     const std::string lgr_name = {"LGR1"};
     grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
@@ -638,8 +638,8 @@ BOOST_AUTO_TEST_CASE(mark2consequtiveCells)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
 
@@ -647,12 +647,12 @@ BOOST_AUTO_TEST_CASE(mark2consequtiveCells)
     Dune::CpGrid other_grid;
     other_grid.createCartesian(grid_dim, cell_sizes);
 
-    const std::array<int, 3> startIJK = {2,0,0};
-    const std::array<int, 3> endIJK = {4,1,1};  // -> marked elements 2 and 3
+    const std::array<long long, 3> startIJK = {2,0,0};
+    const std::array<long long, 3> endIJK = {4,1,1};  // -> marked elements 2 and 3
     const std::string lgr_name = {"LGR1"};
     other_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
-    std::vector<int> markedCells = {2,3};
+    std::vector<long long> markedCells = {2,3};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, other_grid, true, false, false);
 }
@@ -662,8 +662,8 @@ BOOST_AUTO_TEST_CASE(mark2InteriorConsequtiveCells)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
 
@@ -671,12 +671,12 @@ BOOST_AUTO_TEST_CASE(mark2InteriorConsequtiveCells)
     Dune::CpGrid other_grid;
     other_grid.createCartesian(grid_dim, cell_sizes);
 
-    const std::array<int, 3> startIJK = {1,1,1};
-    const std::array<int, 3> endIJK = {3,2,2};  // -> marked elements 17 and 18
+    const std::array<long long, 3> startIJK = {1,1,1};
+    const std::array<long long, 3> endIJK = {3,2,2};  // -> marked elements 17 and 18
     const std::string lgr_name = {"LGR1"};
     other_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
-    std::vector<int> markedCells = {17,18};
+    std::vector<long long> markedCells = {17,18};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, other_grid, true, false, false);
 }
@@ -686,9 +686,9 @@ BOOST_AUTO_TEST_CASE(markNonBlockShapeCells)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    std::vector<int> markedCells = {0}; //,1,2,5,13};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    std::vector<long long> markedCells = {0}; //,1,2,5,13};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, false, false, false);
@@ -699,9 +699,9 @@ BOOST_AUTO_TEST_CASE(markNonBlockShapeCells_II)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,3,4};
-    std::vector<int> markedCells = {1,4,6,9,17,22,28,32,33};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,3,4};
+    std::vector<long long> markedCells = {1,4,6,9,17,22,28,32,33};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, false, false, false);
@@ -712,9 +712,9 @@ BOOST_AUTO_TEST_CASE(markNonBlockCells_compareAdapt)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {3,3,3};
-    std::vector<int> markedCells = {1,4,6,9,17,22,28,32,33};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {3,3,3};
+    std::vector<long long> markedCells = {1,4,6,9,17,22,28,32,33};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // Create a grid
@@ -738,15 +738,15 @@ BOOST_AUTO_TEST_CASE(callAdaptMultipleTimes)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
-    const std::array<int, 3> cells_per_dim = {2,2,2};
-    std::vector<int> markedCells1 = {1,4,6};
-    std::vector<int> markedCells2 = {38, 43}; // Equivalent cells to level 0 cells with indices {17,22};
-    std::vector<int> markedCells3 = {63, 67}; // Equivalent cells to level 0 cells with indices {28,32};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
+    std::vector<long long> markedCells1 = {1,4,6};
+    std::vector<long long> markedCells2 = {38, 43}; // Equivalent cells to level 0 cells with indices {17,22};
+    std::vector<long long> markedCells3 = {63, 67}; // Equivalent cells to level 0 cells with indices {28,32};
 
-    std::vector<int> markedCells = {1,4,6,17,22,28,32};
+    std::vector<long long> markedCells = {1,4,6,17,22,28,32};
 
     // Create a grid
     Dune::CpGrid other_grid;
@@ -786,17 +786,17 @@ BOOST_AUTO_TEST_CASE(refineCoarseCells_in_mixedGrid) {
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {2,2,2};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {2,2,2};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // LGR1 marked element with elemIdx = 3, refined into 8 children cells with leaf indices 3,...,10.
-    const std::array<int, 3> startIJK = {3,0,0};
-    const std::array<int, 3> endIJK = {4,1,1};
+    const std::array<long long, 3> startIJK = {3,0,0};
+    const std::array<long long, 3> endIJK = {4,1,1};
     const std::string lgr_name = {"LGR1"};
     coarse_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
-    std::vector<int> markedCells = {0,1,11,15}; // coarse cells (in level 0 grid, this cell has index 8)
+    std::vector<long long> markedCells = {0,1,11,15}; // coarse cells (in level 0 grid, this cell has index 8)
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, false, true, false);
 }
@@ -805,20 +805,20 @@ BOOST_AUTO_TEST_CASE(refineInteriorRefinedCells_in_mixedGrid) {
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {3,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {3,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // LGR1 marked elements with elemIdx = 17 and 18, refined into 27 children cells each,
     // with leaf indices 17+0,...,17+26 = 43 (children {level 0, cell index 17}),44,...,70 (children {level 0, cell index 18}).
-    const std::array<int, 3> startIJK = {1,1,1};
-    const std::array<int, 3> endIJK = {3,2,2};
+    const std::array<long long, 3> startIJK = {1,1,1};
+    const std::array<long long, 3> endIJK = {3,2,2};
     const std::string lgr_name = {"LGR1"};
     coarse_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
     // Cells 30, 31, 56, and 57 are refined cells, located in the interior of the refined-level-grid-1 (lgr 1 / level 1).
     // Therefore, cell_to_face_ for all of them has size 6. (Their faces have all 2 refined neigboring cells - (not one coarse cell, and one refined)).
-    std::vector<int> markedCells = {30,31, 56,57};
+    std::vector<long long> markedCells = {30,31, 56,57};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, false, true, false);
 }
@@ -828,14 +828,14 @@ BOOST_AUTO_TEST_CASE(refineMixedCells_in_mixedGrid) {
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {3,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {3,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // LGR1 marked elements with elemIdx = 17 and 18, refined into 27 children cells each,
     // with leaf indices 17+0,...,17+26 = 43 (children {level 0, cell index 17}),44,...,70 (children {level 0, cell index 18}).
-    const std::array<int, 3> startIJK = {1,1,1};
-    const std::array<int, 3> endIJK = {3,2,2};
+    const std::array<long long, 3> startIJK = {1,1,1};
+    const std::array<long long, 3> endIJK = {3,2,2};
     const std::string lgr_name = {"LGR1"};
     coarse_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
@@ -843,7 +843,7 @@ BOOST_AUTO_TEST_CASE(refineMixedCells_in_mixedGrid) {
     // Therefore, cell_to_face_ for all of them has size 6. (Their faces have all 2 refined neigboring cells - (not one coarse cell, and one refined)).
     // - Cells 0,1,2,12, and 15 are coarse cells, not touching the boundary of the LGR1 (cells 12 and 15 do share corners with LGR1 but do not share
     // any face. Therefore, the faces of cells 0,1,2,12,and 15 have all 1 or 2 neighboring coarse cells).
-    std::vector<int> markedCells = {0,1,2,12,15,30,31,56,57};
+    std::vector<long long> markedCells = {0,1,2,12,15,30,31,56,57};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, false, true, false);
 }
@@ -853,14 +853,14 @@ BOOST_AUTO_TEST_CASE(refineMixedCells_in_multiLevelGrid) {
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {3,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {3,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // LGR1: element with elemIdx = 17, refined into 27 children cells with leaf indices 17+0,...,17+26 = 43 (children {level 0, cell index 17}).
     // LGR2: element with elemIdx = 18, refined into 27 children cells with leaf indices 44,...,70 (children {level 0, cell index 18}).
-    const std::vector<std::array<int, 3>> startIJK_vec = {{1,1,1}, {2,1,1}};
-    const std::vector<std::array<int, 3>> endIJK_vec = {{2,2,2}, {3,2,2}};
+    const std::vector<std::array<long long, 3>> startIJK_vec = {{1,1,1}, {2,1,1}};
+    const std::vector<std::array<long long, 3>> endIJK_vec = {{2,2,2}, {3,2,2}};
     const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2"};
     coarse_grid.addLgrsUpdateLeafView({cells_per_dim, cells_per_dim}, startIJK_vec, endIJK_vec, lgr_name_vec);
 
@@ -868,7 +868,7 @@ BOOST_AUTO_TEST_CASE(refineMixedCells_in_multiLevelGrid) {
     // Therefore, cell_to_face_ for all of them has size 6. (Their faces have all 2 refined neigboring cells - (not one coarse cell, and one refined)).
     // - Cells 0,1,2,12, and 15 are coarse cells, not touching the boundary of the LGR1 (cells 12 and 15 do share corners with LGR1 but do not share
     // any face. Therefore, the faces of cells 0,1,2,12,and 15 have all 1 or 2 neighboring coarse cells).
-    std::vector<int> markedCells = {0,1,2,12,15,30,31,56,57};
+    std::vector<long long> markedCells = {0,1,2,12,15,30,31,56,57};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, false, true, false);
 }
@@ -879,14 +879,14 @@ BOOST_AUTO_TEST_CASE(refineMixedCells_in_mixedGrid_II)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {3,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {3,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // LGR1 marked elements with elemIdx = 17 and 18, refined into 27 children cells each,
     // with leaf indices 17+0,...,17+26 = 43 (children {level 0, cell index 17}),44,...,70 (children {level 0, cell index 18}).
-    const std::array<int, 3> startIJK = {1,1,1};
-    const std::array<int, 3> endIJK = {3,2,2};
+    const std::array<long long, 3> startIJK = {1,1,1};
+    const std::array<long long, 3> endIJK = {3,2,2};
     const std::string lgr_name = {"LGR1"};
     coarse_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
@@ -895,7 +895,7 @@ BOOST_AUTO_TEST_CASE(refineMixedCells_in_mixedGrid_II)
     // - Cells 25,34,43 are refined cells, children of {level 0, cell index 17}, forming a collum.
     // - Cells 50,59,68 are refined cells, children of {level 0, cell index 18}, forming a collum.
     // Cells 25 and 50, 34 and 59, 43 and 68, share a face (the collums are next to each other).
-    std::vector<int> markedCells = {25,34,43,50,59,68, 72, 84};
+    std::vector<long long> markedCells = {25,34,43,50,59,68, 72, 84};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, true, true, false);
 }
@@ -905,20 +905,20 @@ BOOST_AUTO_TEST_CASE(cellTouchesLgrBoundary_throw)
     // Create a grid
     Dune::CpGrid coarse_grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
-    const std::array<int, 3> cells_per_dim = {3,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> cells_per_dim = {3,3,3};
     coarse_grid.createCartesian(grid_dim, cell_sizes);
 
     // LGR1 marked elements with elemIdx = 17 and 18, refined into 27 children cells each,
     // with leaf indices 17+0,...,17+26 = 43 (children {level 0, cell index 17}),44,...,70 (children {level 0, cell index 18}).
-    const std::array<int, 3> startIJK = {1,1,1};
-    const std::array<int, 3> endIJK = {3,2,2};
+    const std::array<long long, 3> startIJK = {1,1,1};
+    const std::array<long long, 3> endIJK = {3,2,2};
     const std::string lgr_name = {"LGR1"};
     coarse_grid.addLgrsUpdateLeafView({cells_per_dim}, {startIJK}, {endIJK}, {lgr_name});
 
     // - Coarse cells touching the LGR1 on its boundary.
     // Cell 5, 14, 16, 71, 73, and 82, touching the bottom, front, left, right, back, and the top of LGR1, respectively.
-    std::vector<int> markedCells = {5,14,16,71,73,82};
+    std::vector<long long> markedCells = {5,14,16,71,73,82};
     // The last three bool arguments represent: isBlockShape, hasBeenRefinedAtLeastOnce, isGlobalRefinement.
     BOOST_CHECK_THROW(markAndAdapt_check(coarse_grid, cells_per_dim, markedCells, coarse_grid, true, true, false), std::logic_error);
 }

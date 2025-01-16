@@ -50,7 +50,7 @@ namespace Dune
   // PolyhedralGridFamily
   // ------------
 
-  template< int dim, int dimworld, typename coord_t >
+  template< long long dim, long long dimworld, typename coord_t >
   struct PolyhedralGridFamily
   {
     struct Traits
@@ -63,10 +63,10 @@ namespace Dune
       // for PolyhedralGrid this is just an empty place holder
       typedef const Grid* ExtraData;
 
-      typedef int Index ;
+      typedef long long Index ;
 
-      static const int dimension      = dim;
-      static const int dimensionworld = dimworld;
+      static const long long dimension      = dim;
+      static const long long dimensionworld = dimworld;
 
       typedef Dune::FieldVector< ctype, dimensionworld > GlobalCoordinate ;
 
@@ -84,7 +84,7 @@ namespace Dune
       typedef PolyhedralGridIterator< 0, const Grid, All_Partition > HierarchicIteratorImpl;
       typedef Dune::EntityIterator< 0, const Grid, HierarchicIteratorImpl > HierarchicIterator;
 
-      template< int codim >
+      template< long long codim >
       struct Codim
       {
         typedef PolyhedralGridGeometry<dimension-codim, dimensionworld, const Grid> GeometryImpl;
@@ -150,7 +150,7 @@ namespace Dune
    *
    *  \nosubgrouping
    */
-  template < int dim, int dimworld, typename coord_t >
+  template < long long dim, long long dimworld, typename coord_t >
   class PolyhedralGrid
   /** \cond */
   : public GridDefaultImplementation
@@ -213,7 +213,7 @@ namespace Dune
      *
      *  \nosubgrouping
      */
-    template< int codim >
+    template< long long codim >
     struct Codim;
 
     /** \} */
@@ -343,7 +343,7 @@ namespace Dune
      *  \param[in]  deck         Opm Eclipse deck
      *  \param[in]  poreVolumes  vector with pore volumes (default = empty)
      */
-    explicit PolyhedralGrid ( const std::vector< int >& n,
+    explicit PolyhedralGrid ( const std::vector< long long >& n,
                               const std::vector< double >& dx )
     : gridPtr_( createGrid( n, dx ) ),
       grid_( *gridPtr_ ),
@@ -411,7 +411,7 @@ namespace Dune
      *
      *  \returns maximal grid level
      */
-    int maxLevel () const
+    long long maxLevel () const
     {
       return 0;
     }
@@ -424,7 +424,7 @@ namespace Dune
      *  \returns number of entities of codimension \em codim on grid level
      *           \em level.
      */
-    int size ( int /* level */, int codim ) const
+    long long size ( long long /* level */, long long codim ) const
     {
       return size( codim );
     }
@@ -435,7 +435,7 @@ namespace Dune
      *
      *  \returns number of leaf entities of codimension \em codim
      */
-    int size ( int codim ) const
+    long long size ( long long codim ) const
     {
       if( codim == 0 )
       {
@@ -464,7 +464,7 @@ namespace Dune
      *  \returns number of entities with a geometry of type \em type on grid
      *           level \em level.
      */
-    int size ( int /* level */, GeometryType type ) const
+    long long size ( long long /* level */, GeometryType type ) const
     {
       return size( dim - type.dim() );
     }
@@ -473,7 +473,7 @@ namespace Dune
      *
      *  \returns number of boundary segments within the macro grid
      */
-    int size ( GeometryType type ) const
+    long long size ( GeometryType type ) const
     {
       return size( dim - type.dim() );
     }
@@ -490,19 +490,19 @@ namespace Dune
     }
     /** \} */
 
-    template< int codim >
+    template< long long codim >
     typename Codim< codim >::LeafIterator leafbegin () const
     {
       return leafbegin< codim, All_Partition >();
     }
 
-    template< int codim >
+    template< long long codim >
     typename Codim< codim >::LeafIterator leafend () const
     {
       return leafend< codim, All_Partition >();
     }
 
-    template< int codim, PartitionIteratorType pitype >
+    template< long long codim, PartitionIteratorType pitype >
     typename Codim< codim >::template Partition< pitype >::LeafIterator
     leafbegin () const
     {
@@ -510,7 +510,7 @@ namespace Dune
       return Impl( extraData(), true );
     }
 
-    template< int codim, PartitionIteratorType pitype >
+    template< long long codim, PartitionIteratorType pitype >
     typename Codim< codim >::template Partition< pitype >::LeafIterator
     leafend () const
     {
@@ -518,28 +518,28 @@ namespace Dune
       return Impl( extraData(), false );
     }
 
-    template< int codim >
-    typename Codim< codim >::LevelIterator lbegin ( const int /* level */ ) const
+    template< long long codim >
+    typename Codim< codim >::LevelIterator lbegin ( const long long /* level */ ) const
     {
       return leafbegin< codim, All_Partition >();
     }
 
-    template< int codim >
-    typename Codim< codim >::LevelIterator lend ( const int /* level */ ) const
+    template< long long codim >
+    typename Codim< codim >::LevelIterator lend ( const long long /* level */ ) const
     {
       return leafend< codim, All_Partition >();
     }
 
-    template< int codim, PartitionIteratorType pitype >
+    template< long long codim, PartitionIteratorType pitype >
     typename Codim< codim >::template Partition< pitype >::LevelIterator
-    lbegin ( const int /* level */ ) const
+    lbegin ( const long long /* level */ ) const
     {
       return leafbegin< codim, pitype > ();
     }
 
-    template< int codim, PartitionIteratorType pitype >
+    template< long long codim, PartitionIteratorType pitype >
     typename Codim< codim >::template Partition< pitype >::LevelIterator
-    lend ( const int /* level */ ) const
+    lend ( const long long /* level */ ) const
     {
       return leafend< codim, pitype > ();
     }
@@ -554,7 +554,7 @@ namespace Dune
       return localIdSet_;
     }
 
-    const LevelIndexSet &levelIndexSet ( int /* level */ ) const
+    const LevelIndexSet &levelIndexSet ( long long /* level */ ) const
     {
       return leafIndexSet();
     }
@@ -564,16 +564,16 @@ namespace Dune
       return leafIndexSet_;
     }
 
-    void globalRefine ( int /* refCount */ )
+    void globalRefine ( long long /* refCount */ )
     {
     }
 
-    bool mark ( int /* refCount */, const typename Codim< 0 >::Entity& /* entity */ )
+    bool mark ( long long /* refCount */, const typename Codim< 0 >::Entity& /* entity */ )
     {
       return false;
     }
 
-    int getMark ( const typename Codim< 0 >::Entity& /* entity */) const
+    long long getMark ( const typename Codim< 0 >::Entity& /* entity */) const
     {
       return false;
     }
@@ -612,7 +612,7 @@ namespace Dune
      *
      *  \param[in]  codim  codimension for with the information is desired
      */
-    int overlapSize ( int /* codim */) const
+    long long overlapSize ( long long /* codim */) const
     {
       return 0;
     }
@@ -621,7 +621,7 @@ namespace Dune
      *
      *  \param[in]  codim  codimension for with the information is desired
      */
-    int ghostSize( int codim ) const
+    long long ghostSize( long long codim ) const
     {
       return (codim == 0 ) ? 1 : 0;
     }
@@ -631,7 +631,7 @@ namespace Dune
      *  \param[in]  level  grid level (0, ..., maxLevel())
      *  \param[in]  codim  codimension (0, ..., dimension)
      */
-    int overlapSize ( int /* level */, int /* codim */ ) const
+    long long overlapSize ( long long /* level */, long long /* codim */ ) const
     {
       return 0;
     }
@@ -641,7 +641,7 @@ namespace Dune
      *  \param[in]  level  grid level (0, ..., maxLevel())
      *  \param[in]  codim  codimension (0, ..., dimension)
      */
-    int ghostSize ( int /* level */, int codim ) const
+    long long ghostSize ( long long /* level */, long long codim ) const
     {
       return ghostSize( codim );
     }
@@ -663,7 +663,7 @@ namespace Dune
     void communicate ( DataHandle& /* dataHandle */,
                        InterfaceType /* interface */,
                        CommunicationDirection /* direction */,
-                       int /* level */ ) const
+                       long long /* level */ ) const
     {
         OPM_THROW(std::runtime_error, "communicate not implemented for polyhedreal grid!");
     }
@@ -772,7 +772,7 @@ namespace Dune
 
     /** \brief View for a grid level */
     template< PartitionIteratorType pitype >
-    typename Partition< pitype >::LevelGridView levelGridView ( int /* level */ ) const
+    typename Partition< pitype >::LevelGridView levelGridView ( long long /* level */ ) const
     {
       typedef typename Partition< pitype >::LevelGridView View;
       typedef typename View::GridViewImp ViewImp;
@@ -789,7 +789,7 @@ namespace Dune
     }
 
     /** \brief View for a grid level for All_Partition */
-    LevelGridView levelGridView ( int /* level */ ) const
+    LevelGridView levelGridView ( long long /* level */ ) const
     {
       typedef typename LevelGridView::GridViewImp ViewImp;
       return LevelGridView( ViewImp( *this ) );
@@ -841,25 +841,25 @@ namespace Dune
 
     /** \} */
 
-    const std::array<int, 3>& logicalCartesianSize() const
+    const std::array<long long, 3>& logicalCartesianSize() const
     {
       return cartDims_;
     }
 
-    const int* globalCell() const
+    const long long* globalCell() const
     {
       assert( grid_.global_cell != 0 );
       return grid_.global_cell;
     }
 
-    const int* globalCellPtr() const
+    const long long* globalCellPtr() const
     {
       return grid_.global_cell;
     }
 
-    void getIJK(const int c, std::array<int,3>& ijk) const
+    void getIJK(const long long c, std::array<long long,3>& ijk) const
     {
-      int gc = globalCell()[c];
+      long long gc = globalCell()[c];
       ijk[0] = gc % logicalCartesianSize()[0];  gc /= logicalCartesianSize()[0];
       ijk[1] = gc % logicalCartesianSize()[1];
       ijk[2] = gc / logicalCartesianSize()[1];
@@ -897,7 +897,7 @@ namespace Dune
 
         std::vector<double> coord = inputGrid.getCOORD( );
         std::vector<double> zcorn = inputGrid.getZCORN( );
-        std::vector<int> actnum = inputGrid.getACTNUM(  );
+        std::vector<long long> actnum = inputGrid.getACTNUM(  );
 
         g.coord = coord.data();
         g.zcorn = zcorn.data();
@@ -941,10 +941,10 @@ namespace Dune
     }
 #endif
 
-    UnstructuredGridType* createGrid( const std::vector< int >& n, const std::vector< double >& dx ) const
+    UnstructuredGridType* createGrid( const std::vector< long long >& n, const std::vector< double >& dx ) const
     {
         UnstructuredGridType* cgrid = nullptr ;
-        assert( int(n.size()) == dim );
+        assert( (long long)(n.size()) == dim );
         if( dim == 2 )
         {
           cgrid = create_grid_cart2d( n[ 0 ], n[ 1 ], dx[ 0 ], dx[ 1 ] );
@@ -966,10 +966,10 @@ namespace Dune
     ExtraData extraData () const  { return this; }
 
     template <class EntitySeed>
-    int corners( const EntitySeed& seed ) const
+    long long corners( const EntitySeed& seed ) const
     {
-      const int codim = EntitySeed :: codimension;
-      const int index = seed.index();
+      const long long codim = EntitySeed :: codimension;
+      const long long index = seed.index();
       if (codim==0)
         return cellVertices_[ index ].size();
       if (codim==1)
@@ -981,12 +981,12 @@ namespace Dune
 
     template <class EntitySeed>
     GlobalCoordinate
-    corner ( const EntitySeed& seed, const int i ) const
+    corner ( const EntitySeed& seed, const long long i ) const
     {
-      const int codim = EntitySeed :: codimension;
+      const long long codim = EntitySeed :: codimension;
       if (codim==0)
       {
-        const int coordIndex = GlobalCoordinate :: dimension * cellVertices_[ seed.index() ][ i ];
+        const long long coordIndex = GlobalCoordinate :: dimension * cellVertices_[ seed.index() ][ i ];
           return copyToGlobalCoordinate( grid_.node_coordinates + coordIndex );
       }
       if (codim==1)
@@ -994,23 +994,23 @@ namespace Dune
         // for faces we need to swap vertices in 3d since in UnstructuredGrid
         // those are ordered counter clockwise, for 2d this does not matter
         // TODO: Improve this for performance reasons
-        const int crners = corners( seed );
-        const int crner  = (crners == 4 && EntitySeed :: dimension == 3 && i > 1 ) ? 5 - i : i;
-        const int faceVertex = grid_.face_nodes[ grid_.face_nodepos[seed.index() ] + crner ];
+        const long long crners = corners( seed );
+        const long long crner  = (crners == 4 && EntitySeed :: dimension == 3 && i > 1 ) ? 5 - i : i;
+        const long long faceVertex = grid_.face_nodes[ grid_.face_nodepos[seed.index() ] + crner ];
         return copyToGlobalCoordinate( grid_.node_coordinates + GlobalCoordinate :: dimension * faceVertex );
       }
       if (codim==dim)
       {
-        const int coordIndex = GlobalCoordinate :: dimension * seed.index();
+        const long long coordIndex = GlobalCoordinate :: dimension * seed.index();
         return copyToGlobalCoordinate( grid_.node_coordinates + coordIndex );
       }      
       return GlobalCoordinate( 0 );
     }
 
     template <class EntitySeed>
-    int subEntities( const EntitySeed& seed, const int codim ) const
+    long long subEntities( const EntitySeed& seed, const long long codim ) const
     {
-      const int index = seed.index();
+      const long long index = seed.index();
       if( seed.codimension == 0 )
       {
         if (codim==0)
@@ -1035,9 +1035,9 @@ namespace Dune
       return 0;
     }
 
-    template <int codim, class EntitySeedArg >
+    template <long long codim, class EntitySeedArg >
     typename Codim<codim>::EntitySeed
-    subEntitySeed( const EntitySeedArg& baseSeed, const int i ) const
+    subEntitySeed( const EntitySeedArg& baseSeed, const long long i ) const
     {
       assert( codim >= EntitySeedArg::codimension );
       assert( i>= 0 && i<subEntities( baseSeed, codim ) );
@@ -1069,9 +1069,9 @@ namespace Dune
       return EntitySeed();
     }
 
-    template <int codim>
+    template <long long codim>
     typename Codim<codim>::EntitySeed
-    subEntitySeed( const typename Codim<1>::EntitySeed& faceSeed, const int i ) const
+    subEntitySeed( const typename Codim<1>::EntitySeed& faceSeed, const long long i ) const
     {
       assert( i>= 0 && i<subEntities( faceSeed, codim ) );
       typedef typename Codim<codim>::EntitySeed  EntitySeed;
@@ -1091,8 +1091,8 @@ namespace Dune
 
     bool hasBoundaryIntersections(const typename Codim<0>::EntitySeed& seed ) const
     {
-      const int faces = subEntities( seed, 1 );
-      for( int f=0; f<faces; ++f )
+      const long long faces = subEntities( seed, 1 );
+      for( long long f=0; f<faces; ++f )
       {
         const auto faceSeed = this->template subEntitySeed<1>( seed, f );
         if( isBoundaryFace( faceSeed ) )
@@ -1101,10 +1101,10 @@ namespace Dune
       return false;
     }
 
-    bool isBoundaryFace(const int face ) const
+    bool isBoundaryFace(const long long face ) const
     {
       assert( face >= 0 && face < grid_.number_of_faces );
-      const int facePos = 2 * face;
+      const long long facePos = 2 * face;
       return ((grid_.face_cells[ facePos ] < 0) || (grid_.face_cells[ facePos+1 ] < 0));
     }
 
@@ -1114,18 +1114,18 @@ namespace Dune
       return isBoundaryFace( faceSeed.index() );
     }
 
-    int boundarySegmentIndex(const typename Codim<0>::EntitySeed& seed, const int face ) const
+    long long boundarySegmentIndex(const typename Codim<0>::EntitySeed& seed, const long long face ) const
     {
       const auto faceSeed = this->template subEntitySeed<1>( seed, face );
       assert( faceSeed.isValid() );
-      const int facePos = 2 * faceSeed.index();
-      const int idx = std::min( grid_.face_cells[ facePos ], grid_.face_cells[ facePos+1 ]);
+      const long long facePos = 2 * faceSeed.index();
+      const long long idx = std::min( grid_.face_cells[ facePos ], grid_.face_cells[ facePos+1 ]);
       // check that this is actually the boundary
       assert( idx < 0 );
       return -(idx+1); // +1 to include 0 boundary segment index
     }
 
-    const std::vector< GeometryType > &geomTypes ( const unsigned int codim ) const
+    const std::vector< GeometryType > &geomTypes ( const size_t codim ) const
     {
       static std::vector< GeometryType > emptyDummy;
       if (codim < geomTypes_.size())
@@ -1150,7 +1150,7 @@ namespace Dune
         if( dim == 3 && Seed::codimension == 1 )
         {
           GeometryType face;
-          const int nVx = corners( seed );
+          const long long nVx = corners( seed );
           if( nVx == 4 ) // quad face
             face = Dune::GeometryTypes::cube(2);
           else if( nVx == 3 ) // triangle face
@@ -1166,22 +1166,22 @@ namespace Dune
       }
     }
 
-    int indexInInside( const typename Codim<0>::EntitySeed& seed, const int i ) const
+    long long indexInInside( const typename Codim<0>::EntitySeed& seed, const long long i ) const
     {
       return ( grid_.cell_facetag ) ? cartesianIndexInInside( seed, i ) : i;
     }
 
-    int cartesianIndexInInside( const typename Codim<0>::EntitySeed& seed, const int i ) const
+    long long cartesianIndexInInside( const typename Codim<0>::EntitySeed& seed, const long long i ) const
     {
       assert( i>= 0 && i<subEntities( seed, 1 ) );
       return grid_.cell_facetag[ grid_.cell_facepos[ seed.index() ] + i ] ;
     }
 
     typename Codim<0>::EntitySeed
-    neighbor( const typename Codim<0>::EntitySeed& seed, const int i ) const
+    neighbor( const typename Codim<0>::EntitySeed& seed, const long long i ) const
     {
-      const int face = this->template subEntitySeed<1>( seed, i ).index();
-      int nb = grid_.face_cells[ 2 * face ];
+      const long long face = this->template subEntitySeed<1>( seed, i ).index();
+      long long nb = grid_.face_cells[ 2 * face ];
       if( nb == seed.index() )
       {
         nb = grid_.face_cells[ 2 * face + 1 ];
@@ -1191,21 +1191,21 @@ namespace Dune
       return EntitySeed( nb );
     }
 
-    int
-    indexInOutside( const typename Codim<0>::EntitySeed& seed, const int i ) const
+    long long
+    indexInOutside( const typename Codim<0>::EntitySeed& seed, const long long i ) const
     {
       if( grid_.cell_facetag )
       {
         // if cell_facetag is present we assume pseudo Cartesian corner point case
-        const int in_inside = cartesianIndexInInside( seed, i );
+        const long long in_inside = cartesianIndexInInside( seed, i );
         return in_inside + ((in_inside % 2) ? -1 : 1);
       }
       else
       {
         typedef typename Codim<0>::EntitySeed EntitySeed;
         EntitySeed nb = neighbor( seed, i );
-        const int faces = subEntities( seed, 1 );
-        for( int face = 0; face<faces; ++ face )
+        const long long faces = subEntities( seed, 1 );
+        for( long long face = 0; face<faces; ++ face )
         {
           if( neighbor( nb, face ).equals(seed) )
           {
@@ -1219,12 +1219,12 @@ namespace Dune
 
     template <class EntitySeed>
     GlobalCoordinate
-    outerNormal( const EntitySeed& seed, const int i ) const
+    outerNormal( const EntitySeed& seed, const long long i ) const
     {
-      const int face  = this->template subEntitySeed<1>( seed, i ).index();
-      const int normalIdx = face * GlobalCoordinate :: dimension ;
+      const long long face  = this->template subEntitySeed<1>( seed, i ).index();
+      const long long normalIdx = face * GlobalCoordinate :: dimension ;
       GlobalCoordinate normal = copyToGlobalCoordinate( grid_.face_normals + normalIdx );
-      const int nb = grid_.face_cells[ 2*face ];
+      const long long nb = grid_.face_cells[ 2*face ];
       if( nb != seed.index() )
       {
         normal *= -1.0;
@@ -1234,9 +1234,9 @@ namespace Dune
 
     template <class EntitySeed>
     GlobalCoordinate
-    unitOuterNormal( const EntitySeed& seed, const int i ) const
+    unitOuterNormal( const EntitySeed& seed, const long long i ) const
     {
-      const int face  = this->template subEntitySeed<1>( seed, i ).index();
+      const long long face  = this->template subEntitySeed<1>( seed, i ).index();
       if( seed.index() == grid_.face_cells[ 2*face ] )
       {
         return unitOuterNormals_[ face ];
@@ -1255,8 +1255,8 @@ namespace Dune
       if( ! seed.isValid() )
         return GlobalCoordinate( 0 );
 
-      const int index = GlobalCoordinate :: dimension * seed.index();
-      const int codim = EntitySeed::codimension;
+      const long long index = GlobalCoordinate :: dimension * seed.index();
+      const long long codim = EntitySeed::codimension;
       assert( index >= 0 && index < size( codim ) * GlobalCoordinate :: dimension );
 
       if( codim == 0 )
@@ -1281,7 +1281,7 @@ namespace Dune
     GlobalCoordinate copyToGlobalCoordinate( const double* coords ) const
     {
       GlobalCoordinate coordinate;
-      for( int i=0; i<GlobalCoordinate::dimension; ++i )
+      for( long long i=0; i<GlobalCoordinate::dimension; ++i )
       {
         coordinate[ i ] = coords[ i ];
       }
@@ -1291,7 +1291,7 @@ namespace Dune
     template <class EntitySeed>
     double volumes( const EntitySeed& seed ) const
     {
-      static const int codim = EntitySeed::codimension;
+      static const long long codim = EntitySeed::codimension;
       if( codim == dim || ! seed.isValid() )
       {
         return 1.0;
@@ -1320,22 +1320,22 @@ namespace Dune
     void init ()
     {
       // copy Cartesian dimensions
-      for( int i=0; i<3; ++i )
+      for( long long i=0; i<3; ++i )
       {
         cartDims_[ i ] = grid_.cartdims[ i ];
       }
 
       // setup list of cell vertices
-      const int numCells = size( 0 );
+      const long long numCells = size( 0 );
 
       cellVertices_.resize( numCells );
 
       // sort vertices such that they comply with the dune reference cube
       if( grid_.cell_facetag )
       {
-        typedef std::array<int, 3> KeyType;
-        std::map< const KeyType, const int > vertexFaceTags;
-        const int vertexFacePattern [8][3] = {
+        typedef std::array<long long, 3> KeyType;
+        std::map< const KeyType, const long long > vertexFaceTags;
+        const long long vertexFacePattern [8][3] = {
                                 { 0, 2, 4 }, // vertex 0
                                 { 1, 2, 4 }, // vertex 1
                                 { 0, 3, 4 }, // vertex 2
@@ -1346,10 +1346,10 @@ namespace Dune
                                 { 1, 3, 5 }  // vertex 7
                                };
 
-        for( int i=0; i<8; ++i )
+        for( long long i=0; i<8; ++i )
         {
           KeyType key; key.fill( 4 ); // default is 4 which is the first z coord (for the 2d case)
-          for( int j=0; j<dim; ++j )
+          for( long long j=0; j<dim; ++j )
           {
             key[ j ] = vertexFacePattern[ i ][ j ];
           }
@@ -1357,29 +1357,29 @@ namespace Dune
           vertexFaceTags.insert( std::make_pair( key, i ) );
         }
 
-        for (int c = 0; c < numCells; ++c)
+        for (long long c = 0; c < numCells; ++c)
         {
           if( dim == 2 )
           {
             // for 2d Cartesian grids the face ordering is wrong
-            int f = grid_.cell_facepos[ c ];
+            long long f = grid_.cell_facepos[ c ];
             std::swap( grid_.cell_faces[ f+1 ], grid_.cell_faces[ f+2 ] );
             std::swap( grid_.cell_facetag[ f+1 ], grid_.cell_facetag[ f+2 ] );
           }
 
-          typedef std::map<int,int> vertexmap_t;
+          typedef std::map<long long,long long> vertexmap_t;
           typedef typename vertexmap_t :: iterator iterator;
 
           std::vector< vertexmap_t > cell_pts( dim*2 );
 
           for (unsigned hf = grid_.cell_facepos[ c ]; hf < grid_.cell_facepos[c+1]; ++hf)
           {
-            const int f = grid_.cell_faces[ hf ];
-            const int faceTag = grid_.cell_facetag[ hf ];
+            const long long f = grid_.cell_faces[ hf ];
+            const long long faceTag = grid_.cell_facetag[ hf ];
 
             for (unsigned nodepos = grid_.face_nodepos[f]; nodepos < grid_.face_nodepos[f+1]; ++nodepos )
             {
-              const int node = grid_.face_nodes[ nodepos ];
+              const long long node = grid_.face_nodes[ nodepos ];
               iterator it = cell_pts[ faceTag ].find( node );
               if( it == cell_pts[ faceTag ].end() )
               {
@@ -1393,10 +1393,10 @@ namespace Dune
             }
           }
 
-          typedef std::map< int, std::set<int> > vertexlist_t;
+          typedef std::map< long long, std::set<long long> > vertexlist_t;
           vertexlist_t vertexList;
 
-          for( int faceTag = 0; faceTag<dim*2; ++faceTag )
+          for( long long faceTag = 0; faceTag<dim*2; ++faceTag )
           {
             for( iterator it = cell_pts[ faceTag ].begin(),
                  end = cell_pts[ faceTag ].end(); it != end; ++it )
@@ -1410,7 +1410,7 @@ namespace Dune
             }
           }
 
-          assert( int(vertexList.size()) == ( dim == 2 ? 4 : 8) );
+          assert( (long long)(vertexList.size()) == ( dim == 2 ? 4 : 8) );
 
           cellVertices_[ c ].resize( vertexList.size() );
           for( auto it = vertexList.begin(), end = vertexList.end(); it != end; ++it )
@@ -1423,7 +1423,7 @@ namespace Dune
             assert( vx != vertexFaceTags.end() );
             if( vx != vertexFaceTags.end() )
             {
-              if( (*vx).second >= int(cellVertices_[ c ].size()) )
+              if( (*vx).second >= (long long)(cellVertices_[ c ].size()) )
                 cellVertices_[ c ].resize( (*vx).second+1 );
               // store node number on correct local position
               cellVertices_[ c ][ (*vx).second ] = (*it).first ;
@@ -1434,7 +1434,7 @@ namespace Dune
         // if face_tag is available we assume that the elements follow a cube-like structure
         geomTypes_.resize(dim + 1);
         GeometryType tmp;
-        for (int codim = 0; codim <= dim; ++codim)
+        for (long long codim = 0; codim <= dim; ++codim)
         {
           tmp = Dune::GeometryTypes::cube(dim - codim);
           geomTypes_[codim].push_back(tmp);
@@ -1442,45 +1442,45 @@ namespace Dune
       }
       else // if ( grid_.cell_facetag )
       {
-        int maxVx = 0 ;
-        int minVx = std::numeric_limits<int>::max();
+        long long maxVx = 0 ;
+        long long minVx = std::numeric_limits<long long>::max();
 
-        for (int c = 0; c < numCells; ++c)
+        for (long long c = 0; c < numCells; ++c)
         {
-          std::set<int> cell_pts;
+          std::set<long long> cell_pts;
           for (unsigned hf = grid_.cell_facepos[ c ]; hf < grid_.cell_facepos[c+1]; ++hf)
           {
-             int f = grid_.cell_faces[ hf ];
-             const int* fnbeg = grid_.face_nodes + grid_.face_nodepos[f];
-             const int* fnend = grid_.face_nodes + grid_.face_nodepos[f+1];
+             long long f = grid_.cell_faces[ hf ];
+             const long long* fnbeg = grid_.face_nodes + grid_.face_nodepos[f];
+             const long long* fnend = grid_.face_nodes + grid_.face_nodepos[f+1];
              cell_pts.insert(fnbeg, fnend);
           }
 
           cellVertices_[ c ].resize( cell_pts.size() );
           std::copy(cell_pts.begin(), cell_pts.end(), cellVertices_[ c ].begin() );
-          maxVx = std::max( maxVx, int( cell_pts.size() ) );
-          minVx = std::min( minVx, int( cell_pts.size() ) );
+          maxVx = std::max( maxVx, (long long)( cell_pts.size() ) );
+          minVx = std::min( minVx, (long long)( cell_pts.size() ) );
         }
 
         if( minVx == maxVx && maxVx == 4 )
         {
-          for (int c = 0; c < numCells; ++c)
+          for (long long c = 0; c < numCells; ++c)
           {
             assert( cellVertices_[ c ].size() == 4 );
             GlobalCoordinate center( 0 );
             GlobalCoordinate p[ dim+1 ];
-            for( int i=0; i<dim+1; ++i )
+            for( long long i=0; i<dim+1; ++i )
             {
-              const int vertex = cellVertices_[ c ][ i ];
+              const long long vertex = cellVertices_[ c ][ i ];
 
-              for( int d=0; d<dim; ++d )
+              for( long long d=0; d<dim; ++d )
               {
                 center[ d ] += grid_.node_coordinates[ vertex*dim + d ];
                 p[ i ][ d ]  = grid_.node_coordinates[ vertex*dim + d ];
               }
             }
             center *= 0.25;
-            for( int d=0; d<dim; ++d )
+            for( long long d=0; d<dim; ++d )
             {
               grid_.cell_centroids[ c*dim + d ] = center[ d ];
             }
@@ -1496,11 +1496,11 @@ namespace Dune
 
         // check face normals
         {
-          const int faces = grid_.number_of_faces;
-          for( int face = 0 ; face < faces; ++face )
+          const long long faces = grid_.number_of_faces;
+          for( long long face = 0 ; face < faces; ++face )
           {
-            const int a = grid_.face_cells[ 2*face     ];
-            const int b = grid_.face_cells[ 2*face + 1 ];
+            const long long a = grid_.face_cells[ 2*face     ];
+            const long long b = grid_.face_cells[ 2*face + 1 ];
 
             assert( a >=0 || b >=0 );
 
@@ -1510,14 +1510,14 @@ namespace Dune
             GlobalCoordinate centerDiff( 0 );
             if( b >= 0 )
             {
-              for( int d=0; d<dimworld; ++d )
+              for( long long d=0; d<dimworld; ++d )
               {
                 centerDiff[ d ] = grid_.cell_centroids[ b*dimworld + d ];
               }
             }
             else
             {
-              for( int d=0; d<dimworld; ++d )
+              for( long long d=0; d<dimworld; ++d )
               {
                 centerDiff[ d ] = grid_.face_centroids[ face*dimworld + d ];
               }
@@ -1525,21 +1525,21 @@ namespace Dune
 
             if( a >= 0 )
             {
-              for( int d=0; d<dimworld; ++d )
+              for( long long d=0; d<dimworld; ++d )
               {
                 centerDiff[ d ] -= grid_.cell_centroids[ a*dimworld + d ];
               }
             }
             else
             {
-              for( int d=0; d<dimworld; ++d )
+              for( long long d=0; d<dimworld; ++d )
               {
                 centerDiff[ d ] -= grid_.face_centroids[ face*dimworld + d ];
               }
             }
 
             GlobalCoordinate normal( 0 );
-            for( int d=0; d<dimworld; ++d )
+            for( long long d=0; d<dimworld; ++d )
             {
               normal[ d ] = grid_.face_normals[ face*dimworld + d ];
             }
@@ -1559,9 +1559,9 @@ namespace Dune
         bool allSimplex = true ;
         bool allCube    = true ;
 
-        for (int c = 0; c < numCells; ++c)
+        for (long long c = 0; c < numCells; ++c)
         {
-          const int nVx = cellVertices_[ c ].size();
+          const long long nVx = cellVertices_[ c ].size();
           if( nVx != 4 )
           {
               allSimplex = false;
@@ -1575,7 +1575,7 @@ namespace Dune
         // Propogate the cell geometry type to all codimensions
         geomTypes_.resize(dim + 1);
         GeometryType tmp;
-        for (int codim = 0; codim <= dim; ++codim)
+        for (long long codim = 0; codim <= dim; ++codim)
         {
           if( allSimplex )
           {
@@ -1598,9 +1598,9 @@ namespace Dune
 
       nBndSegments_ = 0;
       unitOuterNormals_.resize( grid_.number_of_faces );
-      for( int face = 0; face < grid_.number_of_faces; ++face )
+      for( long long face = 0; face < grid_.number_of_faces; ++face )
       {
-        const int normalIdx = face * GlobalCoordinate :: dimension ;
+        const long long normalIdx = face * GlobalCoordinate :: dimension ;
         GlobalCoordinate normal = copyToGlobalCoordinate( grid_.face_normals + normalIdx );
         normal /= normal.two_norm();
         unitOuterNormals_[ face ] = normal;
@@ -1609,7 +1609,7 @@ namespace Dune
         {
           // increase number if boundary segments
           ++nBndSegments_;
-          const int facePos = 2 * face ;
+          const long long facePos = 2 * face ;
           // store negative number to indicate boundary
           // the abstract value is the segment index
           if( grid_.face_cells[ facePos ] < 0 )
@@ -1626,15 +1626,15 @@ namespace Dune
 
     void print( std::ostream& out, const UnstructuredGridType& grid ) const
     {
-      const int numCells = grid.number_of_cells;
-      for( int c=0; c<numCells; ++c )
+      const long long numCells = grid.number_of_cells;
+      for( long long c=0; c<numCells; ++c )
       {
         out << "cell " << c << " : faces = " << std::endl;
-        for (int hf=grid.cell_facepos[ c ]; hf < grid.cell_facepos[c+1]; ++hf)
+        for (long long hf=grid.cell_facepos[ c ]; hf < grid.cell_facepos[c+1]; ++hf)
         {
-           int f = grid_.cell_faces[ hf ];
-           const int* fnbeg = grid_.face_nodes + grid_.face_nodepos[f];
-           const int* fnend = grid_.face_nodes + grid_.face_nodepos[f+1];
+           long long f = grid_.cell_faces[ hf ];
+           const long long* fnbeg = grid_.face_nodes + grid_.face_nodepos[f];
+           const long long* fnend = grid_.face_nodes + grid_.face_nodepos[f+1];
            out << f << "  vx = " ;
            while( fnbeg != fnend )
            {
@@ -1659,9 +1659,9 @@ namespace Dune
     const UnstructuredGridType& grid_;
 
     CommunicationType comm_;
-    std::array< int, 3 > cartDims_;
+    std::array< long long, 3 > cartDims_;
     std::vector< std::vector< GeometryType > > geomTypes_;
-    std::vector< std::vector< int > > cellVertices_;
+    std::vector< std::vector< long long > > cellVertices_;
 
     std::vector< GlobalCoordinate > unitOuterNormals_;
 
@@ -1681,8 +1681,8 @@ namespace Dune
   // PolyhedralGrid::Codim
   // -------------
 
-  template< int dim, int dimworld, typename coord_t >
-  template< int codim >
+  template< long long dim, long long dimworld, typename coord_t >
+  template< long long codim >
   struct PolyhedralGrid< dim, dimworld, coord_t >::Codim
   : public Base::template Codim< codim >
   {

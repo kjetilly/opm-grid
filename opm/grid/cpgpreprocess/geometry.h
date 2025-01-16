@@ -5,15 +5,15 @@
 #ifndef MRST_GEOMETRY_H_INCLUDED
 #define MRST_GEOMETRY_H_INCLUDED
 
-void compute_face_geometry(int ndims, double *coords, int nfaces,
-                           unsigned *nodepos, int *facenodes,
+void compute_face_geometry(long long ndims, double *coords, long long nfaces,
+                           unsigned *nodepos, long long *facenodes,
                            double *fnormals, double *fcentroids,
                            double *fareas);
-void compute_cell_geometry(int ndims, double *coords,
-                           unsigned* nodepos, int *facenodes, int *neighbours,
+void compute_cell_geometry(long long ndims, double *coords,
+                           unsigned* nodepos, long long *facenodes, long long *neighbours,
                            double *fnormals,
-                           double *fcentroids, int ncells,
-                           unsigned* facepos, int *cellfaces,
+                           double *fcentroids, long long ncells,
+                           unsigned* facepos, long long *cellfaces,
                            double *ccentroids, double *cvolumes);
 
 #endif /* MRST_GEOMETRY_H_INCLUDED */

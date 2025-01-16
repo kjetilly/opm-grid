@@ -68,15 +68,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -86,7 +86,7 @@ BOOST_GLOBAL_FIXTURE(Fixture);
 
 void lookup_check(const Dune::PolyhedralGrid<3,3>& grid)
 {
-    std::vector<int> fake_feature(grid.size(0), 0);
+    std::vector<long long> fake_feature(grid.size(0), 0);
     std::iota(fake_feature.begin(), fake_feature.end(), 3);
 
     std::vector<double> fake_feature_double(grid.size(0), 0.);
@@ -133,13 +133,13 @@ void lookup_check(const Dune::PolyhedralGrid<3,3>& grid)
         BOOST_CHECK(cartIdx == lookUpCartesianData.getFieldPropCartesianIdx(elem));
         BOOST_CHECK(cartIdx == lookUpCartesianData.getFieldPropCartesianIdx(idx));
         // Extra checks related to Cartesian Coordinate
-        std::array<int,3> ijk;
+        std::array<long long,3> ijk;
         cartMapper.cartesianCoordinate(idx, ijk);
-        std::array<int,3> ijkLevel;
+        std::array<long long,3> ijkLevel;
         levelCartMapp.cartesianCoordinate(idx, ijkLevel, 0);
         BOOST_CHECK(ijk == ijkLevel);
         // Throw for level > 0 (Local grid refinement not supported for Polyhedral Grid)
-        std::array<int,3> ijkThrow;
+        std::array<long long,3> ijkThrow;
         BOOST_CHECK_THROW(levelCartMapp.cartesianCoordinate(idx, ijkThrow, 4), std::invalid_argument);
         BOOST_CHECK_THROW(levelCartMapp.cartesianCoordinate(idx, ijkThrow, -3), std::invalid_argument);
     }
@@ -194,22 +194,22 @@ void fieldProp_check(const Dune::PolyhedralGrid<3,3>& grid, Opm::EclipseGrid ecl
     const auto& poroOnLeaf = lookUpData.assignFieldPropsDoubleOnLeaf(fpm, "PORO");
     const auto& poroOnLeafCart = lookUpCartesianData.assignFieldPropsDoubleOnLeaf(fpm, "PORO");
 
-    const auto& eqlnumOnLeaf = lookUpData.assignFieldPropsIntOnLeaf<int>(fpm, "EQLNUM", true);
-    const auto& eqlnumOnLeafCart = lookUpCartesianData.assignFieldPropsIntOnLeaf<int>(fpm, "EQLNUM", true);
+    const auto& eqlnumOnLeaf = lookUpData.assignFieldPropsIntOnLeaf<long long>(fpm, "EQLNUM", true);
+    const auto& eqlnumOnLeafCart = lookUpCartesianData.assignFieldPropsIntOnLeaf<long long>(fpm, "EQLNUM", true);
 
     for (const auto& elem : elements(leaf_view))
     {
         const auto elemIdx = mapper.index(elem);
         // PORO
         BOOST_CHECK_EQUAL(poro[elemIdx], lookUpData.fieldPropDouble(fpm, "PORO", elem));
-        BOOST_CHECK_EQUAL(poro[elemIdx], lookUpData.fieldPropDouble<int>(fpm, "PORO", elemIdx));
+        BOOST_CHECK_EQUAL(poro[elemIdx], lookUpData.fieldPropDouble<long long>(fpm, "PORO", elemIdx));
         BOOST_CHECK_EQUAL(poro[elemIdx], lookUpCartesianData.fieldPropDouble(fpm, "PORO", elem));
         BOOST_CHECK_EQUAL(poro[elemIdx], lookUpCartesianData.fieldPropDouble(fpm, "PORO", elemIdx));
         BOOST_CHECK_EQUAL(poro[elemIdx], poroOnLeaf[elemIdx]);
         BOOST_CHECK_EQUAL(poro[elemIdx], poroOnLeafCart[elemIdx]);
         // EQLNUM
         BOOST_CHECK_EQUAL(eqlnum[elemIdx], lookUpData.fieldPropInt(fpm, "EQLNUM", elem));
-        BOOST_CHECK_EQUAL(eqlnum[elemIdx], lookUpData.fieldPropInt<int>(fpm, "EQLNUM", elemIdx));
+        BOOST_CHECK_EQUAL(eqlnum[elemIdx], lookUpData.fieldPropInt<long long>(fpm, "EQLNUM", elemIdx));
         BOOST_CHECK_EQUAL(eqlnum[elemIdx], lookUpCartesianData.fieldPropInt(fpm, "EQLNUM", elem));
         BOOST_CHECK_EQUAL(eqlnum[elemIdx], lookUpCartesianData.fieldPropInt(fpm, "EQLNUM", elemIdx));
         BOOST_CHECK_EQUAL(eqlnum[elemIdx]-true, eqlnumOnLeaf[elemIdx]);
@@ -231,7 +231,7 @@ EQLNUM
 1 2 3 4 5 6
 /)";
 
-    std::vector<int> actnum1 = {1,1,1,1,1,1};
+    std::vector<long long> actnum1 = {1,1,1,1,1,1};
     Opm::EclipseGrid eclGrid(3,2,1);
     eclGrid.resetACTNUM(actnum1);
     std::vector<double> porv;

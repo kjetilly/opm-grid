@@ -61,14 +61,14 @@
 
 /* Determine face topology first, then compute intersection. */
 /* All intersections that occur are present in the final face geometry.*/
-static int *
-computeFaceTopology(const int *a1, const int *a2,
-                    const int *b1, const int *b2,
-                    int intersect[4], int *faces)
+static long long *
+computeFaceTopology(const long long *a1, const long long *a2,
+                    const long long *b1, const long long *b2,
+                    long long intersect[4], long long *faces)
 {
-    int mask[8];
-    int k;
-    int *f;
+    long long mask[8];
+    long long k;
+    long long *f;
 
     for (k = 0; k < 8; k++) { mask[k] = -1; }
 
@@ -147,7 +147,7 @@ computeFaceTopology(const int *a1, const int *a2,
 
 #if DEBUG>1
     /* Check for repeated nodes:*/
-    int i;
+    long long i;
     fprintf(stderr, "face: ");
     for (i=0; i<8; ++i){
         fprintf(stderr, "%d ", mask[i]);
@@ -185,9 +185,9 @@ computeFaceTopology(const int *a1, const int *a2,
     (((a1 > b1) && (a2 < b2)) ||                \
      ((a1 < b1) && (a2 > b2)))
 
-static int
-faceintersection(const int *a1, const int *a2,
-                 const int *b1, const int *b2)
+static long long
+faceintersection(const long long *a1, const long long *a2,
+                 const long long *b1, const long long *b2)
 {
     return
         MAX(a1[0], b1[0]) < MIN(a1[1], b1[1]) ||
@@ -203,29 +203,29 @@ faceintersection(const int *a1, const int *a2,
 
 
 /* work should be pointer to 2n ints initialised to zero . */
-void findconnections(int n, int *pts[4],
-                     int *intersectionlist,
-                     int *work,
+void findconnections(long long n, long long *pts[4],
+                     long long *intersectionlist,
+                     long long *work,
                      struct processed_grid *out)
 {
     /* vectors of point numbers for faces a(b) on pillar 1(2) */
-    int *a1 = pts[0];
-    int *a2 = pts[1];
-    int *b1 = pts[2];
-    int *b2 = pts[3];
+    long long *a1 = pts[0];
+    long long *a2 = pts[1];
+    long long *b1 = pts[2];
+    long long *b2 = pts[3];
 
     /* Intersection record for top line and bottomline of a */
-    int *itop    = work;
-    int *ibottom = work + n;
-    int *f       = out->face_nodes + out->face_ptr[out->number_of_faces];
-    int *c       = out->face_neighbors + 2*out->number_of_faces;
+    long long *itop    = work;
+    long long *ibottom = work + n;
+    long long *f       = out->face_nodes + out->face_ptr[out->number_of_faces];
+    long long *c       = out->face_neighbors + 2*out->number_of_faces;
 
-    int k1  = 0;
-    int k2  = 0;
+    long long k1  = 0;
+    long long k2  = 0;
 
-    int i,j=0;
-    int intersect[4];
-    int *tmp;
+    long long i,j=0;
+    long long intersect[4];
+    long long *tmp;
     /* for (i=0; i<2*n; work[i++]=-1); */
 
     for (i = 0; i < 4; i++) { intersect[i] = -1; }
@@ -265,8 +265,8 @@ void findconnections(int n, int *pts[4],
 
                     if (MEANINGFUL_FACE(i, j)) {
 
-                        int cell_a = i%2 != 0 ? (i-1)/2 : -1;
-                        int cell_b = j%2 != 0 ? (j-1)/2 : -1;
+                        long long cell_a = i%2 != 0 ? (i-1)/2 : -1;
+                        long long cell_b = j%2 != 0 ? (j-1)/2 : -1;
 
                         if (cell_a != -1 || cell_b != -1){
                             *c++ = cell_a;
@@ -323,8 +323,8 @@ void findconnections(int n, int *pts[4],
                            Even indices refer to space between cells,
                            odd indices refer to cells
                         */
-                        int cell_a = i%2 != 0 ? (i-1)/2 : -1;
-                        int cell_b = j%2 != 0 ? (j-1)/2 : -1;
+                        long long cell_a = i%2 != 0 ? (i-1)/2 : -1;
+                        long long cell_b = j%2 != 0 ? (j-1)/2 : -1;
 
 
 

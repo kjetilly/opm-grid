@@ -52,7 +52,7 @@ class WellConnections
 
 public:
     /// \brief The const iterator type.
-    typedef std::vector<std::set<int> >::const_iterator const_iterator;
+    typedef std::vector<std::set<long long> >::const_iterator const_iterator;
 
     /// \brief The iterator type (always const).
     typedef const_iterator iterator;
@@ -69,9 +69,9 @@ public:
     ///        compressed cell index. The compressed index is used
     ///        to represent the well conditions.
     WellConnections(const std::vector<OpmWellType>& wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
-                    const std::array<int, 3>& cartesianSize,
-                    const std::vector<int>& cartesian_to_compressed);
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
+                    const std::array<long long, 3>& cartesianSize,
+                    const std::vector<long long>& cartesian_to_compressed);
 
     /// \brief Constructor
     /// \param wells The eclipse information about the wells
@@ -80,7 +80,7 @@ public:
     ///                                  partition. If NULL, they will be neglected.
     /// \param cpGrid The corner point grid
     WellConnections(const std::vector<OpmWellType>& wells,
-                    const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                    const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                     const Dune::CpGrid& cpGrid);
 
     /// \brief Initialze the data of the container
@@ -93,15 +93,15 @@ public:
     ///        compressed cell index. The compressed index is used
     ///        to represent the well conditions.
     void init(const std::vector<OpmWellType>& wells,
-              const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
-              const std::array<int, 3>& cartesianSize,
-              const std::vector<int>& cartesian_to_compressed);
+              const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
+              const std::array<long long, 3>& cartesianSize,
+              const std::vector<long long>& cartesian_to_compressed);
 
     /// \brief Access all connections of a well
     /// \param i The index of the well (position of the well in the
     ///          eclipse schedule.
     /// \return The set of compressed indices of cells perforated by the well.
-    const std::set<int>& operator[](std::size_t i) const
+    const std::set<long long>& operator[](std::size_t i) const
     {
         return well_indices_[i];
     }
@@ -126,7 +126,7 @@ public:
 private:
     /// Stores at index i all cells that are perforated by
     /// the well at position i of the eclipse schedule.
-    std::vector<std::set<int> > well_indices_;
+    std::vector<std::set<long long> > well_indices_;
 };
 
 
@@ -145,10 +145,10 @@ private:
 /// \param cpGrid The unbalanced grid we compute on.
 /// \return On the rank that has the global grid a vector with the well
 ///         indices for process i at index i.
-std::vector<std::vector<int> >
-perforatingWellIndicesOnProc(const std::vector<int>& parts,
+std::vector<std::vector<long long> >
+perforatingWellIndicesOnProc(const std::vector<long long>& parts,
                   const std::vector<Dune::cpgrid::OpmWellType>& wells,
-                  const std::unordered_map<std::string, std::set<int>>& possibleFutureConnections,
+                  const std::unordered_map<std::string, std::set<long long>>& possibleFutureConnections,
                   const CpGrid& cpgrid);
 
 /// \brief Computes wells assigned to processes.
@@ -168,14 +168,14 @@ perforatingWellIndicesOnProc(const std::vector<int>& parts,
 /// \param cc Information about the parallelism together with the decomposition.
 /// \return On rank 0 a vector with the well indices for process i
 ///         at index i.
-std::vector<std::vector<int> >
-postProcessPartitioningForWells(std::vector<int>& parts,
-                                std::function<int(int)> gid,
+std::vector<std::vector<long long> >
+postProcessPartitioningForWells(std::vector<long long>& parts,
+                                std::function<(long long)(long long)> gid,
                                 const std::vector<OpmWellType>&  wells,
                                 const WellConnections& well_connections,
-                                const std::vector<std::set<int> >& wellGraph,
-                                std::vector<std::tuple<int,int,char>>& exportList,
-                                std::vector<std::tuple<int,int,char,int>>& importList,
+                                const std::vector<std::set<long long> >& wellGraph,
+                                std::vector<std::tuple<long long,long long,char>>& exportList,
+                                std::vector<std::tuple<long long,long long,char,long long>>& importList,
                                 const Communication<MPI_Comm>& cc);
 
 /// \brief Computes whether wells are perforating cells on this process.
@@ -187,10 +187,10 @@ postProcessPartitioningForWells(std::vector<int>& parts,
 /// \return Vector of pairs of well name and a boolean indicating whether the
 ///         well with this name perforates cells here. Sorted by well name!
 std::vector<std::pair<std::string,bool>>
-computeParallelWells(const std::vector<std::vector<int> >& wells_on_proc,
+computeParallelWells(const std::vector<std::vector<long long> >& wells_on_proc,
                      const std::vector<OpmWellType>&  wells,
                      const Communication<MPI_Comm>& cc,
-                     int root);
+                     long long root);
 #endif
 } // end namespace cpgrid
 } // end namespace Dune

@@ -58,15 +58,15 @@ namespace Opm
     ///                    Must be array of length grid.dimensions.
     /// \param[out] v      Interpolated velocity.
     ///                    Must be array of length grid.dimensions.
-    void VelocityInterpolationConstant::interpolate(const int cell,
+    void VelocityInterpolationConstant::interpolate(const long long cell,
                                                     const double* /*x*/,
                                                     double* v) const
     {
-        const int dim = grid_.dimensions;
+        const long long dim = grid_.dimensions;
         std::fill(v, v + dim, 0.0);
         const double* cc = grid_.cell_centroids + cell*dim;
         for (unsigned hface = grid_.cell_facepos[cell]; hface < grid_.cell_facepos[cell+1]; ++hface) {
-            const int face = grid_.cell_faces[hface];
+            const long long face = grid_.cell_faces[hface];
             const double* fc = grid_.face_centroids + face*dim;
             double face_flux = 0.0;
             if (cell == grid_.face_cells[2*face]) {
@@ -75,7 +75,7 @@ namespace Opm
                 assert(cell == grid_.face_cells[2*face + 1]);
                 face_flux = -flux_[face];
             }
-            for (int dd = 0; dd < dim; ++dd) {
+            for (long long dd = 0; dd < dim; ++dd) {
                 v[dd] += face_flux * (fc[dd] - cc[dd]) / grid_.cell_volumes[cell];
             }
         }
@@ -100,24 +100,24 @@ namespace Opm
     {
         // We must now update the velocity member of the CornerInfo
         // for each corner.
-        const int dim = grid_.dimensions;
+        const long long dim = grid_.dimensions;
         std::vector<double> N(dim*dim); // Normals matrix. Fortran ordering!
         std::vector<double> orig_N(dim*dim); // Normals matrix. Fortran ordering!
         std::vector<double> f(dim);     // Flux vector.
         std::vector<double> orig_f(dim);     // Flux vector.
         std::vector<MAT_SIZE_T> piv(dim); // For LAPACK solve
         const SparseTable<WachspressCoord::CornerInfo>& all_ci = bcmethod_.cornerInfo();
-        const std::vector<int>& adj_faces = bcmethod_.adjacentFaces();
+        const std::vector<long long>& adj_faces = bcmethod_.adjacentFaces();
         corner_velocity_.resize(dim*all_ci.dataSize());
-        const int num_cells = grid_.number_of_cells;
-        for (int cell = 0; cell < num_cells; ++cell) {
-            const int num_cell_corners = bcmethod_.numCorners(cell);
-            for (int cell_corner = 0; cell_corner < num_cell_corners; ++cell_corner) {
-                const int cid = all_ci[cell][cell_corner].corner_id;
-                for (int adj_ix = 0; adj_ix < dim; ++adj_ix) {
-                    const int face = adj_faces[dim*cid + adj_ix];
+        const long long num_cells = grid_.number_of_cells;
+        for (long long cell = 0; cell < num_cells; ++cell) {
+            const long long num_cell_corners = bcmethod_.numCorners(cell);
+            for (long long cell_corner = 0; cell_corner < num_cell_corners; ++cell_corner) {
+                const long long cid = all_ci[cell][cell_corner].corner_id;
+                for (long long adj_ix = 0; adj_ix < dim; ++adj_ix) {
+                    const long long face = adj_faces[dim*cid + adj_ix];
                     const double* fn = grid_.face_normals + dim*face;
-                    for (int dd = 0; dd < dim; ++dd) {
+                    for (long long dd = 0; dd < dim; ++dd) {
                         N[adj_ix + dd*dim] = fn[dd]; // Row adj_ix, column dd
                     }
                     f[adj_ix] = flux[face];
@@ -139,14 +139,14 @@ namespace Opm
                     // Print the local matrix and rhs.
                     std::cerr << "Failed solving single-cell system Nv = f in cell " << cell
                               << " with N = \n";
-                    for (int row = 0; row < n; ++row) {
-                        for (int col = 0; col < n; ++col) {
+                    for (long long row = 0; row < n; ++row) {
+                        for (long long col = 0; col < n; ++col) {
                             std::cerr << "    " << orig_N[row + n*col];
                         }
                         std::cerr << '\n';
                     }
                     std::cerr << "and f = \n";
-                    for (int row = 0; row < n; ++row) {
+                    for (long long row = 0; row < n; ++row) {
                         std::cerr << "    " << orig_f[row] << '\n';
                     }
                     OPM_THROW(std::runtime_error,
@@ -165,19 +165,19 @@ namespace Opm
     ///                    Must be array of length grid.dimensions.
     /// \param[out] v      Interpolated velocity.
     ///                    Must be array of length grid.dimensions.
-    void VelocityInterpolationECVI::interpolate(const int cell,
+    void VelocityInterpolationECVI::interpolate(const long long cell,
                                                 const double* x,
                                                 double* v) const
     {
-        const int n = bcmethod_.numCorners(cell);
-        const int dim = grid_.dimensions;
+        const long long n = bcmethod_.numCorners(cell);
+        const long long dim = grid_.dimensions;
         bary_coord_.resize(n);
         bcmethod_.cartToBary(cell, x, &bary_coord_[0]);
         std::fill(v, v + dim, 0.0);
         const SparseTable<WachspressCoord::CornerInfo>& all_ci = bcmethod_.cornerInfo();
-        for (int i = 0; i < n; ++i) {
-            const int cid = all_ci[cell][i].corner_id;
-            for (int dd = 0; dd < dim; ++dd) {
+        for (long long i = 0; i < n; ++i) {
+            const long long cid = all_ci[cell][i].corner_id;
+            for (long long dd = 0; dd < dim; ++dd) {
                 v[dd] += corner_velocity_[dim*cid + dd] * bary_coord_[i];
             }
         }

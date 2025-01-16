@@ -13,21 +13,21 @@ namespace Opm
 {
 namespace UgGridHelpers
 {
-int dimensions(const Dune::CpGrid&);
+long long dimensions(const Dune::CpGrid&);
 
-double faceArea(const Dune::CpGrid&, int);
+double faceArea(const Dune::CpGrid&, long long);
 }
 }
 
 namespace
 {
-inline const double* multiplyFaceNormalWithArea(const Dune::CpGrid& grid, int face_index, const double* in)
+inline const double* multiplyFaceNormalWithArea(const Dune::CpGrid& grid, long long face_index, const double* in)
 {
-    int d=Opm::UgGridHelpers::dimensions(grid);
+    long long d=Opm::UgGridHelpers::dimensions(grid);
     double* out=new double[d];
     double area=Opm::UgGridHelpers::faceArea(grid, face_index);
     
-    for(int i=0;i<d;++i)
+    for(long long i=0;i<d;++i)
         out[i]=in[i]*area;
     return out;
 }
@@ -37,7 +37,7 @@ inline void maybeFreeFaceNormal(const Dune::CpGrid&, const double* array)
     delete[] array;
 }
 
-inline const double* multiplyFaceNormalWithArea(const UnstructuredGrid&, int, const double* in)
+inline const double* multiplyFaceNormalWithArea(const UnstructuredGrid&, long long, const double* in)
 {
     return in;
 }
@@ -55,7 +55,7 @@ tpfa_htrans_compute(const Grid* G, const double *perm, double *htrans)
 /* ---------------------------------------------------------------------- */
 {
     using namespace Opm::UgGridHelpers;
-    int    d, j;
+    long long    d, j;
     double s, dist, denom;
 
     double Kn[3];
@@ -75,7 +75,7 @@ tpfa_htrans_compute(const Grid* G, const double *perm, double *htrans)
     incx  = incy     = 1      ;
     a1    = 1.0;  a2 = 0.0    ;
 
-    for (int c =0, i = 0; c < numCells(*G); c++) {
+    for (long long c =0, i = 0; c < numCells(*G); c++) {
         K  = perm + (c * d * d);
         
         typedef typename Cell2FacesTraits<Grid>::Type::row_type FaceRow;
@@ -118,13 +118,13 @@ tpfa_trans_compute(const Grid* G, const double *htrans, double *trans)
 {
     using namespace Opm::UgGridHelpers;
 
-    for (int f = 0; f < numFaces(*G); f++) {
+    for (long long f = 0; f < numFaces(*G); f++) {
         trans[f] = 0.0;
     }
 
     typename Cell2FacesTraits<Grid>::Type c2f = cell2Faces(*G);
 
-    for (int c = 0, i = 0; c < numCells(*G); c++) {
+    for (long long c = 0, i = 0; c < numCells(*G); c++) {
         typedef typename Cell2FacesTraits<Grid>::Type::row_type FaceRow;
         FaceRow faces = c2f[c];
         
@@ -135,7 +135,7 @@ tpfa_trans_compute(const Grid* G, const double *htrans, double *trans)
         }
     }
 
-    for (int f = 0; f < numFaces(*G); f++) {
+    for (long long f = 0; f < numFaces(*G); f++) {
         trans[f] = 1.0 / trans[f];
     }
 }
@@ -152,13 +152,13 @@ tpfa_eff_trans_compute(const Grid*        G,
 {
     using namespace Opm::UgGridHelpers;
 
-    for (int f = 0; f < numFaces(*G); f++) {
+    for (long long f = 0; f < numFaces(*G); f++) {
         trans[f] = 0.0;
     }
 
     typename Cell2FacesTraits<Grid>::Type c2f = cell2Faces(*G);
 
-    for (int c = 0, i = 0; c < numCells(*G); c++) {
+    for (long long c = 0, i = 0; c < numCells(*G); c++) {
         typedef typename Cell2FacesTraits<Grid>::Type::row_type FaceRow;
         FaceRow faces = c2f[c];
         
@@ -169,7 +169,7 @@ tpfa_eff_trans_compute(const Grid*        G,
         }
     }
 
-             for (int f = 0; f < numFaces(*G); f++) {
+             for (long long f = 0; f < numFaces(*G); f++) {
         trans[f] = 1.0 / trans[f];
     }
 }

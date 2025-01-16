@@ -28,7 +28,7 @@ namespace Dune
   public:
     //! Constructor filling the container with values using the default constructor
     //! Depending on the implementation this could be achieved without allocating memory
-    PersistentContainer ( const GridType &grid, const int codim, const Data& data = Data(), const Allocator &allocator = Allocator() )
+    PersistentContainer ( const GridType &grid, const long long codim, const Data& data = Data(), const Allocator &allocator = Allocator() )
     : BaseType( grid.leafIndexSet(), codim, data, allocator )
     {}
   };

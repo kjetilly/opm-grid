@@ -11,7 +11,7 @@
 #include <dune/common/fvector.hh>
 
 // the initial condition c0
-template<int dimworld, class ct>
+template<long long dimworld, class ct>
 double c0 (const Dune::FieldVector<ct,dimworld>& x)
 {
   if (x.two_norm()>0.125 && x.two_norm()<0.5)
@@ -21,7 +21,7 @@ double c0 (const Dune::FieldVector<ct,dimworld>& x)
 }
 
 // the boundary condition b on inflow boundary
-template<int dimworld, class ct>
+template<long long dimworld, class ct>
 double b (const Dune::FieldVector<ct,dimworld>& x, double t)
 {
   return 0.0;
@@ -32,7 +32,7 @@ double b (const Dune::FieldVector<ct,dimworld>& x, double t)
 }
 
 // the vector field u is returned in r
-template<int dimworld, class ct>
+template<long long dimworld, class ct>
 Dune::FieldVector<double,dimworld> u (const Dune::FieldVector<ct,dimworld>& /*x*/, double /*t*/)
 {
   Dune::FieldVector<double,dimworld> r(1.0);

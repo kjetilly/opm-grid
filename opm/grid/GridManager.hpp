@@ -59,16 +59,16 @@ class EclipseGrid;
 #endif
 
         /// Construct a 2d cartesian grid with cells of unit size.
-        GridManager(int nx, int ny);
+        GridManager(long long nx, long long ny);
 
         /// Construct a 2d cartesian grid with cells of size [dx, dy].
-        GridManager(int nx, int ny, double dx, double dy);
+        GridManager(long long nx, long long ny, double dx, double dy);
 
         /// Construct a 3d cartesian grid with cells of unit size.
-        GridManager(int nx, int ny, int nz);
+        GridManager(long long nx, long long ny, long long nz);
 
         /// Construct a 3d cartesian grid with cells of size [dx, dy, dz].
-        GridManager(int nx, int ny, int nz,
+        GridManager(long long nx, long long ny, long long nz,
                     double dx, double dy, double dz);
 
         /// Construct a grid from an input file.

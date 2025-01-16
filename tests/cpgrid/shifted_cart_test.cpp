@@ -31,31 +31,31 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
 };
 
 BOOST_GLOBAL_FIXTURE(Fixture);
-void createAndTestShiftCartGrid(std::array<int, 3> shift)
+void createAndTestShiftCartGrid(std::array<long long, 3> shift)
 {
     Dune::CpGrid grid;
     std::array<double,3> cell_size = {1.0, 0.1, .5};
-    std::array<int,3> cell_dims = {5, 8, 3};
+    std::array<long long,3> cell_dims = {5, 8, 3};
     grid.createCartesian(cell_dims, cell_size, shift);
 
     for(const auto& cell: elements(grid.leafGridView()))
     {
-        std::array<int, 3> ijk, low{0, 0, 0}, high{cell_dims[0] - 1, cell_dims[1] - 1, cell_dims[2] -1};
+        std::array<long long, 3> ijk, low{0, 0, 0}, high{cell_dims[0] - 1, cell_dims[1] - 1, cell_dims[2] -1};
         grid.getIJK(cell.index(), ijk);
         if (ijk == low)
         {

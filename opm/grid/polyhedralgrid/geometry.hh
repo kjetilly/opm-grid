@@ -19,21 +19,21 @@ namespace Dune
   // Internal Forward Declarations
   // -----------------------------
 
-  template< int, int, class > class PolyhedralGridGeometry;
-  template< int, int, class > class PolyhedralGridLocalGeometry;
+  template< long long, long long, class > class PolyhedralGridGeometry;
+  template< long long, long long, class > class PolyhedralGridLocalGeometry;
 
   // PolyhedralGridBasicGeometry
   // -------------------
 
-  template< int mydim, int cdim, class Grid >
+  template< long long mydim, long long cdim, class Grid >
   struct PolyhedralGridBasicGeometry
   {
-    static const int dimension = Grid::dimension;
-    static const int mydimension = mydim;
-    static const int codimension = dimension - mydimension;
+    static const long long dimension = Grid::dimension;
+    static const long long mydimension = mydim;
+    static const long long codimension = dimension - mydimension;
 
-    static const int dimensionworld = Grid::dimensionworld;
-    static const int coorddimension = dimensionworld;
+    static const long long dimensionworld = Grid::dimensionworld;
+    static const long long coorddimension = dimensionworld;
 
     typedef typename Grid::ctype ctype;
     typedef Dune::FieldVector< ctype, coorddimension > GlobalCoordinate;
@@ -52,8 +52,8 @@ namespace Dune
           : public Dune::ForwardIteratorFacade< Iterator, GlobalCoordinate, GlobalCoordinate >
         {
           const Storage* data_;
-          int count_;
-          explicit Iterator( const Storage* ptr, int count ) : data_( ptr ), count_( count ) {}
+          long long count_;
+          explicit Iterator( const Storage* ptr, long long count ) : data_( ptr ), count_( count ) {}
 
           GlobalCoordinate dereference() const { return data_->corner( count_ ); }
           void increment() { ++count_; }
@@ -76,13 +76,13 @@ namespace Dune
         ExtraData data() const { return data_; }
         bool isValid () const { return seed_.isValid(); }
 
-        GlobalCoordinate operator [] (const int i) const { return corner( i ); }
+        GlobalCoordinate operator [] (const long long i) const { return corner( i ); }
 
         Iterator begin() const { return Iterator(this, 0); }
         Iterator end ()  const { return Iterator(this, corners()); }
 
-        int corners () const { return data()->corners( seed_ ); }
-        GlobalCoordinate corner ( const int i ) const { return data()->corner( seed_, i ); }
+        long long corners () const { return data()->corners( seed_ ); }
+        GlobalCoordinate corner ( const long long i ) const { return data()->corner( seed_, i ); }
         GlobalCoordinate center () const { return data()->centroids( seed_ ); }
 
         ctype volume() const { return data()->volumes( seed_ ); }
@@ -90,7 +90,7 @@ namespace Dune
         const EntitySeed& seed () const { return seed_; }
       };
 
-      template <int mdim, int cordim>
+      template <long long mdim, long long cordim>
       struct CornerStorage
       {
         typedef Storage Type;
@@ -135,8 +135,8 @@ namespace Dune
     GeometryType type () const { return data()->geometryType( storage_.seed() ); }
     bool affine () const { return (geometryImpl_) ? geometryImpl_->affine() : false; }
 
-    int corners () const { return storage_.corners(); }
-    GlobalCoordinate corner ( const int i ) const { return storage_.corner( i ); }
+    long long corners () const { return storage_.corners(); }
+    GlobalCoordinate corner ( const long long i ) const { return storage_.corner( i ); }
     GlobalCoordinate center () const
     {
       if( type().isNone() )
@@ -239,7 +239,7 @@ namespace Dune
   // PolyhedralGridGeometry
   // --------------
 
-  template< int mydim, int cdim, class Grid >
+  template< long long mydim, long long cdim, class Grid >
   class PolyhedralGridGeometry
   : public PolyhedralGridBasicGeometry< mydim, cdim, Grid >
   {
@@ -258,7 +258,7 @@ namespace Dune
     {}
   };
 
-  template< int mydim, int cdim, class Grid >
+  template< long long mydim, long long cdim, class Grid >
   class PolyhedralGridLocalGeometry
   : public PolyhedralGridBasicGeometry< mydim, cdim, Grid >
   {

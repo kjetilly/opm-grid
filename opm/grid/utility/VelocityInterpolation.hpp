@@ -44,7 +44,7 @@ namespace Opm
         ///                    Must be array of length grid.dimensions.
         /// \param[out] v      Interpolated velocity.
         ///                    Must be array of length grid.dimensions.
-        virtual void interpolate(const int cell,
+        virtual void interpolate(const long long cell,
                                  const double* x,
                                  double* v) const = 0;
     };
@@ -71,7 +71,7 @@ namespace Opm
         ///                    Must be array of length grid.dimensions.
         /// \param[out] v      Interpolated velocity.
         ///                    Must be array of length grid.dimensions.
-        virtual void interpolate(const int cell,
+        virtual void interpolate(const long long cell,
                                  const double* x,
                                  double* v) const;
     private:
@@ -104,7 +104,7 @@ namespace Opm
         ///                    Must be array of length grid.dimensions.
         /// \param[out] v      Interpolated velocity.
         ///                    Must be array of length grid.dimensions.
-        virtual void interpolate(const int cell,
+        virtual void interpolate(const long long cell,
                                  const double* x,
                                  double* v) const;
     private:

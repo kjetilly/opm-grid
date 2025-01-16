@@ -255,7 +255,7 @@ GRIDPARAMETER\n \
 closure none\n \
 #";
 
-int main(int argc, char** argv )
+long long main(long long argc, char** argv )
 {
     // initialize MPI
     Dune::MPIHelper::instance( argc, argv );

@@ -34,7 +34,7 @@ namespace Dune {
 
 namespace Dune {
     namespace cpgrid {
-        using OpmWellType = int;
+        using OpmWellType = long long;
     }
 }
 

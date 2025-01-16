@@ -43,15 +43,15 @@ namespace
         }
         template <class Func>
         double interpolate(const Func& f,
-                           const int cell,
+                           const long long cell,
                            const std::vector<double>& x) const
         {
-            const int ncor = bcmethod_.numCorners(cell);
+            const long long ncor = bcmethod_.numCorners(cell);
             bary_coord_.resize(ncor);
             bcmethod_.cartToBary(cell, &x[0], &bary_coord_[0]);
             double val = 0.0;
-            for (int cor = 0; cor < ncor; ++cor) {
-                const int vertex = bcmethod_.cornerInfo()[cell][cor].vertex;
+            for (long long cor = 0; cor < ncor; ++cor) {
+                const long long vertex = bcmethod_.cornerInfo()[cell][cor].vertex;
                 const double vval = f(grid_.node_coordinates + grid_.dimensions*vertex);
                 val += vval*bary_coord_[cor];
             }
@@ -110,11 +110,11 @@ namespace
     // Face numbering goes xmin, xmax, ymin, ymax, bottom.
     namespace Pyramid
     {
-        static int face_nodes[]   = { 0, 4, 2,    3, 4, 1,    0, 1, 4,    4, 3, 2,    0, 2, 3, 1,       };
-        static int face_nodepos[] = { 0,          3,          6,          9,          12,            16 };
-        static int face_cells[]   = { 0, -1,      0, -1,      0, -1,      0, -1,      0, -1             };
-        static int cell_faces[]   = { 0, 1, 2, 3, 4 };
-        static int cell_facepos[] = { 0, 5 };
+        static long long face_nodes[]   = { 0, 4, 2,    3, 4, 1,    0, 1, 4,    4, 3, 2,    0, 2, 3, 1,       };
+        static long long face_nodepos[] = { 0,          3,          6,          9,          12,            16 };
+        static long long face_cells[]   = { 0, -1,      0, -1,      0, -1,      0, -1,      0, -1             };
+        static long long cell_faces[]   = { 0, 1, 2, 3, 4 };
+        static long long cell_facepos[] = { 0, 5 };
         static double node_coordinates[] = { 0.0, 0.0, 0.0,   1.0, 0.0, 0.0,   0.0, 1.0, 0.0,   1.0, 1.0, 0.0,   0.0, 0.0, 1.0 };
         static double face_centroids[]   = { 0,       1.0/3.0, 1.0/3.0,
                                              2.0/3.0, 1.0/3.0, 1.0/3.0,
@@ -194,11 +194,11 @@ namespace
     // Data for an irregular 2d polygon.
     namespace Irreg2d
     {
-        static int face_nodes[]   = { 0, 1,    1, 2,    2, 3,    3, 4,    4, 0        };
-        static int face_nodepos[] = { 0,       2,       4,       6,       8,       10 };
-        static int face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1       };
-        static int cell_faces[]   = { 0, 1, 2, 3, 4 };
-        static int cell_facepos[] = { 0, 5 };
+        static long long face_nodes[]   = { 0, 1,    1, 2,    2, 3,    3, 4,    4, 0        };
+        static long long face_nodepos[] = { 0,       2,       4,       6,       8,       10 };
+        static long long face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1       };
+        static long long cell_faces[]   = { 0, 1, 2, 3, 4 };
+        static long long cell_facepos[] = { 0, 5 };
         static double node_coordinates[] = { 0, 0,    3, 0,    3, 2,    1, 3,    0, 2 };
         static double face_centroids[]   = { 1.5, 0,    3, 1,    2, 2.5,    0.5, 2.5,    0, 1 };
         static double face_areas[] = { 3, 2, std::sqrt(5.0), std::sqrt(2.0), 2 };
@@ -265,11 +265,11 @@ namespace
     // Data for an irregular 3d prism.
     namespace IrregPrism
     {
-        static int face_nodes[]   = { 0, 4, 2, 1, 3, 5, 0, 1, 5, 4, 2, 4, 5, 3, 2, 3, 0, 1};
-        static int face_nodepos[] = { 0, 3, 6, 10, 14, 18 };
-        static int face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1 };
-        static int cell_faces[]   = { 0, 1, 2, 3, 4 };
-        static int cell_facepos[] = { 0, 5 };
+        static long long face_nodes[]   = { 0, 4, 2, 1, 3, 5, 0, 1, 5, 4, 2, 4, 5, 3, 2, 3, 0, 1};
+        static long long face_nodepos[] = { 0, 3, 6, 10, 14, 18 };
+        static long long face_cells[]   = { 0, -1,   0, -1,   0, -1,   0, -1,   0, -1 };
+        static long long cell_faces[]   = { 0, 1, 2, 3, 4 };
+        static long long cell_facepos[] = { 0, 5 };
         static double node_coordinates[] = { 0, 0, 0,
                                              2, 0, 0,
                                              0, 1, 0,

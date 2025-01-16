@@ -41,7 +41,7 @@ namespace
     class Integrator
     {
     public:
-        explicit Integrator(const UnstructuredGrid& grid, const int entity, const int degree)
+        explicit Integrator(const UnstructuredGrid& grid, const long long entity, const long long degree)
             : quad_(grid, entity, degree),
               pt(grid.dimensions)
         {
@@ -50,7 +50,7 @@ namespace
         double integrate(const Func& f) const
         {
             double res = 0;
-            for (int quad_pt = 0; quad_pt < quad_.numQuadPts(); ++quad_pt) {
+            for (long long quad_pt = 0; quad_pt < quad_.numQuadPts(); ++quad_pt) {
                 quad_.quadPtCoord(quad_pt, &pt[0]);
                 const double w = quad_.quadPtWeight(quad_pt);
                 const double fval = f(&pt[0]);
@@ -66,8 +66,8 @@ namespace
 
     template <class Quadrature, class Func>
     void testSingleCase(const UnstructuredGrid& grid,
-                        const int entity,
-                        const int degree,
+                        const long long entity,
+                        const long long degree,
                         const double expected_answer)
     {
         Integrator<Quadrature> integrator(grid, entity, degree);

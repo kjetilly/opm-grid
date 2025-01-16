@@ -90,33 +90,33 @@ class IndexSet;
 class IdSet;
 class LevelGlobalIdSet;
 class PartitionTypeIndicator;
-template<int,int> class Geometry;
-template<int> class Entity;
-template<int> class EntityRep;
+template<long long,long long> class Geometry;
+template<long long> class Entity;
+template<long long> class EntityRep;
 }
 }
 
 
 void markAndAdapt_check(Dune::CpGrid&,
-                        const std::array<int,3>&,
-                        const std::vector<int>&,
+                        const std::array<long long,3>&,
+                        const std::vector<long long>&,
                         Dune::CpGrid&,
                         bool,
                         bool,
                         bool);
 
 void refine_and_check(const Dune::cpgrid::Geometry<3, 3>&,
-                      const std::array<int, 3>&,
+                      const std::array<long long, 3>&,
                       bool);
 
-void refinePatch_and_check(const std::array<int,3>&,
-                           const std::array<int,3>&,
-                           const std::array<int,3>&);
+void refinePatch_and_check(const std::array<long long,3>&,
+                           const std::array<long long,3>&,
+                           const std::array<long long,3>&);
 
 void refinePatch_and_check(Dune::CpGrid&,
-                           const std::vector<std::array<int,3>>&,
-                           const std::vector<std::array<int,3>>&,
-                           const std::vector<std::array<int,3>>&,
+                           const std::vector<std::array<long long,3>>&,
+                           const std::vector<std::array<long long,3>>&,
+                           const std::vector<std::array<long long,3>>&,
                            const std::vector<std::string>&);
 
 void check_global_refine(const Dune::CpGrid&,
@@ -125,9 +125,9 @@ void check_global_refine(const Dune::CpGrid&,
 void fieldProp_check(const Dune::CpGrid& grid, Opm::EclipseGrid eclGrid, const std::string& deck_string);
 
 void testInactiveCellsLgrs(const std::string&,
-                           const std::vector<std::array<int,3>>&,
-                           const std::vector<std::array<int,3>>&,
-                           const std::vector<std::array<int,3>>&,
+                           const std::vector<std::array<long long,3>>&,
+                           const std::vector<std::array<long long,3>>&,
+                           const std::vector<std::array<long long,3>>&,
                            const std::vector<std::string>&);
 
 namespace Dune
@@ -136,7 +136,7 @@ namespace cpgrid
 {
 namespace mover
 {
-template<class T, int i> struct Mover;
+template<class T, long long i> struct Mover;
 }
 
 /**
@@ -145,7 +145,7 @@ template<class T, int i> struct Mover;
  */
 class CpGridData
 {
-    template<class T, int i> friend struct mover::Mover;
+    template<class T, long long i> friend struct mover::Mover;
     friend class GlobalIdSet;
     friend class HierarchicIterator;
     friend class Dune::cpgrid::IndexSet;
@@ -154,8 +154,8 @@ class CpGridData
 
     friend
     void ::markAndAdapt_check(Dune::CpGrid&,
-                              const std::array<int,3>&,
-                              const std::vector<int>&,
+                              const std::array<long long,3>&,
+                              const std::vector<long long>&,
                               Dune::CpGrid&,
                               bool,
                               bool,
@@ -163,18 +163,18 @@ class CpGridData
 
     friend
     void ::refine_and_check(const Dune::cpgrid::Geometry<3, 3>&,
-                            const std::array<int, 3>&,
+                            const std::array<long long, 3>&,
                             bool);
     friend
-    void ::refinePatch_and_check(const std::array<int,3>&,
-                                 const std::array<int,3>&,
-                                 const std::array<int,3>&);
+    void ::refinePatch_and_check(const std::array<long long,3>&,
+                                 const std::array<long long,3>&,
+                                 const std::array<long long,3>&);
 
     friend
     void ::refinePatch_and_check(Dune::CpGrid&,
-                                 const std::vector<std::array<int,3>>&,
-                                 const std::vector<std::array<int,3>>&,
-                                 const std::vector<std::array<int,3>>&,
+                                 const std::vector<std::array<long long,3>>&,
+                                 const std::vector<std::array<long long,3>>&,
+                                 const std::vector<std::array<long long,3>>&,
                                  const std::vector<std::string>&);
 
     friend
@@ -184,9 +184,9 @@ class CpGridData
     void ::fieldProp_check(const Dune::CpGrid& grid, Opm::EclipseGrid eclGrid, const std::string& deck_string);
     friend
     void ::testInactiveCellsLgrs(const std::string&,
-                                 const std::vector<std::array<int,3>>&,
-                                 const std::vector<std::array<int,3>>&,
-                                 const std::vector<std::array<int,3>>&,
+                                 const std::vector<std::array<long long,3>>&,
+                                 const std::vector<std::array<long long,3>>&,
+                                 const std::vector<std::array<long long,3>>&,
                                  const std::vector<std::string>&);
 
 private:
@@ -227,10 +227,10 @@ public:
     
     
     /// number of leaf entities per codim in this process
-    int size(int codim) const;
+    long long size(long long codim) const;
 
     /// number of leaf entities per geometry type in this process
-    int size (GeometryType type) const
+    long long size (GeometryType type) const
     {
         if (type.isCube()) {
             return size(3 - type.dim());
@@ -292,7 +292,7 @@ public:
 #if HAVE_ECL_INPUT
                               Opm::EclipseState* ecl_state,
 #endif
-                              std::array<std::set<std::pair<int, int>>, 2>& nnc,
+                              std::array<std::set<std::pair<long long, long long>>, 2>& nnc,
                               bool remove_ij_boundary, bool turn_normals, bool pinchActive,
                               double tolerance_unique_points);
 
@@ -303,7 +303,7 @@ public:
     ///    Active cell index.
     ///
     /// @param [out] ijk  Cartesian index triplet
-    void getIJK(int c, std::array<int,3>& ijk) const
+    void getIJK(long long c, std::array<long long,3>& ijk) const
     {
         ijk = getIJK(global_cell_[c], logical_cartesian_size_);
     }
@@ -314,7 +314,7 @@ public:
     /// Note: CpGrid::globalCell() returns current_view_data_-> global_cell_ (current_view_data_ points at
     /// data_.back() or distributed_data_.back(), in general. If the grid has been refined, current_view_data_
     /// points at the "leaf grid view").
-    const std::vector<int>& globalCell() const
+    const std::vector<long long>& globalCell() const
     {
         return  global_cell_;
     }
@@ -325,7 +325,7 @@ public:
     /// @param [in] idx      Integer between 0 and cells_per_dim[0]*cells_per_dim[1]*cells_per_dim[2]-1
     /// @param [in] cells_per_dim
     /// @return Cartesian index triplet.
-    std::array<int,3> getIJK(int idx_in_parent_cell, const std::array<int,3>& cells_per_dim) const
+    std::array<long long,3> getIJK(long long idx_in_parent_cell, const std::array<long long,3>& cells_per_dim) const
     {
         // idx = k*cells_per_dim_[0]*cells_per_dim_[1] + j*cells_per_dim_[0] + i
         // with 0<= i < cells_per_dim_[0], 0<= j < cells_per_dim_[1], 0<= k <cells_per_dim_[2].
@@ -333,7 +333,7 @@ public:
         assert(cells_per_dim[1]);
         assert(cells_per_dim[2]);
 
-        std::array<int,3> ijk = {0,0,0};
+        std::array<long long,3> ijk = {0,0,0};
         ijk[0] = idx_in_parent_cell % cells_per_dim[0]; idx_in_parent_cell /= cells_per_dim[0];
         ijk[1] = idx_in_parent_cell % cells_per_dim[1];
         ijk[2] = idx_in_parent_cell /cells_per_dim[1];
@@ -345,7 +345,7 @@ public:
     /// @param [in]  startIJK_vec  Vector of Cartesian triplet indices where each patch starts.
     /// @param [in]  endIJK_vec    Vector of Cartesian triplet indices where each patch ends.
     ///                            Last cell part of the lgr will be {endIJK_vec[<patch>][0]-1, ... ,endIJK_vec[<patch>][2]-1}.
-    bool disjointPatches(const std::vector<std::array<int,3>>& startIJK_vec, const std::vector<std::array<int,3>>& endIJK_vec) const;
+    bool disjointPatches(const std::vector<std::array<long long,3>>& startIJK_vec, const std::vector<std::array<long long,3>>& endIJK_vec) const;
 
     /// @brief Compute cell indices of selected patches of cells (Cartesian grid required).
     ///
@@ -354,12 +354,12 @@ public:
     ///                            Last cell part of the lgr will be {endIJK_vec[<patch>][0]-1, ... endIJK_vec[<patch>][2]-1}.
     ///
     /// @return allPatches_cells
-    std::vector<int>
-    getPatchesCells(const std::vector<std::array<int,3>>& startIJK_vec, const std::vector<std::array<int,3>>& endIJK_vec) const;
+    std::vector<long long>
+    getPatchesCells(const std::vector<std::array<long long,3>>& startIJK_vec, const std::vector<std::array<long long,3>>& endIJK_vec) const;
 
     /// @brief Check all cells selected for refinement have no NNCs (no neighbor connections).
     ///        Assumption: all grid cells are active.
-    bool hasNNCs(const std::vector<int>& cellIndices) const;
+    bool hasNNCs(const std::vector<long long>& cellIndices) const;
 
     /// @brief Check startIJK and endIJK of each patch of cells to be refined are valid, i.e.
     ///        startIJK and endIJK vectors have the same size and, startIJK < endIJK coordenate by coordenate.
@@ -367,19 +367,19 @@ public:
     /// @param [in]  startIJK_vec       Vector of Cartesian triplet indices where each patch starts.
     /// @param [in]  endIJK_vec         Vector of Cartesian triplet indices where each patch ends.
     ///                                 Last cell part of the lgr will be {endIJK_vec[patch][0]-1, ..., endIJK_vec[patch][2]-1}.
-    void validStartEndIJKs(const std::vector<std::array<int,3>>& startIJK_vec, const std::vector<std::array<int,3>>& endIJK_vec) const;
+    void validStartEndIJKs(const std::vector<std::array<long long,3>>& startIJK_vec, const std::vector<std::array<long long,3>>& endIJK_vec) const;
 
     /// @brief Check that every cell to be refined has cuboid shape.
-    void checkCuboidShape(const std::vector<int>& cellIdx_vec) const;
+    void checkCuboidShape(const std::vector<long long>& cellIdx_vec) const;
 
     /// @brief Determine if a finite amount of patches (of cells) share a face.
     ///
     /// @param [in]  startIJK_vec  Vector of Cartesian triplet indices where each patch starts.
     /// @param [in]  endIJK_vec    Vector of Cartesian triplet indices where each patch ends.
     ///                            Last cell part of the lgr will be {endIJK_vec[<patch>][0]-1, ... ,endIJK_vec[<patch>][2]-1}.
-    bool patchesShareFace(const std::vector<std::array<int,3>>& startIJK_vec, const std::vector<std::array<int,3>>& endIJK_vec) const;
+    bool patchesShareFace(const std::vector<std::array<long long,3>>& startIJK_vec, const std::vector<std::array<long long,3>>& endIJK_vec) const;
 
-    int sharedFaceTag(const std::vector<std::array<int,3>>& startIJK_2Patches, const std::vector<std::array<int,3>>& endIJK_2Patches) const;
+    long long sharedFaceTag(const std::vector<std::array<long long,3>>& startIJK_2Patches, const std::vector<std::array<long long,3>>& endIJK_2Patches) const;
 
     
     /// @brief Mark entity for refinement or coarsening.
@@ -394,12 +394,12 @@ public:
     /// @param [in] element    Entity<0>. Currently, an element from the GLOBAL grid (level zero).
     /// @return true, if marking was succesfull.
     ///         false, if marking was not possible.
-    bool mark(int refCount, const cpgrid::Entity<0>& element);
+    bool mark(long long refCount, const cpgrid::Entity<0>& element);
 
     /// @brief Return refinement mark for entity.
     ///
     /// @return refinement mark (1 refinement, 0 doing nothing, -1 coarsening - not supported yet).
-    int getMark(const cpgrid::Entity<0>& element) const;
+    long long getMark(const cpgrid::Entity<0>& element) const;
 
     /// @brief Set mightVanish flags for elements that will be refined in the next adapt() call
     ///        Need to be called after elements have been marked for refinement.
@@ -427,11 +427,11 @@ private:
     ///         NZ1 == Nz2.
     ///         False if at least two blocks share a face and their subdivions are not compatible. In the example above,
     ///         if NY1 != NY2 or NZ1 != NZ2.
-    bool compatibleSubdivisions(const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                                const std::vector<std::array<int,3>>& startIJK_vec,
-                                const std::vector<std::array<int,3>>& endIJK_vec) const;
+    bool compatibleSubdivisions(const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                                const std::vector<std::array<long long,3>>& startIJK_vec,
+                                const std::vector<std::array<long long,3>>& endIJK_vec) const;
 
-    std::array<Dune::FieldVector<double,3>,8> getReferenceRefinedCorners(int idx_in_parent_cell, const std::array<int,3>& cells_per_dim) const;
+    std::array<Dune::FieldVector<double,3>,8> getReferenceRefinedCorners(long long idx_in_parent_cell, const std::array<long long,3>& cells_per_dim) const;
 
     /// @brief Compute amount of cells in each direction of a patch of cells. (Cartesian grid required).
     ///
@@ -440,7 +440,7 @@ private:
     ///                        Last cell part of the lgr will be {endijk[0]-1, ... endIJK[2]-1}.
     ///
     /// @return patch_dim Patch dimension {#cells in x-direction, #cells in y-direction, #cells in z-direction}.
-    std::array<int,3> getPatchDim(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::array<long long,3> getPatchDim(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief Compute corner indices of a patch of cells (Cartesian grid required).
     ///
@@ -449,7 +449,7 @@ private:
     ///                        Last cell part of the lgr will be {endijk[0]-1, ... endIJK[2]-1}.
     ///
     /// @return patch_corners
-    std::vector<int> getPatchCorners(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::vector<long long> getPatchCorners(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief Compute face indices of a patch of cells (Cartesian grid required).
     ///
@@ -458,7 +458,7 @@ private:
     ///                        Last cell part of the lgr will be {endijk[0]-1, ... endIJK[2]-1}.
     ///
     /// @return patch_faces
-    std::vector<int> getPatchFaces(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::vector<long long> getPatchFaces(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief Compute cell indices of a patch of cells (Cartesian grid required).
     ///
@@ -467,7 +467,7 @@ private:
     ///                        Last cell part of the lgr will be {endIJK[0]-1, ... endIJK[2]-1}.
     ///
     /// @return patch_cells
-    std::vector<int> getPatchCells(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::vector<long long> getPatchCells(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief Compute patch boundary corner indices (Cartesian grid required).
     ///
@@ -476,7 +476,7 @@ private:
     ///                        Last cell part of the lgr will be {endijk[0]-1, ... endIJK[2]-1}.
     ///
     /// @return patch_boundary_corners
-    std::vector<int> getPatchBoundaryCorners(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::vector<long long> getPatchBoundaryCorners(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief Compute patch boundary face indices (Cartesian grid required).
     ///
@@ -485,10 +485,10 @@ private:
     ///                        Last cell part of the lgr will be {endijk[0]-1, ... endIJK[2]-1}.
     ///
     /// @return patch_boundary_faces
-    std::array<std::vector<int>,6> getBoundaryPatchFaces(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::array<std::vector<long long>,6> getBoundaryPatchFaces(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief For selected cell indices, computes the variation in x-,y-, and z-direction, assuming each cell has cubiod shape.
-    std::array<std::vector<double>,3> getWidthsLengthsHeights(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+    std::array<std::vector<double>,3> getWidthsLengthsHeights(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     /// @brief Construct a 'fake cell (Geometry<3,3> object)' out of a patch of cells.(Cartesian grid required).
     ///
@@ -504,10 +504,10 @@ private:
     /// @param [out] allcorners_cellifiedPatch Required to build a Geometry<3,3> object.
     ///
     /// @return 'cellifiedPatchCell'         Geometry<3,3> object.
-    Geometry<3,3> cellifyPatch(const std::array<int,3>& startIJK, const std::array<int,3>& endIJK,
-                               const std::vector<int>& patch_cells, DefaultGeometryPolicy& cellifiedPatch_geometry,
-                               std::array<int,8>& cellifiedPatch_to_point,
-                               std::array<int,8>& allcorners_cellifiedPatch) const;
+    Geometry<3,3> cellifyPatch(const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK,
+                               const std::vector<long long>& patch_cells, DefaultGeometryPolicy& cellifiedPatch_geometry,
+                               std::array<long long,8>& cellifiedPatch_to_point,
+                               std::array<long long,8>& allcorners_cellifiedPatch) const;
 
     // @brief Compute the average of array<double,3>.
     //
@@ -517,7 +517,7 @@ private:
 
 public:
     /// Add doc/or remove method and replace it with better approach
-    int getGridIdx() const {
+    long long getGridIdx() const {
         // Not the nicest way of checking if "this" points at the leaf grid view of a mixed grid (with coarse and refined cells).
         // 1. When the grid has been refined at least onece, level_data_ptr_ ->size() >1. Therefore, there is a chance of "this" pointing at the leaf grid view.
         // 2. Unfortunately, level_ is default initialized by 0. This implies, in particular, that if someone wants to check the value of
@@ -541,7 +541,7 @@ public:
     ///
     /// refineSingleCell() takes a cell and refines it in a chosen amount of cells (per direction); creating the
     /// geometries, topological relations, etc. Stored in a CpGridData object. Additionally, containers for
-    /// parent-to-new-born entities are buil, as well as, new-born-to-parent. Maps(<int,bool>) to detect parent
+    /// parent-to-new-born entities are buil, as well as, new-born-to-parent. Maps(<long long,bool>) to detect parent
     /// faces or cells are also provided. (Cell with 6 faces required).
     ///
     /// @param [in] cells_per_dim                 Number of (refined) cells in each direction that each parent cell should be refined to.
@@ -559,12 +559,12 @@ public:
     ///                                           {parent face/cell index in coarse level, {indices of its children in refined level}}
     /// @return child_to_parent_faces/cells       {child index, parent index}
     std::tuple< const std::shared_ptr<CpGridData>,
-                const std::vector<std::array<int,2>>,                // parent_to_refined_corners(~boundary_old_to_new_corners)
-                const std::vector<std::tuple<int,std::vector<int>>>, // parent_to_children_faces (~boundary_old_to_new_faces)
-                const std::tuple<int, std::vector<int>>,             // parent_to_children_cells
-                const std::vector<std::array<int,2>>,                // child_to_parent_faces
-                const std::vector<std::array<int,2>>>                // child_to_parent_cells
-    refineSingleCell(const std::array<int,3>& cells_per_dim, const int& parent_idx) const;
+                const std::vector<std::array<long long,2>>,                // parent_to_refined_corners(~boundary_old_to_new_corners)
+                const std::vector<std::tuple<long long,std::vector<long long>>>, // parent_to_children_faces (~boundary_old_to_new_faces)
+                const std::tuple<long long, std::vector<long long>>,             // parent_to_children_cells
+                const std::vector<std::array<long long,2>>,                // child_to_parent_faces
+                const std::vector<std::array<long long,2>>>                // child_to_parent_cells
+    refineSingleCell(const std::array<long long,3>& cells_per_dim, const long long& parent_idx) const;
 
     /// @brief Refine a (connected block-shaped) patch of cells. Based on the patch, a Geometry<3,3> object is created and refined.
     ///
@@ -579,21 +579,21 @@ public:
     ///                                            {parent face/cell index in coarse level, {indices of its children in refined level}}
     /// @return child_to_parent_faces/cells        {child index, parent index}
     std::tuple< std::shared_ptr<CpGridData>,
-                const std::vector<std::array<int,2>>,                // boundary_old_to_new_corners
-                const std::vector<std::tuple<int,std::vector<int>>>, // boundary_old_to_new_faces
-                const std::vector<std::tuple<int,std::vector<int>>>, // parent_to_children_faces
-                const std::vector<std::tuple<int,std::vector<int>>>, // parent_to_children_cell
-                const std::vector<std::array<int,2>>,                // child_to_parent_faces
-                const std::vector<std::array<int,2>>>                // child_to_parent_cells
-    refinePatch(const std::array<int,3>& cells_per_dim, const std::array<int,3>& startIJK, const std::array<int,3>& endIJK) const;
+                const std::vector<std::array<long long,2>>,                // boundary_old_to_new_corners
+                const std::vector<std::tuple<long long,std::vector<long long>>>, // boundary_old_to_new_faces
+                const std::vector<std::tuple<long long,std::vector<long long>>>, // parent_to_children_faces
+                const std::vector<std::tuple<long long,std::vector<long long>>>, // parent_to_children_cell
+                const std::vector<std::array<long long,2>>,                // child_to_parent_faces
+                const std::vector<std::array<long long,2>>>                // child_to_parent_cells
+    refinePatch(const std::array<long long,3>& cells_per_dim, const std::array<long long,3>& startIJK, const std::array<long long,3>& endIJK) const;
 
     // @breif Compute center of an entity/element/cell in the Eclipse way:
     //        - Average of the 4 corners of the bottom face.
     //        - Average of the 4 corners of the top face.
     //        Return average of the previous computations.
-    // @param [in]   int   Index of a cell.
+    // @param [in]   long long   Index of a cell.
     // @return            'eclipse centroid'
-    std::array<double,3> computeEclCentroid(const int idx) const;
+    std::array<double,3> computeEclCentroid(const long long idx) const;
 
     // @breif Compute center of an entity/element/cell in the Eclipse way:
     //        - Average of the 4 corners of the bottom face.
@@ -654,7 +654,7 @@ public:
     /// The logical cartesian size of the grid.
     /// This function is not part of the Dune grid interface,
     /// and should be used with caution.
-    const std::array<int, 3>& logicalCartesianSize() const
+    const std::array<long long, 3>& logicalCartesianSize() const
     {
         return logical_cartesian_size_;
     }
@@ -664,7 +664,7 @@ public:
     /// The whole grid must be available on all processors.
     void distributeGlobalGrid(CpGrid& grid,
                               const CpGridData& view_data,
-                              const std::vector<int>& cell_part);
+                              const std::vector<long long>& cell_part);
 
     /// \brief communicate objects for all codims on a given level
     /// \param data The data handle describing the data. Has to adhere to the
@@ -678,7 +678,7 @@ public:
 
     void computePointPartitionType();
 
-    void computeCommunicationInterfaces(int noexistingPoints);
+    void computeCommunicationInterfaces(long long noexistingPoints);
 
     /// \brief The type of the mpi communicator.
     using MPICommunicator = CpGridDataTraits::MPICommunicator ;
@@ -742,7 +742,7 @@ public:
 #endif
 
     /// \brief Get sorted active cell indices of numerical aquifer
-    const std::vector<int>& sortedNumAquiferCells() const
+    const std::vector<long long>& sortedNumAquiferCells() const
     {
         return aquifer_cells_;
     }
@@ -770,7 +770,7 @@ private:
     /// \param distributed_view The view of the distributed grid.
     /// \tparam DataHandle The type of the data handle used.
     /// \tparam codim The codimension
-    template<int codim, class DataHandle>
+    template<long long codim, class DataHandle>
     void gatherCodimData(DataHandle& data, CpGridData* global_data,
                          CpGridData* distributed_data);
 
@@ -792,7 +792,7 @@ private:
     /// \param distributed_view The view of the distributed grid.
     /// \tparam DataHandle The type of the data handle used.
     /// \tparam codim The codimension.
-    template<int codim, class DataHandle>
+    template<long long codim, class DataHandle>
     void scatterCodimData(DataHandle& data, CpGridData* global_data,
                           CpGridData* distributed_data);
 
@@ -804,7 +804,7 @@ private:
     ///  and gathering the data.
     /// \param dir The direction of the communication.
     /// \param interface The information about the communication interface
-    template<int codim, class DataHandle>
+    template<long long codim, class DataHandle>
     void communicateCodim(Entity2IndexDataHandle<DataHandle, codim>& data, CommunicationDirection dir,
                           const Interface& interface);
 
@@ -816,7 +816,7 @@ private:
     ///  and gathering the data.
     /// \param dir The direction of the communication.
     /// \param interface The information about the communication interface
-    template<int codim, class DataHandle>
+    template<long long codim, class DataHandle>
     void communicateCodim(Entity2IndexDataHandle<DataHandle, codim>& data, CommunicationDirection dir,
                           const InterfaceMap& interface);
 
@@ -824,12 +824,12 @@ private:
 
     void computeGeometry(CpGrid& grid,
                          const DefaultGeometryPolicy&  globalGeometry,
-                         const std::vector<int>& globalAquiferCells,
+                         const std::vector<long long>& globalAquiferCells,
                          const OrientedEntityTable<0, 1>& globalCell2Faces,
                          DefaultGeometryPolicy& geometry,
-                         std::vector<int>& aquiferCells,
+                         std::vector<long long>& aquiferCells,
                          const OrientedEntityTable<0, 1>& cell2Faces,
-                         const std::vector< std::array<int,8> >& cell2Points);
+                         const std::vector< std::array<long long,8> >& cell2Points);
 
     // Representing the topology
     /** @brief Container for lookup of the faces attached to each cell. */
@@ -839,27 +839,27 @@ private:
      *
      * All faces have two neighbours except for those at the domain boundary.
      * @warn  Note that along the front partition there are invalid neighbours
-     * marked with index std::numeric_limits<int>::max()
+     * marked with index std::numeric_limits<long long>::max()
      */
     cpgrid::OrientedEntityTable<1, 0> face_to_cell_;
     /** @brief Container for the lookup of the points for each face. */
-    Opm::SparseTable<int>             face_to_point_;
+    Opm::SparseTable<long long>             face_to_point_;
     /** @brief Vector that contains an arrays of the points of each cell*/
-    std::vector< std::array<int,8> >       cell_to_point_;
+    std::vector< std::array<long long,8> >       cell_to_point_;
     /** @brief The size of the underlying logical cartesian grid.
      *
      * In a Eclipse a cornerpoint grid has the same number of cells
      * in each pillar. Note that of these some may have no volume
      * and this be inactive.
      */
-    std::array<int, 3>                logical_cartesian_size_{};
+    std::array<long long, 3>                logical_cartesian_size_{};
     /** @brief vector with the gobal cell index for each cell.
      *
      * Note the size of this container is determined by the
      * the number of cells present on the process and the content
      * by the mapping to the underlying global cartesian mesh..
      */
-    std::vector<int>                  global_cell_;
+    std::vector<long long>                  global_cell_;
     /** @brief The tag of the faces. */
     cpgrid::EntityVariable<enum face_tag, 1> face_tag_;
     /** @brief The geometries representing the grid. */
@@ -869,7 +869,7 @@ private:
     /** @brief The face normals of the grid. */
     cpgrid::SignedEntityVariable<PointType, 1> face_normals_;
     /** @brief The boundary ids. */
-    cpgrid::EntityVariable<int, 1> unique_boundary_ids_;
+    cpgrid::EntityVariable<long long, 1> unique_boundary_ids_;
     /** @brief The index set of the grid (level). */
     std::unique_ptr<cpgrid::IndexSet> index_set_;
     /** @brief The internal local id set (not exported). */
@@ -879,29 +879,29 @@ private:
     /** @brief The indicator of the partition type of the entities */
     std::shared_ptr<PartitionTypeIndicator> partition_type_indicator_;
     /** Mark elements to be refined **/
-    std::vector<int> mark_;
+    std::vector<long long> mark_;
     /** Level of the current CpGridData (0 when it's "GLOBAL", 1,2,.. for LGRs). */
-    int level_{0};
+    long long level_{0};
     /** Copy of (CpGrid object).data_ associated with the CpGridData object. */
     std::vector<std::shared_ptr<CpGridData>>* level_data_ptr_;
     // SUITABLE FOR ALL LEVELS EXCEPT FOR LEAFVIEW
     /** Map between level and leafview cell indices. Only cells (from that level) that appear in leafview count. -1 when the cell vanished.*/  
-    std::vector<int> level_to_leaf_cells_; // In entry 'level cell index', we store 'leafview cell index'
+    std::vector<long long> level_to_leaf_cells_; // In entry 'level cell index', we store 'leafview cell index'
     /** Parent cells and their children. Entry is {-1, {}} when cell has no children.*/ // {level LGR, {child0, child1, ...}}
-    std::vector<std::tuple<int,std::vector<int>>> parent_to_children_cells_; 
+    std::vector<std::tuple<long long,std::vector<long long>>> parent_to_children_cells_; 
     /** Amount of children cells per parent cell in each direction. */ // {# children in x-direction, ... y-, ... z-}
-    std::array<int,3> cells_per_dim_;
+    std::array<long long,3> cells_per_dim_;
     // SUITABLE ONLY FOR LEAFVIEW
     /** Relation between leafview and (possible different) level(s) cell indices. */ // {level, cell index in that level}
-    std::vector<std::array<int,2>> leaf_to_level_cells_;
+    std::vector<std::array<long long,2>> leaf_to_level_cells_;
     /** Corner history. corner_history_[ corner index ] = {level where the corner was born, its index there }, {-1,-1} otherwise. */
-    std::vector<std::array<int,2>> corner_history_;
+    std::vector<std::array<long long,2>> corner_history_;
     // SUITABLE FOR ALL LEVELS INCLUDING LEAFVIEW
     /** Child cells and their parents. Entry is {-1,-1} when cell has no father. */ // {level parent cell, parent cell index}
-    std::vector<std::array<int,2>> child_to_parent_cells_;
+    std::vector<std::array<long long,2>> child_to_parent_cells_;
     /** Level-grid or Leaf-grid cell to parent cell and refined-cell-in-parent-cell index (number between zero and total amount
         of children per parent (cells_per_dim[0]_*cells_per_dim_[1]*cells_per_dim_[2])). Entry is -1 when cell has no father. */
-    std::vector<int> cell_to_idxInParentCell_;
+    std::vector<long long> cell_to_idxInParentCell_;
     
 
 
@@ -919,7 +919,7 @@ private:
     std::vector<double> zcorn;
 
     /// \brief Sorted vector of aquifer cell indices.
-    std::vector<int> aquifer_cells_;
+    std::vector<long long> aquifer_cells_;
 
 #if HAVE_MPI
 
@@ -942,15 +942,15 @@ private:
 #endif
 
     // Return the geometry vector corresponding to the given codim.
-    template <int codim>
+    template <long long codim>
     const EntityVariable<Geometry<3 - codim, 3>, codim>& geomVector() const
     {
         return geometry_.geomVector<codim>();
     }
 
     friend class Dune::CpGrid;
-    template<int> friend class Entity;
-    template<int> friend class EntityRep;
+    template<long long> friend class Entity;
+    template<long long> friend class EntityRep;
     friend class Intersection;
     friend class PartitionTypeIndicator;
 };
@@ -987,14 +987,14 @@ T& getInterface(InterfaceType iftype,
 
 } // end unnamed namespace
 
-template<int codim, class DataHandle>
+template<long long codim, class DataHandle>
 void CpGridData::communicateCodim(Entity2IndexDataHandle<DataHandle, codim>& data, CommunicationDirection dir,
                                   const Interface& interface)
 {
     this->template communicateCodim<codim>(data, dir, interface.interfaces());
 }
 
-template<int codim, class DataHandle>
+template<long long codim, class DataHandle>
 void CpGridData::communicateCodim(Entity2IndexDataHandle<DataHandle, codim>& data_wrapper, CommunicationDirection dir,
                                   const InterfaceMap& interface)
 {
@@ -1066,7 +1066,7 @@ private:
     std::vector<T> buffer_;
     typename std::vector<T>::size_type index_;
 };
-template<class DataHandle,int codim>
+template<class DataHandle,long long codim>
 struct Mover
 {
 };
@@ -1126,7 +1126,7 @@ struct Mover<DataHandle,1> : public BaseMover<DataHandle>
         row_type from_faces=table.operator[](from_cell);
         row_type to_faces=scatterView_->cell_to_face_[to_cell];
 
-        for(int i=0; i<from_faces.size(); ++i)
+        for(long long i=0; i<from_faces.size(); ++i)
             this->moveData(from_faces[i], to_faces[i]);
     }
     CpGridData *gatherView_;
@@ -1142,9 +1142,9 @@ struct Mover<DataHandle,3> : public BaseMover<DataHandle>
     {}
     void operator()(std::size_t from_cell_index,std::size_t to_cell_index)
     {
-        const std::array<int,8>& from_cell_points=
+        const std::array<long long,8>& from_cell_points=
             gatherView_->cell_to_point_[from_cell_index];
-        const std::array<int,8>& to_cell_points=
+        const std::array<long long,8>& to_cell_points=
             scatterView_->cell_to_point_[to_cell_index];
         for(std::size_t i=0; i<8; ++i)
         {
@@ -1177,7 +1177,7 @@ void CpGridData::scatterData(DataHandle& data, CpGridData* global_data,
 #endif
 }
 
-template<int codim, class DataHandle>
+template<long long codim, class DataHandle>
 void CpGridData::scatterCodimData(DataHandle& data, CpGridData* global_data,
                           CpGridData* distributed_data)
 {
@@ -1201,7 +1201,7 @@ void CpGridData::scatterCodimData(DataHandle& data, CpGridData* global_data,
 namespace
 {
 
-template<int codim, class T, class F>
+template<long long codim, class T, class F>
 void visitInterior(CpGridData& distributed_data, T begin, T endit, F& func)
 {
     for(T it=begin; it!=endit; ++it)
@@ -1219,8 +1219,8 @@ template<class DataHandle>
 struct GlobalIndexSizeGatherer
 {
     GlobalIndexSizeGatherer(DataHandle& data_,
-                            std::vector<int>& ownedGlobalIndices_,
-                            std::vector<int>& ownedSizes_)
+                            std::vector<long long>& ownedGlobalIndices_,
+                            std::vector<long long>& ownedSizes_)
         : data(data_), ownedGlobalIndices(ownedGlobalIndices_), ownedSizes(ownedSizes_)
     {}
 
@@ -1231,8 +1231,8 @@ struct GlobalIndexSizeGatherer
             ownedSizes.push_back(data.size(entity));
     }
     DataHandle& data;
-    std::vector<int>& ownedGlobalIndices;
-    std::vector<int>& ownedSizes;
+    std::vector<long long>& ownedGlobalIndices;
+    std::vector<long long>& ownedSizes;
 };
 
 template<class DataHandle>
@@ -1266,19 +1266,19 @@ void CpGridData::gatherData(DataHandle& data, CpGridData* global_data,
 #endif
 }
 
-template<int codim, class DataHandle>
+template<long long codim, class DataHandle>
 void CpGridData::gatherCodimData(DataHandle& data, CpGridData* global_data,
                                  CpGridData* distributed_data)
 {
 #if HAVE_MPI
     // Get the mapping to global index from  the global id set
-    const std::vector<int>& mapping =
+    const std::vector<long long>& mapping =
         distributed_data->global_id_set_->getMapping<codim>();
 
     // Get the global indices and data size for the entities whose data is
     // to be sent, i.e. the ones that we own.
-    std::vector<int>         owned_global_indices;
-    std::vector<int> owned_sizes;
+    std::vector<long long>         owned_global_indices;
+    std::vector<long long> owned_sizes;
     owned_global_indices.reserve(mapping.size());
     owned_sizes.reserve(mapping.size());
 
@@ -1286,47 +1286,47 @@ void CpGridData::gatherCodimData(DataHandle& data, CpGridData* global_data,
     visitInterior<codim>(*distributed_data, mapping.begin(), mapping.end(), gisg);
 
     // communicate the number of indices that each processor sends
-    int no_indices=owned_sizes.size();
+    long long no_indices=owned_sizes.size();
     // We will take the address of the first elemet for MPI_Allgather below.
     // Make sure the containers have such an element.
     if ( owned_global_indices.empty() )
         owned_global_indices.resize(1);
     if ( owned_sizes.empty() )
         owned_sizes.resize(1);
-    std::vector<int> no_indices_to_recv(distributed_data->ccobj_.size());
+    std::vector<long long> no_indices_to_recv(distributed_data->ccobj_.size());
     distributed_data->ccobj_.allgather(&no_indices, 1, &(no_indices_to_recv[0]));
     // compute size of the vector capable for receiving all indices
     // and allgather the global indices and the sizes.
     // calculate displacements
-    std::vector<int> displ(distributed_data->ccobj_.size()+1, 0);
+    std::vector<long long> displ(distributed_data->ccobj_.size()+1, 0);
     std::transform(displ.begin(), displ.end()-1, no_indices_to_recv.begin(), displ.begin()+1,
-                   std::plus<int>());
-    int global_size=displ[displ.size()-1];//+no_indices_to_recv[displ.size()-1];
-    std::vector<int>         global_indices(global_size);
-    std::vector<int> global_sizes(global_size);
-    MPI_Allgatherv(&(owned_global_indices[0]), no_indices, MPITraits<int>::getType(),
+                   std::plus<long long>());
+    long long global_size=displ[displ.size()-1];//+no_indices_to_recv[displ.size()-1];
+    std::vector<long long>         global_indices(global_size);
+    std::vector<long long> global_sizes(global_size);
+    MPI_Allgatherv(&(owned_global_indices[0]), no_indices, MPITraits<long long>::getType(),
                    &(global_indices[0]), &(no_indices_to_recv[0]), &(displ[0]),
-                   MPITraits<int>::getType(),
+                   MPITraits<long long>::getType(),
                    distributed_data->ccobj_);
-    MPI_Allgatherv(&(owned_sizes[0]), no_indices, MPITraits<int>::getType(),
+    MPI_Allgatherv(&(owned_sizes[0]), no_indices, MPITraits<long long>::getType(),
                    &(global_sizes[0]), &(no_indices_to_recv[0]), &(displ[0]),
-                   MPITraits<int>::getType(),
+                   MPITraits<long long>::getType(),
                    distributed_data->ccobj_);
-    std::vector<int>().swap(owned_global_indices); // free data for reuse.
+    std::vector<long long>().swap(owned_global_indices); // free data for reuse.
     // Compute the number of data items to send
-    std::vector<int> no_data_send(distributed_data->ccobj_.size());
-    for(typename std::vector<int>::iterator begin=no_data_send.begin(),
+    std::vector<long long> no_data_send(distributed_data->ccobj_.size());
+    for(typename std::vector<long long>::iterator begin=no_data_send.begin(),
             i=begin, end=no_data_send.end(); i!=end; ++i)
         *i = std::accumulate(global_sizes.begin()+displ[i-begin],
                             global_sizes.begin()+displ[i-begin+1], std::size_t());
     // free at least some memory that can be reused.
-    std::vector<int>().swap(owned_sizes);
+    std::vector<long long>().swap(owned_sizes);
     // compute the displacements for receiving with allgatherv
     displ[0]=0;
     std::transform(displ.begin(), displ.end()-1, no_data_send.begin(), displ.begin()+1,
                    std::plus<std::size_t>());
     // Compute the number of data items we will receive
-    int no_data_recv = displ[displ.size()-1];//+global_sizes[displ.size()-1];
+    long long no_data_recv = displ[displ.size()-1];//+global_sizes[displ.size()-1];
 
     // Collect the data to send, gather it
     mover::MoveBuffer<typename DataHandle::DataType> local_data_buffer, global_data_buffer;
@@ -1348,12 +1348,12 @@ void CpGridData::gatherCodimData(DataHandle& data, CpGridData* global_data,
                    MPITraits<typename DataHandle::DataType>::getType(),
                    distributed_data->ccobj_);
     Entity2IndexDataHandle<DataHandle, codim> edata(*global_data, data);
-    int offset=0;
-    for(int i=0; i< codim; ++i)
+    long long offset=0;
+    for(long long i=0; i< codim; ++i)
         offset+=global_data->size(i);
 
-    typename std::vector<int>::const_iterator s=global_sizes.begin();
-    for(typename std::vector<int>::const_iterator i=global_indices.begin(),
+    typename std::vector<long long>::const_iterator s=global_sizes.begin();
+    for(typename std::vector<long long>::const_iterator i=global_indices.begin(),
             end=global_indices.end();
         i!=end; ++s, ++i)
     {

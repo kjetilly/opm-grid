@@ -59,15 +59,15 @@ struct Fixture
 {
     Fixture()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         Dune::MPIHelper::instance(m_argc, m_argv);
         Opm::OpmLog::setupSimpleDefaultLogging();
     }
 
-    static int rank()
+    static long long rank()
     {
-        int m_argc = boost::unit_test::framework::master_test_suite().argc;
+        long long m_argc = boost::unit_test::framework::master_test_suite().argc;
         char** m_argv = boost::unit_test::framework::master_test_suite().argv;
         return Dune::MPIHelper::instance(m_argc, m_argv).rank();
     }
@@ -78,14 +78,14 @@ BOOST_GLOBAL_FIXTURE(Fixture);
 
 
 #define CHECK_COORDINATES(c1, c2)                                       \
-    for (int c = 0; c < 3; c++) {                                       \
+    for (long long c = 0; c < 3; c++) {                                       \
         BOOST_TEST(c1[c] == c2[c], boost::test_tools::tolerance(1e-12)); \
     }
 
 void refinePatch_and_check(Dune::CpGrid& coarse_grid,
-                           const std::vector<std::array<int,3>>& cells_per_dim_vec,
-                           const std::vector<std::array<int,3>>& startIJK_vec,
-                           [[maybe_unused]] const std::vector<std::array<int,3>>& endIJK_vec,
+                           const std::vector<std::array<long long,3>>& cells_per_dim_vec,
+                           const std::vector<std::array<long long,3>>& startIJK_vec,
+                           [[maybe_unused]] const std::vector<std::array<long long,3>>& endIJK_vec,
                            const std::vector<std::string>& lgr_name_vec)
 {
     auto& data = coarse_grid.currentData(); // what data current_view_data_ is pointing at (data_ or distributed_data_)
@@ -94,13 +94,13 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
     BOOST_CHECK( data[0]->child_to_parent_cells_.empty());
     BOOST_CHECK(coarse_grid.getLgrNameToLevel().at("GLOBAL") == 0);
 
-    for (long unsigned int level = 1; level < startIJK_vec.size() +1; ++level) // only 1 when there is only 1 patch
+    for (long size_t level = 1; level < startIJK_vec.size() +1; ++level) // only 1 when there is only 1 patch
     {
         BOOST_CHECK( (*data[level]).parent_to_children_cells_.empty());
-        BOOST_CHECK(coarse_grid.getLgrNameToLevel().at(lgr_name_vec[level-1]) == static_cast<int>(level));
+        BOOST_CHECK(coarse_grid.getLgrNameToLevel().at(lgr_name_vec[level-1]) == static_cast<long long>(level));
 
         // GLOBAL grid
-        for (int cell = 0; cell <  data[0]-> size(0); ++cell)
+        for (long long cell = 0; cell <  data[0]-> size(0); ++cell)
         {
             Dune::cpgrid::Entity<0> entity = Dune::cpgrid::Entity<0>(*data[0], cell, true);
             BOOST_CHECK( entity.hasFather() == false);
@@ -121,7 +121,7 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
             else{
                 BOOST_CHECK(lgr != -1);
                 BOOST_CHECK(childrenList.size() > 1);
-                // Auxiliary int to check amount of children
+                // Auxiliary long long to check amount of children
                 double referenceElemOneParent_volume = 0.;
                 std::array<double,3> referenceElem_entity_center = {0.,0.,0.}; // Expected {.5,.5,.5}
                 for (const auto& child : childrenList) {
@@ -133,12 +133,12 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
                     BOOST_CHECK(childElem.hasFather() == true);
                     BOOST_CHECK(childElem.level() == lgr);
                     referenceElemOneParent_volume += childElem.geometryInFather().volume();
-                    for (int c = 0; c < 3; ++c)  {
+                    for (long long c = 0; c < 3; ++c)  {
                         referenceElem_entity_center[c] += (childElem.geometryInFather().center())[c];
                     }
                 }
                 BOOST_CHECK_EQUAL( entity.isLeaf(), false); // parent cells do not appear in the LeafView
-                // Auxiliary int to check hierarchic iterator functionality
+                // Auxiliary long long to check hierarchic iterator functionality
                 double referenceElemOneParent_volume_it = 0.;
                 std::array<double,3> referenceElem_entity_center_it = {0.,0.,0.}; // Expected {.5,.5,.5}
                 // If it != endIt, then entity.isLeaf() false (when dristibuted_data_ is empty)
@@ -149,12 +149,12 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
                     BOOST_CHECK(it ->hasFather() == true);
                     BOOST_CHECK(it ->level() == lgr);
                     referenceElemOneParent_volume_it += it-> geometryInFather().volume();
-                    for (int c = 0; c < 3; ++c)
+                    for (long long c = 0; c < 3; ++c)
                     {
                         referenceElem_entity_center_it[c] += (it-> geometryInFather().center())[c];
                     }
                 }
-                for (int c = 0; c < 3; ++c)
+                for (long long c = 0; c < 3; ++c)
                 {
                     referenceElem_entity_center[c]
                         /= cells_per_dim_vec[lgr-1][0]*cells_per_dim_vec[lgr-1][1]*cells_per_dim_vec[lgr-1][2];
@@ -183,7 +183,7 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
         }
 
         // LGRs
-        for (int cell = 0; cell <  data[level]-> size(0); ++cell)
+        for (long long cell = 0; cell <  data[level]-> size(0); ++cell)
         {
             Dune::cpgrid::Entity<0> entity = Dune::cpgrid::Entity<0>(*data[level], cell, true);
             BOOST_CHECK( entity.hasFather() == true);
@@ -204,7 +204,7 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
             // Check amount of children cells of the parent cell
             BOOST_CHECK_EQUAL(std::get<1>((*data[0]).parent_to_children_cells_[child_to_parent[1]]).size(),
                               cells_per_dim_vec[level-1][0]*cells_per_dim_vec[level-1][1]*cells_per_dim_vec[level-1][2]);
-            BOOST_CHECK( entity.level() == static_cast<int>(level));
+            BOOST_CHECK( entity.level() == static_cast<long long>(level));
             BOOST_CHECK( entity.isLeaf() == true);
             auto it = entity.hbegin(coarse_grid.maxLevel());
             auto endIt = entity.hend(coarse_grid.maxLevel());
@@ -213,11 +213,11 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
         }
 
         // LeafView faces
-        for (int face = 0; face <  data[startIJK_vec.size()+1]-> face_to_cell_.size(); ++face)
+        for (long long face = 0; face <  data[startIJK_vec.size()+1]-> face_to_cell_.size(); ++face)
         {
             const auto& faceToPoint =  (*data[startIJK_vec.size() +1]).face_to_point_[face];
             BOOST_CHECK(faceToPoint.size() == 4);
-            for (int i = 0; i < 4; ++i) {
+            for (long long i = 0; i < 4; ++i) {
                 BOOST_CHECK((*data[startIJK_vec.size() +1]).face_to_point_[face][i] != -1);
             }
 
@@ -232,15 +232,15 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
         BOOST_CHECK( *itMax < maxCartesianIdx);
 
         // LeafView
-        for (int cell = 0; cell <  data[startIJK_vec.size()+1]-> size(0); ++cell)
+        for (long long cell = 0; cell <  data[startIJK_vec.size()+1]-> size(0); ++cell)
         {
             BOOST_CHECK( data[startIJK_vec.size()+1] -> cell_to_point_[cell].size() == 8);
-            for (int i = 0; i < 8; ++i)
+            for (long long i = 0; i < 8; ++i)
             {
                 BOOST_CHECK( data[startIJK_vec.size()+1] -> cell_to_point_[cell][i] != -1);
             }
             Dune::cpgrid::Entity<0> entity = Dune::cpgrid::Entity<0>(*data[startIJK_vec.size()+1], cell, true);
-            for (int i = 0; i < data[startIJK_vec.size()+1] -> cell_to_face_[entity].size(); ++i)
+            for (long long i = 0; i < data[startIJK_vec.size()+1] -> cell_to_face_[entity].size(); ++i)
             {
                 BOOST_CHECK( data[startIJK_vec.size()+1] -> cell_to_face_[entity][i].index() != -1);
             }
@@ -271,7 +271,7 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
                                   cells_per_dim_vec[entity.level()-1][0]*
                                   cells_per_dim_vec[entity.level()-1][1]*cells_per_dim_vec[entity.level()-1][2]);
                 BOOST_CHECK( entity.father().isLeaf() == false);
-                BOOST_CHECK( (entity.level() > 0) || (entity.level() < static_cast<int>(startIJK_vec.size()) +1));
+                BOOST_CHECK( (entity.level() > 0) || (entity.level() < static_cast<long long>(startIJK_vec.size()) +1));
                 BOOST_CHECK( level_cellIdx[0] == entity.level());
             }
             else{
@@ -291,7 +291,7 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
         }
     } // end-level-for-loop
 
-    BOOST_CHECK( static_cast<int>(startIJK_vec.size()) == coarse_grid.maxLevel());
+    BOOST_CHECK( static_cast<long long>(startIJK_vec.size()) == coarse_grid.maxLevel());
     BOOST_CHECK( (*data[data.size()-1]).parent_to_children_cells_.empty());
 
     auto it_min = std::min_element((data.back() -> global_cell_).begin(),  (data.back()-> global_cell_).end());
@@ -301,7 +301,7 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
     BOOST_CHECK_EQUAL( *it_min, *it_min_level_zero);
     BOOST_CHECK_EQUAL( *it_max, *it_max_level_zero);
 
-    for (long unsigned int l = 0; l < startIJK_vec.size() +1; ++l) // level 0,1,2,... , last patch
+    for (long size_t l = 0; l < startIJK_vec.size() +1; ++l) // level 0,1,2,... , last patch
     {
         const auto& view = coarse_grid.levelGridView(l);
         for (const auto& element: elements(view)){
@@ -309,14 +309,14 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
         }
     }
 
-    std::vector<int> leaf_to_parent_cell; // To store parent cell index, when leaf cell has a parent. Empty entry otherwise.
+    std::vector<long long> leaf_to_parent_cell; // To store parent cell index, when leaf cell has a parent. Empty entry otherwise.
     leaf_to_parent_cell.resize(data[startIJK_vec.size()+1]-> size(0)); // Correct size.
 
     Dune::MultipleCodimMultipleGeomTypeMapper<Dune::CpGrid::LeafGridView> leafMapper(coarse_grid.leafGridView(), Dune::mcmgElementLayout());
     Dune::MultipleCodimMultipleGeomTypeMapper<Dune::CpGrid::LevelGridView> level0Mapper(coarse_grid.levelGridView(0), Dune::mcmgElementLayout());
 
     for (const auto& element: elements(coarse_grid.leafGridView())){
-        BOOST_CHECK( ((element.level() >= 0) || (element.level() < static_cast<int>(startIJK_vec.size()) +1)));
+        BOOST_CHECK( ((element.level() >= 0) || (element.level() < static_cast<long long>(startIJK_vec.size()) +1)));
         if (element.hasFather()) { // leaf_cell has a father!
             leaf_to_parent_cell[leafMapper.index(element)] = level0Mapper.index(element.father());
             const auto& parent_id = data[0]->localIdSet().id(element.father());
@@ -328,8 +328,8 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
     }
 
     // Ids on the leaf grid view (local id and global id coincide ON THE LEAF GRID VIEW, might differ in level grids)
-    std::set<int> allIds_set;
-    std::vector<int> allIds_vec;
+    std::set<long long> allIds_set;
+    std::vector<long long> allIds_vec;
     allIds_vec.reserve(data.back()->size(0) + data.back()->size(3));
     for (const auto& element: elements(coarse_grid.leafGridView())){
         const auto& localId = data.back()->localIdSet().id(element);
@@ -363,8 +363,8 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
 
     for (std::size_t level = 1; level < cells_per_dim_vec.size()+1; ++level) {
         // Check global id is not duplicated for interior cells in each refined level grid.
-        std::vector<int> interior_cell_global_ids;
-        int local_interior_cell_count = 0;
+        std::vector<long long> interior_cell_global_ids;
+        long long local_interior_cell_count = 0;
         interior_cell_global_ids.reserve(data[level]->size(0));
 
         for (const auto& element: elements(coarse_grid.levelGridView(level), Dune::Partitions::interior)){
@@ -374,15 +374,15 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
 
         auto global_level_interior_cell_count = coarse_grid.comm().sum(local_interior_cell_count);
         auto [all_level_interior_cell_global_ids, displ] = Opm::allGatherv(interior_cell_global_ids, coarse_grid.comm());
-        const std::set<int> all_level_interior_cell_global_ids_set(all_level_interior_cell_global_ids.begin(), all_level_interior_cell_global_ids.end());
+        const std::set<long long> all_level_interior_cell_global_ids_set(all_level_interior_cell_global_ids.begin(), all_level_interior_cell_global_ids.end());
         BOOST_CHECK( all_level_interior_cell_global_ids.size() == all_level_interior_cell_global_ids_set.size() );
-        BOOST_CHECK( global_level_interior_cell_count == static_cast<int>(all_level_interior_cell_global_ids_set.size()) );
+        BOOST_CHECK( global_level_interior_cell_count == static_cast<long long>(all_level_interior_cell_global_ids_set.size()) );
     }
 
     // Check global id is not duplicated for interior cells
-    std::vector<int> localInteriorCellIds_vec;
+    std::vector<long long> localInteriorCellIds_vec;
     localInteriorCellIds_vec.reserve(data.back()->size(0)); // more than actually needed since only care about interior cells
-    int local_interior_cells_count = 0;
+    long long local_interior_cells_count = 0;
     for (const auto& element: elements(coarse_grid.leafGridView())) {
         const auto& elemPartitionType = element.getEquivLevelElem().partitionType();
         if ( elemPartitionType == Dune::InteriorEntity) {
@@ -393,8 +393,8 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
     auto global_cells_count  = coarse_grid.comm().sum(local_interior_cells_count);
     auto [allGlobalIds_cells, displ] = Opm::allGatherv(localInteriorCellIds_vec, coarse_grid.comm());
 
-    const std::set<int> allGlobalIds_cells_set(allGlobalIds_cells.begin(), allGlobalIds_cells.end());
-    BOOST_CHECK( static_cast<int>(allGlobalIds_cells.size()) == global_cells_count);
+    const std::set<long long> allGlobalIds_cells_set(allGlobalIds_cells.begin(), allGlobalIds_cells.end());
+    BOOST_CHECK( static_cast<long long>(allGlobalIds_cells.size()) == global_cells_count);
     BOOST_CHECK( allGlobalIds_cells.size() == allGlobalIds_cells_set.size() );
 
     /** [Bug] Uniqueness of point global ids cannot be checked in general since current code sets overlap layer size equal to 1,
@@ -402,10 +402,10 @@ void refinePatch_and_check(Dune::CpGrid& coarse_grid,
         seen by the process. Therefore, depending how the LGRs are distributed, there may be "multiple ids" for the same points.*/
 
     // Local/Global id sets for level grids (level 0, 1, ..., maxLevel). For level grids, local might differ from global id.
-    for (int level = 0; level < coarse_grid.maxLevel() +1; ++level)
+    for (long long level = 0; level < coarse_grid.maxLevel() +1; ++level)
     {
-        std::set<int> levelIds_set;
-        std::vector<int> levelIds_vec;
+        std::set<long long> levelIds_set;
+        std::vector<long long> levelIds_vec;
         levelIds_vec.reserve(data[level]->size(0) + data[level]->size(3));
         for (const auto& element: elements(coarse_grid.levelGridView(level))){
             const auto& localId = data[level]->localIdSet().id(element);
@@ -453,13 +453,13 @@ BOOST_AUTO_TEST_CASE(threeLgrs)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {10,8,8};
+    const std::array<long long, 3> grid_dim = {10,8,8};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> parts(640);
-    for (int k = 0; k < 8; ++k) {
-        for (int j = 0; j < 8; ++j) {
-            for (int i = 0; i < 10; ++i)
+    std::vector<long long> parts(640);
+    for (long long k = 0; k < 8; ++k) {
+        for (long long j = 0; j < 8; ++j) {
+            for (long long i = 0; i < 10; ++i)
             {
                 const auto& elemIdx = (k*80) + (j*10) + i;
                 if (i<5) {
@@ -485,9 +485,9 @@ BOOST_AUTO_TEST_CASE(threeLgrs)
     {
         grid.loadBalance(parts);
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}, {0,0,3}, {3,2,2}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{2,1,2}, {1,1,4}, {4,3,3}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}, {0,0,3}, {3,2,2}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{2,1,2}, {1,1,4}, {4,3,3}};
         const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3"};
         // LGR1 element indices = 0,1,80,81 -> 32 refined cells                       LGR1 dim 4x2x4
         // LGR2 element indices = 240  -> refined into 3x3x3 = 27 cells               LGR2 dim 3x3x3
@@ -501,31 +501,31 @@ BOOST_AUTO_TEST_CASE(threeLgrs)
         // LGR1 dim 4x2x4 -> 5x3x5 = 75 points
         // LGR2 dim 3x3x3 -? 4x4x4 = 64 points
         // LGR3 dim 4x4x4 -> 5x5x5 = 125 points
-        const std::vector<int>& expected_point_ids_per_lgr = { 75, 64, 125};
-        for (int lgr = 1; lgr < 4; ++lgr) {
-            std::vector<int> local_point_ids;
+        const std::vector<long long>& expected_point_ids_per_lgr = { 75, 64, 125};
+        for (long long lgr = 1; lgr < 4; ++lgr) {
+            std::vector<long long> local_point_ids;
             local_point_ids.reserve(expected_point_ids_per_lgr[lgr-1]);
             for (const auto& element : elements(grid.levelGridView(lgr))) {
-                for (int corner = 0; corner < 8; ++corner)
+                for (long long corner = 0; corner < 8; ++corner)
                 {
                     const auto& point = element.subEntity<3>(corner);
                     local_point_ids.push_back(grid.currentData()[lgr]->globalIdSet().id(point));
                 }
             }
             auto [all_point_ids, displPoint ] = Opm::allGatherv(local_point_ids, grid.comm());
-            const std::set<int> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
-            BOOST_CHECK( static_cast<int>(all_point_ids_set.size()) == expected_point_ids_per_lgr[lgr-1]);
+            const std::set<long long> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
+            BOOST_CHECK( static_cast<long long>(all_point_ids_set.size()) == expected_point_ids_per_lgr[lgr-1]);
         }
 
         // Check global id is not duplicated for points
-        std::vector<int> localPointIds_vec;
+        std::vector<long long> localPointIds_vec;
         localPointIds_vec.reserve(grid.currentData().back()->size(3));
         for (const auto& point : vertices(grid.leafGridView())) {
             // Notice that all partition type points are pushed back. Selecting only interior points does not bring us to the expected value.
             localPointIds_vec.push_back(grid.currentData().back()->globalIdSet().id(point));
         }
         auto [allGlobalIds_points, displPoint ] = Opm::allGatherv(localPointIds_vec, grid.comm());
-        const std::set<int> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
+        const std::set<long long> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
 
         // Leaf grid grid total ampunt of points: 11x9x9 + (75-18) + (64-8) + (125-8) = 1121
         BOOST_CHECK( allGlobalIds_points_set.size() == 1121 );
@@ -537,15 +537,15 @@ BOOST_AUTO_TEST_CASE(atLeastOneLgr_per_process_attempt)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -554,9 +554,9 @@ BOOST_AUTO_TEST_CASE(atLeastOneLgr_per_process_attempt)
     {
         grid.loadBalance(parts);
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}, {2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,1,0}, {0,0,2}, {3,2,0}, {3,0,2}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{1,3,1}, {1,1,3}, {4,3,1}, {4,2,3}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}, {2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,1,0}, {0,0,2}, {3,2,0}, {3,0,2}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{1,3,1}, {1,1,3}, {4,3,1}, {4,2,3}};
         const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3", "LGR4"};
         // LGR1 element indices = 4,8 in rank 0. Total 16 refined cells, 45 points (45-12 = 33 with new global id).
         // LGR2 element indices = 24 in rank 1. Total 27 refined cells, 64 points (64-8 = 56 with new global id).
@@ -577,31 +577,31 @@ BOOST_AUTO_TEST_CASE(atLeastOneLgr_per_process_attempt)
         // LGR2 dim 3x3x3 -> 4x4x4 = 64 points
         // LGR3 dim 4x4x4 -> 5x5x5 = 125 points
         // LGR4 dim 2x4x2 -> 3x5x3 = 45 points
-        const std::vector<int>& expected_point_ids_per_lgr = { 45, 64, 125, 45};
-        for (int lgr = 1; lgr < 5; ++lgr) {
-            std::vector<int> local_point_ids;
+        const std::vector<long long>& expected_point_ids_per_lgr = { 45, 64, 125, 45};
+        for (long long lgr = 1; lgr < 5; ++lgr) {
+            std::vector<long long> local_point_ids;
             local_point_ids.reserve(expected_point_ids_per_lgr[lgr-1]);
             for (const auto& element : elements(grid.levelGridView(lgr))) {
-                for (int corner = 0; corner < 8; ++corner)
+                for (long long corner = 0; corner < 8; ++corner)
                 {
                     const auto& point = element.subEntity<3>(corner);
                     local_point_ids.push_back(grid.currentData()[lgr]->globalIdSet().id(point));
                 }
             }
             auto [all_point_ids, displPoint ] = Opm::allGatherv(local_point_ids, grid.comm());
-            const std::set<int> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
-            BOOST_CHECK( static_cast<int>(all_point_ids_set.size()) == expected_point_ids_per_lgr[lgr-1]);
+            const std::set<long long> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
+            BOOST_CHECK( static_cast<long long>(all_point_ids_set.size()) == expected_point_ids_per_lgr[lgr-1]);
         }
 
         // Check global id is not duplicated for points
-        std::vector<int> localPointIds_vec;
+        std::vector<long long> localPointIds_vec;
         localPointIds_vec.reserve(grid.currentData().back()->size(3));
         for (const auto& point : vertices(grid.leafGridView())) {
             // Notice that all partition type points are pushed back. Selecting only interior points does not bring us to the expected value.
             localPointIds_vec.push_back(grid.currentData().back()->globalIdSet().id(point));
         }
         auto [allGlobalIds_points, displPoint ] = Opm::allGatherv(localPointIds_vec, grid.comm());
-        const std::set<int> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
+        const std::set<long long> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
         // Total global ids in leaf grid view for points: 80 + 33 + 56 + 117 + 33 = 319
         BOOST_CHECK( allGlobalIds_points_set.size() == 319 );
     }
@@ -612,15 +612,15 @@ BOOST_AUTO_TEST_CASE(throw_not_fully_interior_lgr)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -629,9 +629,9 @@ BOOST_AUTO_TEST_CASE(throw_not_fully_interior_lgr)
     {
         grid.loadBalance(parts);
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}, {2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,1,0}, {0,0,2}, {3,1,0}, {3,0,2}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{1,3,1}, {1,1,3}, {4,2,1}, {4,2,3}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}, {3,3,3}, {4,4,4}, {2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,1,0}, {0,0,2}, {3,1,0}, {3,0,2}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{1,3,1}, {1,1,3}, {4,2,1}, {4,2,3}};
         const std::vector<std::string> lgr_name_vec = {"LGR1", "LGR2", "LGR3", "LGR4"};
         // LGR1 element indices = 4,8 in rank 0. Total 16 refined cells, 45 points (45-12 = 33 with new global id).
         // LGR2 element indices = 24 in rank 1. Total 27 refined cells, 64 points (64-8 = 56 with new global id).
@@ -646,31 +646,31 @@ BOOST_AUTO_TEST_CASE(throw_not_fully_interior_lgr)
         // LGR2 dim 3x3x3 -> 4x4x4 = 64 points
         // LGR3 dim 4x4x4 -> 5x5x5 = 125 points
         // LGR4 dim 2x4x2 -> 3x5x3 = 45 points
-        const std::vector<int>& expected_point_ids_per_lgr = { 45, 64, 125, 45};
-        for (int lgr = 1; lgr < 5; ++lgr) {
-            std::vector<int> local_point_ids;
+        const std::vector<long long>& expected_point_ids_per_lgr = { 45, 64, 125, 45};
+        for (long long lgr = 1; lgr < 5; ++lgr) {
+            std::vector<long long> local_point_ids;
             local_point_ids.reserve(expected_point_ids_per_lgr[lgr-1]);
             for (const auto& element : elements(grid.levelGridView(lgr))) {
-                for (int corner = 0; corner < 8; ++corner)
+                for (long long corner = 0; corner < 8; ++corner)
                 {
                     const auto& point = element.subEntity<3>(corner);
                     local_point_ids.push_back(grid.currentData()[lgr]->globalIdSet().id(point));
                 }
             }
             auto [all_point_ids, displPoint ] = Opm::allGatherv(local_point_ids, grid.comm());
-            const std::set<int> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
-            BOOST_CHECK( static_cast<int>(all_point_ids_set.size()) == expected_point_ids_per_lgr[lgr-1]);
+            const std::set<long long> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
+            BOOST_CHECK( static_cast<long long>(all_point_ids_set.size()) == expected_point_ids_per_lgr[lgr-1]);
         }
 
         // Check global id is not duplicated for points
-        std::vector<int> localPointIds_vec;
+        std::vector<long long> localPointIds_vec;
         localPointIds_vec.reserve(grid.currentData().back()->size(3));
         for (const auto& point : vertices(grid.leafGridView())) {
             // Notice that all partition type points are pushed back. Selecting only interior points does not bring us to the expected value.
             localPointIds_vec.push_back(grid.currentData().back()->globalIdSet().id(point));
         }
         auto [allGlobalIds_points, displPoint ] = Opm::allGatherv(localPointIds_vec, grid.comm());
-        const std::set<int> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
+        const std::set<long long> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
         // Total global ids in leaf grid view for points: 80 + 33 + 56 + 117 + 33 = 319
         BOOST_CHECK( allGlobalIds_points_set.size() == 319 );
     }
@@ -682,12 +682,12 @@ BOOST_AUTO_TEST_CASE(globalRefine1)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,2,1};
+    const std::array<long long, 3> grid_dim = {4,2,1};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> parts(8);
-    std::vector<std::vector<int>> cells_per_rank = {{0,4},{1,5},{2,6}, {3,7}};
-    for (int rank = 0; rank < 4; ++rank) {
+    std::vector<long long> parts(8);
+    std::vector<std::vector<long long>> cells_per_rank = {{0,4},{1,5},{2,6}, {3,7}};
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -698,9 +698,9 @@ BOOST_AUTO_TEST_CASE(globalRefine1)
         grid.loadBalance();
 
         grid.globalRefine(1);
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{4,2,1}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{4,2,1}};
         const std::vector<std::string> lgr_name_vec = {"GR1"}; // GR stands for GLOBAL REFINEMENT
 
         refinePatch_and_check(grid, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
@@ -712,15 +712,15 @@ BOOST_AUTO_TEST_CASE(globalRefine2)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
 
-     std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+     std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -731,9 +731,9 @@ BOOST_AUTO_TEST_CASE(globalRefine2)
         grid.loadBalance();
 
         grid.globalRefine(1);
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,0,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{4,3,3}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,0,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{4,3,3}};
         const std::vector<std::string> lgr_name_vec = {"GR1"}; // GR stands for GLOBAL REFINEMENT
         refinePatch_and_check(grid, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);
     }
@@ -744,15 +744,15 @@ BOOST_AUTO_TEST_CASE(distributed_lgr)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -761,9 +761,9 @@ BOOST_AUTO_TEST_CASE(distributed_lgr)
     {
         grid.loadBalance(parts);
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{1,0,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{3,1,1}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{1,0,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{3,1,1}};
         const std::vector<std::string> lgr_name_vec = {"LGR1"};
         // LGR1 element indices = 1 (rank 0), 2 (rank 2). Total 16 refined cells, 45 points (45-12 = 33 with new global id).
         // LGR1 dim 4x2x2 (16 refined cells) (45 points - only 33 new points)
@@ -773,17 +773,17 @@ BOOST_AUTO_TEST_CASE(distributed_lgr)
 
         // Check global id is not duplicated for points for each LGR
         // LGR1 dim 4x2x2 -> 5x3x3 = 45 points
-        std::vector<int> local_point_ids;
+        std::vector<long long> local_point_ids;
         local_point_ids.reserve(45); // expected_point_ids in LGR1
         for (const auto& element : elements(grid.levelGridView(1))) {
-            for (int corner = 0; corner < 8; ++corner)
+            for (long long corner = 0; corner < 8; ++corner)
             {
                 const auto& point = element.subEntity<3>(corner);
                 local_point_ids.push_back(grid.currentData()[1]->globalIdSet().id(point));
             }
         }
         auto [all_point_ids, displPoint ] = Opm::allGatherv(local_point_ids, grid.comm());
-        const std::set<int> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
+        const std::set<long long> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
         // Coarse cells 1 in rank 0 and 2 in rank 2 share an I_FACE where (LGR1_dim[1]+1)*(LGR1_dim[2]+ 1),
         // here (2 +1)*(2 +1) = 9 points lying on, 4 of them being the 4 corners of the coarse I_FACE shared
         // by cell 1 and cell 2. Leaving us with 9 - 4 = 5 potential duplicated ids.
@@ -800,7 +800,7 @@ BOOST_AUTO_TEST_CASE(distributed_lgr)
         //  +5 duplicated ids on {I_FACE, false} cell 2 (seen in P3) [equivalent face: {I_FACE, true} of unseen-in-P3 cell 1]
         // That means that the "unfortunate" expected point ids count is 45 (desired value) + 5 (duplicated laying on
         // shared I_FACE) = 50.
-        BOOST_CHECK( static_cast<int>(all_point_ids_set.size()) == 50);
+        BOOST_CHECK( static_cast<long long>(all_point_ids_set.size()) == 50);
 
          // Current approach avoids duplicated point ids when
          // 1. the LGR is distributed in P_{i_0}, ..., P_{i_n}, with n+1 < grid.comm().size(),
@@ -809,14 +809,14 @@ BOOST_AUTO_TEST_CASE(distributed_lgr)
          // Otherwise, there will be points with multiple ids.*/ 
 
         // Check global id is not duplicated for points
-        std::vector<int> localPointIds_vec;
+        std::vector<long long> localPointIds_vec;
         localPointIds_vec.reserve(grid.currentData().back()->size(3));
         for (const auto& point : vertices(grid.leafGridView())) {
             // Notice that all partition type points are pushed back. Selecting only interior points does not bring us to the expected value.
             localPointIds_vec.push_back(grid.currentData().back()->globalIdSet().id(point));
         }
         auto [allGlobalIds_points, displPointLeaf ] = Opm::allGatherv(localPointIds_vec, grid.comm());
-        const std::set<int> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
+        const std::set<long long> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
         // Total global ids in leaf grid view for points: 80 + (45 - 12) + 5 (undesired duplicated ids on shared I_FACE) = 118
         BOOST_CHECK( allGlobalIds_points_set.size() == 118 );
     }
@@ -827,15 +827,15 @@ BOOST_AUTO_TEST_CASE(distributed_lgr_II)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
 
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -844,9 +844,9 @@ BOOST_AUTO_TEST_CASE(distributed_lgr_II)
     {
         grid.loadBalance(parts);
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{0,2,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{3,3,1}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{0,2,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{3,3,1}};
         const std::vector<std::string> lgr_name_vec = {"LGR1"};
         // LGR1 element indices = 8,9 (rank 0), 10 (rank 2). Total 24 refined cells, 63 points (63-16 = 47 with new global id).
 
@@ -855,14 +855,14 @@ BOOST_AUTO_TEST_CASE(distributed_lgr_II)
 
         // Check global id is not duplicated for points for each LGR
         // LGR1 dim 6x2x2 -> 7x3x3 = 63 points
-        std::vector<int> local_point_ids;
+        std::vector<long long> local_point_ids;
         local_point_ids.reserve(63); // expected_point_ids in LGR1
         for (const auto& point : vertices(grid.levelGridView(1))) {
             local_point_ids.push_back(grid.currentData()[1]->globalIdSet().id(point));
         }
         auto [all_point_ids, displPoint ] = Opm::allGatherv(local_point_ids, grid.comm());
-        const std::set<int> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
-        BOOST_CHECK( static_cast<int>(all_point_ids_set.size()) == 63);
+        const std::set<long long> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
+        BOOST_CHECK( static_cast<long long>(all_point_ids_set.size()) == 63);
         // Difference with previous test case:
         // Global cell ids of cells to be refined = {8, 9, 10}
         // cell 8 = { interior in P0, does not exist in P1, does not exist in P2, does not exist in P3}
@@ -875,14 +875,14 @@ BOOST_AUTO_TEST_CASE(distributed_lgr_II)
         // - P3 does NOT see the LGR at all.
 
         // Check global id is not duplicated for points
-        std::vector<int> localPointIds_vec;
+        std::vector<long long> localPointIds_vec;
         localPointIds_vec.reserve(grid.currentData().back()->size(3));
         for (const auto& point : vertices(grid.leafGridView())) {
             // Notice that all partition type points are pushed back. Selecting only interior points does not bring us to the expected value.
             localPointIds_vec.push_back(grid.currentData().back()->globalIdSet().id(point));
         }
         auto [allGlobalIds_points, displPointLeaf ] = Opm::allGatherv(localPointIds_vec, grid.comm());
-        const std::set<int> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
+        const std::set<long long> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
         // Total global ids in leaf grid view for points: 80 + (63 - 16) = 127
         BOOST_CHECK( allGlobalIds_points_set.size() == 127 );
     }
@@ -893,14 +893,14 @@ BOOST_AUTO_TEST_CASE(distributed_in_all_ranks_lgr)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -908,9 +908,9 @@ BOOST_AUTO_TEST_CASE(distributed_in_all_ranks_lgr)
     if(grid.comm().size()>1)
     {
         grid.loadBalance(parts);
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{1,0,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{3,2,2}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{1,0,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{3,2,2}};
         const std::vector<std::string> lgr_name_vec = {"LGR1"};
         // LGR1 element indices = {1,2,5,6,13,14,17,18} where
         // 1,5 in rank 0,
@@ -924,17 +924,17 @@ BOOST_AUTO_TEST_CASE(distributed_in_all_ranks_lgr)
 
         // Check global id is not duplicated for points for each LGR
         // LGR1 dim 4x4x4 -> 5x5x5 = 125 points
-        std::vector<int> local_point_ids;
+        std::vector<long long> local_point_ids;
         local_point_ids.reserve(125); // expected_point_ids in LGR1
         for (const auto& element : elements(grid.levelGridView(1))) {
-            for (int corner = 0; corner < 8; ++corner)
+            for (long long corner = 0; corner < 8; ++corner)
             {
                 const auto& point = element.subEntity<3>(corner);
                 local_point_ids.push_back(grid.currentData()[1]->globalIdSet().id(point));
             }
         }
         auto [all_point_ids, displPoint ] = Opm::allGatherv(local_point_ids, grid.comm());
-        const std::set<int> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
+        const std::set<long long> all_point_ids_set(all_point_ids.begin(), all_point_ids.end());
 
         /** [Bug] Uniqueness of point global ids cannot be checked in general since current code sets overlap layer size equal to 1,
             which in particular means that cells that share corners or edges (and not faces) with interior cells are not considered/
@@ -963,17 +963,17 @@ BOOST_AUTO_TEST_CASE(distributed_in_all_ranks_lgr)
         //  +1 duplicated id on edge unseen-in-P3 cell 5
         //  +5 duplicated ids on {J_FACE, true} cell 13 (seen in P3) [equivalent face: {J_FACE, false} of unseen-in-P3 cell 17]
         //  +5 duplicated ids on {I_FACE, false} cell 18 (seen in P3) [equivalent face: {I_FACE, true} of unseen-in-P3 cell 17]
-        BOOST_CHECK( static_cast<int>(all_point_ids_set.size()) == 145); // Desired value: 125; 20 (=1+2+1+5+1+5+5) duplicated ids.
+        BOOST_CHECK( static_cast<long long>(all_point_ids_set.size()) == 145); // Desired value: 125; 20 (=1+2+1+5+1+5+5) duplicated ids.
 
         // Check global id is not duplicated for points
-        std::vector<int> localPointIds_vec;
+        std::vector<long long> localPointIds_vec;
         localPointIds_vec.reserve(grid.currentData().back()->size(3));
         for (const auto& point : vertices(grid.leafGridView())) {
             // Notice that all partition type points are pushed back. Selecting only interior points does not bring us to the expected value.
             localPointIds_vec.push_back(grid.currentData().back()->globalIdSet().id(point));
         }
         auto [allGlobalIds_points, displPointLeaf ] = Opm::allGatherv(localPointIds_vec, grid.comm());
-        const std::set<int> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
+        const std::set<long long> allGlobalIds_points_set(allGlobalIds_points.begin(), allGlobalIds_points.end());
         // Total global ids in leaf grid view for points: 80 + (125 - 27) = 178 desired value; +20 duplicated ids.
         BOOST_CHECK( allGlobalIds_points_set.size() == 198 );
     }
@@ -987,14 +987,14 @@ BOOST_AUTO_TEST_CASE(call_adapt_with_args_on_distributed_grid)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
                                                      {12,13,17,24,25,28,29,32,33},
                                                      {2,3,6,7,10,11,18,22,23},
                                                      {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -1003,9 +1003,9 @@ BOOST_AUTO_TEST_CASE(call_adapt_with_args_on_distributed_grid)
     {
         grid.loadBalance(parts);
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{1,0,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{3,2,2}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{1,0,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{3,2,2}};
         const std::vector<std::string> lgr_name_vec = {"LGR1"};
         // LGR1 element indices = {1,2,5,6,13,14,17,18} where
         // 1,5 in rank 0,
@@ -1014,8 +1014,8 @@ BOOST_AUTO_TEST_CASE(call_adapt_with_args_on_distributed_grid)
         // 14 in rank 3.
         // Block of cells to refine dim 2x2x2. LGR1 dim 4x4x4.
         // 64 new refined cells. 5x5x5 = 125 points (only 98 = 125 - 3x3x3 parent corners new points - new global ids).
-        const std::vector<int>& marked_elemIdx = {1,2,5,6,13,14,17,18};
-        std::vector<int> assignRefinedLevel(grid.currentData().front()->size(0));
+        const std::vector<long long>& marked_elemIdx = {1,2,5,6,13,14,17,18};
+        std::vector<long long> assignRefinedLevel(grid.currentData().front()->size(0));
         for (const auto& idx : marked_elemIdx)
             assignRefinedLevel[idx] = 1;
 
@@ -1039,14 +1039,14 @@ BOOST_AUTO_TEST_CASE(call_adapt_on_distributed_grid)
     // Create a grid
     Dune::CpGrid grid;
     const std::array<double, 3> cell_sizes = {1.0, 1.0, 1.0};
-    const std::array<int, 3> grid_dim = {4,3,3};
+    const std::array<long long, 3> grid_dim = {4,3,3};
     grid.createCartesian(grid_dim, cell_sizes);
-    std::vector<int> parts(36);
-    std::vector<std::vector<int>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
+    std::vector<long long> parts(36);
+    std::vector<std::vector<long long>> cells_per_rank = { {0,1,4,5,8,9,16,20,21},
         {12,13,17,24,25,28,29,32,33},
         {2,3,6,7,10,11,18,22,23},
         {14,15,19,26,27,30,31,34,35} };
-    for (int rank = 0; rank < 4; ++rank) {
+    for (long long rank = 0; rank < 4; ++rank) {
         for (const auto& elemIdx : cells_per_rank[rank]) {
             parts[elemIdx] = rank;
         }
@@ -1062,9 +1062,9 @@ BOOST_AUTO_TEST_CASE(call_adapt_on_distributed_grid)
         grid.adapt();
         grid.postAdapt();
 
-        const std::vector<std::array<int,3>> cells_per_dim_vec = {{2,2,2}};
-        const std::vector<std::array<int,3>> startIJK_vec = {{1,0,0}};
-        const std::vector<std::array<int,3>> endIJK_vec = {{4,3,3}};
+        const std::vector<std::array<long long,3>> cells_per_dim_vec = {{2,2,2}};
+        const std::vector<std::array<long long,3>> startIJK_vec = {{1,0,0}};
+        const std::vector<std::array<long long,3>> endIJK_vec = {{4,3,3}};
         const std::vector<std::string> lgr_name_vec = {"GR1"};
 
         refinePatch_and_check(grid, cells_per_dim_vec, startIJK_vec, endIJK_vec, lgr_name_vec);

@@ -30,8 +30,8 @@ namespace Dune
     typedef typename Traits::ctype ctype;
     typedef typename Traits::GlobalCoordinate GlobalCoordinate;
 
-    static const int dimension = Traits::dimension;
-    static const int dimensionworld = Traits::dimensionworld;
+    static const long long dimension = Traits::dimension;
+    static const long long dimensionworld = Traits::dimensionworld;
 
     typedef typename Traits::template Codim< 0 >::Entity Entity;
     typedef typename Traits::template Codim< 0 >::EntityPointer EntityPointer;
@@ -58,7 +58,7 @@ namespace Dune
       intersectionIdx_( -1 )
     {}
 
-    PolyhedralGridIntersection ( ExtraData data, const EntitySeed& seed, const int intersectionIdx )
+    PolyhedralGridIntersection ( ExtraData data, const EntitySeed& seed, const long long intersectionIdx )
     : data_( data ),
       seed_( seed ),
       intersectionIdx_( intersectionIdx )
@@ -101,7 +101,7 @@ namespace Dune
 
     bool neighbor () const { return data()->neighbor(seed_, intersectionIdx_).isValid(); }
 
-    int boundaryId () const { return 1; }
+    long long boundaryId () const { return 1; }
 
     size_t boundarySegmentIndex () const
     {
@@ -128,12 +128,12 @@ namespace Dune
         return Dune::GeometryTypes::cube(dimension);
     }
 
-    int indexInInside () const
+    long long indexInInside () const
     {
         return data()->indexInInside(seed_, intersectionIdx_);
     }
 
-    int indexInOutside () const
+    long long indexInOutside () const
     {
         return data()->indexInOutside(seed_, intersectionIdx_);
     }
@@ -169,7 +169,7 @@ namespace Dune
     }
 
     // intersection id (here index of the face in the grid)
-    int id() const
+    long long id() const
     {
       // return face number of current intersection
       return data()->template subEntitySeed<1>( seed_, intersectionIdx_).index();
@@ -179,7 +179,7 @@ namespace Dune
     ExtraData  data_;
     EntitySeed seed_;
   public:
-    int intersectionIdx_; // the element-local index
+    long long intersectionIdx_; // the element-local index
   };
 
 } // namespace Dune

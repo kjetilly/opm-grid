@@ -29,13 +29,13 @@ namespace Opm
     /// For each cell, find indices of all cells sharing a vertex with it.
     /// \param[in] grid    A grid object.
     /// \return            A table of neighbour cell-indices by cell.
-    SparseTable<int> cellNeighboursAcrossVertices(const UnstructuredGrid& grid);
+    SparseTable<long long> cellNeighboursAcrossVertices(const UnstructuredGrid& grid);
 
     /// For each cell, order the (cell) neighbours counterclockwise.
     /// \param[in] grid    A 2d grid object.
     /// \param[in, out] nb A cell-cell neighbourhood table, such as from vertexNeighbours().
     void orderCounterClockwise(const UnstructuredGrid& grid,
-                               SparseTable<int>& nb);
+                               SparseTable<long long>& nb);
 
 } // namespace Opm
 

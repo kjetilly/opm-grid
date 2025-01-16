@@ -46,7 +46,7 @@ using namespace Opm;
 
 BOOST_AUTO_TEST_CASE(construction_and_queries)
 {
-    const SparseTable<int> st1;
+    const SparseTable<long long> st1;
     BOOST_CHECK(st1.empty());
     BOOST_CHECK_EQUAL(st1.size(), 0);
     BOOST_CHECK_EQUAL(st1.dataSize(), 0);
@@ -59,12 +59,12 @@ BOOST_AUTO_TEST_CASE(construction_and_queries)
     // 3 4 5 6
     // 7 8 9
     // ----------------
-    std::vector<std::vector<int>> expected = { {0}, {}, {1, 2}, {3, 4, 5, 6}, {7, 8, 9} };
-    const int num_elem = 10;
-    const int elem[num_elem] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    const int num_rows = 5;
-    const int rowsizes[num_rows] = { 1, 0, 2, 4, 3 };
-    const SparseTable<int> st2(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
+    std::vector<std::vector<long long>> expected = { {0}, {}, {1, 2}, {3, 4, 5, 6}, {7, 8, 9} };
+    const long long num_elem = 10;
+    const long long elem[num_elem] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    const long long num_rows = 5;
+    const long long rowsizes[num_rows] = { 1, 0, 2, 4, 3 };
+    const SparseTable<long long> st2(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
     BOOST_CHECK(!st2.empty());
     BOOST_CHECK_EQUAL(st2.size(), num_rows);
     BOOST_CHECK_EQUAL(st2.dataSize(), num_elem);
@@ -74,18 +74,18 @@ BOOST_AUTO_TEST_CASE(construction_and_queries)
     BOOST_CHECK_EQUAL(st2.rowSize(1), 0);
     BOOST_CHECK_EQUAL(st2[3][1], 4);
     BOOST_CHECK_EQUAL(st2[4][2], 9);
-    BOOST_CHECK(int(st2[4].size()) == rowsizes[4]);
-    const SparseTable<int> st2_again(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
+    BOOST_CHECK((long long)(st2[4].size()) == rowsizes[4]);
+    const SparseTable<long long> st2_again(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
     BOOST_CHECK(st2 == st2_again);
-    SparseTable<int> st2_byassign;
+    SparseTable<long long> st2_byassign;
     st2_byassign.assign(elem, elem + num_elem, rowsizes, rowsizes + num_rows);
     BOOST_CHECK(st2 == st2_byassign);
-    const int last_row_size = rowsizes[num_rows - 1];
-    SparseTable<int> st2_append(elem, elem + num_elem - last_row_size, rowsizes, rowsizes + num_rows - 1);
+    const long long last_row_size = rowsizes[num_rows - 1];
+    SparseTable<long long> st2_append(elem, elem + num_elem - last_row_size, rowsizes, rowsizes + num_rows - 1);
     BOOST_CHECK_EQUAL(st2_append.dataSize(), num_elem - last_row_size);
     st2_append.appendRow(elem + num_elem - last_row_size, elem + num_elem);
     BOOST_CHECK(st2 == st2_append);
-    SparseTable<int> st2_append2;
+    SparseTable<long long> st2_append2;
     st2_append2.appendRow(elem, elem + 1);
     st2_append2.appendRow(elem + 1, elem + 1);
     st2_append2.appendRow(elem + 1, elem + 3);
@@ -93,32 +93,32 @@ BOOST_AUTO_TEST_CASE(construction_and_queries)
     st2_append2.appendRow(elem + 7, elem + 10);
     BOOST_CHECK(st2 == st2_append2);
     st2_append2.clear();
-    SparseTable<int> st_empty;
+    SparseTable<long long> st_empty;
     BOOST_CHECK(st2_append2 == st_empty);
 
-    SparseTable<int> st2_allocate;
+    SparseTable<long long> st2_allocate;
     st2_allocate.allocate(rowsizes, rowsizes + num_rows);
     BOOST_CHECK_EQUAL(st2_allocate.size(), num_rows);
     BOOST_CHECK_EQUAL(st2_allocate.dataSize(), num_elem);
-    int s = 0;
-    for (int i = 0; i < num_rows; ++i) {
-        SparseTable<int>::mutable_row_type row = st2_allocate[i];
-        for (int j = 0; j < rowsizes[i]; ++j, ++s)
+    long long s = 0;
+    for (long long i = 0; i < num_rows; ++i) {
+        SparseTable<long long>::mutable_row_type row = st2_allocate[i];
+        for (long long j = 0; j < rowsizes[i]; ++j, ++s)
             row[j] = elem[s];
     }
     BOOST_CHECK(st2 == st2_allocate);
 
     // One element too few.
-    BOOST_CHECK_THROW(const SparseTable<int> st3(elem, elem + num_elem - 1, rowsizes, rowsizes + num_rows), std::exception);
+    BOOST_CHECK_THROW(const SparseTable<long long> st3(elem, elem + num_elem - 1, rowsizes, rowsizes + num_rows), std::exception);
 
     // A few elements too many.
-    BOOST_CHECK_THROW(const SparseTable<int> st4(elem, elem + num_elem, rowsizes, rowsizes + num_rows - 1), std::exception);
+    BOOST_CHECK_THROW(const SparseTable<long long> st4(elem, elem + num_elem, rowsizes, rowsizes + num_rows - 1), std::exception);
 
     // Need at least one row.
-    BOOST_CHECK_THROW(const SparseTable<int> st5(elem, elem + num_elem, rowsizes, rowsizes), std::exception);
+    BOOST_CHECK_THROW(const SparseTable<long long> st5(elem, elem + num_elem, rowsizes, rowsizes), std::exception);
 
     // Test iteration over rows with a range-for loop.
-    int row_index = 0;
+    long long row_index = 0;
     for (const auto row : st2) { // Not a reference, since row type is a created view
         BOOST_CHECK_EQUAL(row.size(), expected[row_index].size());
         ++row_index;
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(construction_and_queries)
     BOOST_CHECK_THROW(st2.rowSize(-1), std::exception);
     BOOST_CHECK_THROW(st2.rowSize(st2.size()), std::exception);
     // No negative row sizes.
-    const int err_rs[num_rows] = { 1, 0, -1, 7, 3 };
-    BOOST_CHECK_THROW(const SparseTable<int> st6(elem, elem + num_elem, err_rs, err_rs + num_rows), std::exception);
+    const long long err_rs[num_rows] = { 1, 0, -1, 7, 3 };
+    BOOST_CHECK_THROW(const SparseTable<long long> st6(elem, elem + num_elem, err_rs, err_rs + num_rows), std::exception);
 #endif
 }
