@@ -63,6 +63,11 @@ class HierarchicIterator;
 class CpGridData;
 class LevelGlobalIdSet;
 
+template<int codim> 
+class Entity;
+
+
+
 /// @brief
 /// @todo Doc me!
 /// @tparam
@@ -90,16 +95,7 @@ public:
     // the official DUNE names
     typedef Entity    EntitySeed;
 
-    /// @brief
-    /// @todo Doc me!
-    /// @tparam
-    template <int cd>
-    struct Codim
-    {
-        typedef cpgrid::Entity<cd> Entity;
-    };
-
-
+    
     typedef cpgrid::Geometry<3-codim,3> Geometry;
     typedef Geometry LocalGeometry;
 
@@ -108,6 +104,18 @@ public:
     typedef cpgrid::HierarchicIterator HierarchicIterator;
 
     typedef double ctype;
+
+
+/// @brief
+    /// @todo Doc me!
+    /// @tparam
+    template <int cd>
+    struct Codim
+    {
+        using Entity = ::Dune::cpgrid::Entity<cd>;
+    };
+
+  
 
     /// Constructor taking a grid and an integer entity representation.
     /// This constructor should probably be removed, since it exposes
