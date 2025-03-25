@@ -62,6 +62,14 @@ class IntersectionIterator;
 class HierarchicIterator;
 class CpGridData;
 class LevelGlobalIdSet;
+/// @brief
+/// @todo Doc me!
+/// @tparam
+template <int cd>
+struct Codim
+{
+    using Entity = ::Dune::cpgrid::Entity<cd>;
+};
 
 /// @brief
 /// @todo Doc me!
@@ -90,15 +98,8 @@ public:
     // the official DUNE names
     typedef Entity    EntitySeed;
 
-    /// @brief
-    /// @todo Doc me!
-    /// @tparam
-    template <int cd>
-    struct Codim
-    {
-        using Entity = ::Dune::cpgrid::Entity<cd>;
-    };
-
+    template<int cd>
+    using Codim = Codim<cd>;
 
     typedef cpgrid::Geometry<3-codim,3> Geometry;
     typedef Geometry LocalGeometry;
